@@ -138,6 +138,8 @@ All possible frontend URL paths are following:
 - We will have a limited set of paths for a clean design.
 - But there will be multiple components,and some will have distinct viewer/editor/custom modes.
 - The mode in which a component is rendered is determined by the role/access level of current user
+- For all of the above entities, at creation time,
+  `/new` endpoint will be used, and `/<entityId>` while editing
 
 > [!WARNING]
 >
