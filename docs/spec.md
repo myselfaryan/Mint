@@ -29,7 +29,6 @@ The new schemas and entity design are compatible with the
 [previous schemas](https://github.com/codegasms/pariksa/blob/main/db/schema.ts)
 by @virinci, with minor changes sprinkled here and there, aimed at simplification!
 
-
 ### User
 
 - A user can belong to multiple organizations
@@ -106,6 +105,47 @@ by @virinci, with minor changes sprinkled here and there, aimed at simplificatio
 - The object will be asynchronously updated later with execution results
 
 ## UI Pages
+
+> [!NOTE]
+>
+> - Here (in the UI Pages section) Id
+> does not mean db ids, but usernames or slugs.
+> These are unique, and kept indexed on db.
+>
+> - Variables are denoted within angular brackets
+>
+> - A page won't render if current user does not have access.
+> Throw unauthorized error and error.tsx in that directory should handle it.
+> Such pages would also be removed from the sidebar for a user.
+
+All possible frontend URL paths are following:
+
+- `/<orgId>`
+  - `/` Dashboard (based on current user's role in org)
+  - Users `/users`
+    - Specific User `/<userId>`
+    - Groups `/groups`
+      - Specific Group `/<groupId>`
+  - Contests `/contests`
+    - Specific Contest `/<contestId>`
+      - `/` Overview: rules and other details of the contest
+      - `/problems` (problems of the contest)
+      - `/submissions` (A participant can view only their submission,while admins can view all)
+  - Problems `/problems`
+    - Specific Problem `/<problemId>`
+      - An admin can have edit access, while a participant have coding access
+
+- We will have a limited set of paths for a clean design.
+- But there will be multiple components,and some will have distinct viewer/editor/custom modes.
+- The mode in which a component is rendered is determined by the role/access level of current user
+
+> [!WARNING]
+>
+> - Don't write any UI inside `app` directory.
+> - It's exclusively for definining the routes-component mapping
+> - All UI should be exclusively under `components` directory.
+> - Some components will be re-used with different filter props on different routes
+> - Like `<Problems/>` will be rendered on `/problems`, while `<Problems contest={contestId}/>` will be rendered on `/contests/<contestId>/problems` page
 
 
 ## Schema Design
