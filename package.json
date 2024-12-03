@@ -48,7 +48,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@radix-ui/react-label": "2.1.0",
+    "@radix-ui/react-label": "^2.1.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/codemirror": "^5.60.15",
     "@types/node": "^20",
