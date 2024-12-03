@@ -244,10 +244,22 @@ export const problemSubmissions = pgTable(
   }
 );
 
+export const sessionTable = pgTable("session", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  expiresAt: timestamp("expires_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(),
+});
+
 export type SelectUserEmail = typeof userEmails.$inferSelect;
 export type InsertUserEmail = typeof userEmails.$inferInsert;
 
 export type SelectUser = typeof users.$inferSelect;
+export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 export type SelectOrg = typeof orgs.$inferSelect;
@@ -277,3 +289,5 @@ export type SelectProblemSubmission =
   typeof problemSubmissions.$inferSelect;
 export type InsertProblemSubmission =
   typeof problemSubmissions.$inferInsert;
+
+export type Session = typeof sessionTable.$inferSelect;
