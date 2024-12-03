@@ -52,7 +52,7 @@ export default function LibraryBookListing() {
       .filter(
         (book) =>
           book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchTerm.toLowerCase())
+          book.author.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       .sort((a, b) => {
         if (a[sortField] < b[sortField]) return sortOrder === "asc" ? -1 : 1;
@@ -87,7 +87,7 @@ export default function LibraryBookListing() {
           book.pages,
           book.publicationDate,
           book.copiesAvailable,
-        ].join(",")
+        ].join(","),
       ),
     ].join("\n");
 
@@ -134,7 +134,7 @@ export default function LibraryBookListing() {
   const handleSaveBook = (savedBook: BookSchema) => {
     if (selectedBook) {
       setBooks(
-        books.map((book) => (book.id === savedBook.id ? savedBook : book))
+        books.map((book) => (book.id === savedBook.id ? savedBook : book)),
       );
       setToast({
         type: ToastType.SUCCESS,
