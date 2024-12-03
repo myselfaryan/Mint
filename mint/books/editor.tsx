@@ -69,97 +69,87 @@ export function BookEditor({ book, isOpen, onClose, onSave }: BookEditorProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="name"
-                  {...register("name")}
-                  className={errors.name ? "border-red-500" : ""}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                {...register("name")}
+                className={errors.name ? "border-red-500" : ""}
+                placeholder="Book Name"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="author" className="text-right">
-                Author
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="author"
-                  {...register("author")}
-                  className={errors.author ? "border-red-500" : ""}
-                />
-                {errors.author && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.author.message}
-                  </p>
-                )}
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="author">Author</Label>
+              <Input
+                id="author"
+                {...register("author")}
+                className={errors.author ? "border-red-500" : ""}
+                placeholder="Author Name"
+              />
+              {errors.author && (
+                <p className="text-red-500 text-sm">
+                  {errors.author.message}
+                </p>
+              )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="pages" className="text-right">
-                Pages
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="pages"
-                  type="number"
-                  {...register("pages", { valueAsNumber: true })}
-                  className={errors.pages ? "border-red-500" : ""}
-                />
-                {errors.pages && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.pages.message}
-                  </p>
-                )}
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="pages">Pages</Label>
+              <Input
+                id="pages"
+                type="number"
+                {...register("pages", { valueAsNumber: true })}
+                className={errors.pages ? "border-red-500" : ""}
+                placeholder="0"
+              />
+              {errors.pages && (
+                <p className="text-red-500 text-sm">
+                  {errors.pages.message}
+                </p>
+              )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="publicationDate" className="text-right">
-                Publication Date
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="publicationDate"
-                  type="date"
-                  {...register("publicationDate")}
-                  className={errors.publicationDate ? "border-red-500" : ""}
-                />
-                {errors.publicationDate && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.publicationDate.message}
-                  </p>
-                )}
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="publicationDate">Publication Date</Label>
+              <Input
+                id="publicationDate"
+                type="date"
+                {...register("publicationDate")}
+                className={errors.publicationDate ? "border-red-500" : ""}
+                placeholder="mm/dd/yyyy"
+              />
+              {errors.publicationDate && (
+                <p className="text-red-500 text-sm">
+                  {errors.publicationDate.message}
+                </p>
+              )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="copiesAvailable" className="text-right">
-                Copies Available
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="copiesAvailable"
-                  type="number"
-                  {...register("copiesAvailable", { valueAsNumber: true })}
-                  className={errors.copiesAvailable ? "border-red-500" : ""}
-                />
-                {errors.copiesAvailable && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.copiesAvailable.message}
-                  </p>
-                )}
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="copiesAvailable">Copies Available</Label>
+              <Input
+                id="copiesAvailable"
+                type="number"
+                {...register("copiesAvailable", { valueAsNumber: true })}
+                className={errors.copiesAvailable ? "border-red-500" : ""}
+                placeholder="0"
+              />
+              {errors.copiesAvailable && (
+                <p className="text-red-500 text-sm">
+                  {errors.copiesAvailable.message}
+                </p>
+              )}
             </div>
           </div>
+
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" className="w-full">Save changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>
