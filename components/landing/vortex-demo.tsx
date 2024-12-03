@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Vortex } from "./ui/vortex";
+import { Vortex } from "../ui/vortex";
 import { motion } from "framer-motion";
 
 export function VortexDemo() {
