@@ -78,9 +78,7 @@ export function BookEditor({ book, isOpen, onClose, onSave }: BookEditorProps) {
                 placeholder="Book Name"
               />
               {errors.name && (
-                <p className="text-red-500 text-sm">
-                  {errors.name.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
               )}
             </div>
 
@@ -93,9 +91,7 @@ export function BookEditor({ book, isOpen, onClose, onSave }: BookEditorProps) {
                 placeholder="Author Name"
               />
               {errors.author && (
-                <p className="text-red-500 text-sm">
-                  {errors.author.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.author.message}</p>
               )}
             </div>
 
@@ -109,9 +105,7 @@ export function BookEditor({ book, isOpen, onClose, onSave }: BookEditorProps) {
                 placeholder="0"
               />
               {errors.pages && (
-                <p className="text-red-500 text-sm">
-                  {errors.pages.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.pages.message}</p>
               )}
             </div>
 
@@ -149,7 +143,9 @@ export function BookEditor({ book, isOpen, onClose, onSave }: BookEditorProps) {
           </div>
 
           <DialogFooter>
-            <Button type="submit" className="w-full">Save changes</Button>
+            <Button type="submit" className="w-full">
+              Save changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
