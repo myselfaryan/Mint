@@ -3,7 +3,13 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { IconBrandYoutubeFilled, IconCode, IconMessageCircle, IconRocket, IconBrain } from "@tabler/icons-react";
+import {
+  IconBrandYoutubeFilled,
+  IconCode,
+  IconMessageCircle,
+  IconRocket,
+  IconBrain,
+} from "@tabler/icons-react";
 import Link from "next/link";
 
 export function AboutUs() {
@@ -28,8 +34,7 @@ export function AboutUs() {
       description:
         "Engage students with our interactive coding environment and real-time collaboration features.",
       skeleton: <SkeletonThree />,
-      className:
-        "col-span-1 lg:col-span-3 lg:border-r dark:border-neutral-800",
+      className: "col-span-1 lg:col-span-3 lg:border-r dark:border-neutral-800",
     },
     {
       title: "Seamless Integration",
@@ -48,7 +53,9 @@ export function AboutUs() {
         </h4>
 
         <p className="text-sm lg:text-base max-w-2xl my-4 mx-auto text-neutral-400 text-center font-normal">
-          Pariksa provides cutting-edge tools and features to make coding education more effective, engaging, and efficient for both educators and students.
+          Pariksa provides cutting-edge tools and features to make coding
+          education more effective, engaging, and efficient for both educators
+          and students.
         </p>
       </div>
 
@@ -91,11 +98,13 @@ const FeatureTitle = ({ children }: { children?: React.ReactNode }) => {
 
 const FeatureDescription = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <p className={cn(
-      "text-sm md:text-base max-w-4xl text-left mx-auto",
-      "text-neutral-400 text-center font-normal",
-      "text-left max-w-sm mx-0 md:text-sm my-2"
-    )}>
+    <p
+      className={cn(
+        "text-sm md:text-base max-w-4xl text-left mx-auto",
+        "text-neutral-400 text-center font-normal",
+        "text-left max-w-sm mx-0 md:text-sm my-2",
+      )}
+    >
       {children}
     </p>
   );
@@ -105,7 +114,7 @@ const SkeletonOne = () => {
   return (
     <div className="relative flex py-8 px-2 gap-10 h-full">
       <div className="w-full p-8 mx-auto bg-neutral-900 shadow-2xl group h-full rounded-xl border border-neutral-800">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center justify-center h-full space-y-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,7 +135,7 @@ const SkeletonTwo = () => {
   return (
     <div className="relative flex py-8 px-2 gap-10 h-full">
       <div className="w-full p-8 mx-auto bg-neutral-900 shadow-2xl group h-full rounded-xl border border-neutral-800">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center justify-center h-full space-y-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -147,7 +156,7 @@ const SkeletonThree = () => {
   return (
     <div className="relative flex py-8 px-2 gap-10 h-full">
       <div className="w-full p-8 mx-auto bg-neutral-900 shadow-2xl group h-full rounded-xl border border-neutral-800">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center justify-center h-full space-y-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,7 +177,7 @@ const SkeletonFour = () => {
   return (
     <div className="relative flex py-8 px-2 gap-10 h-full">
       <div className="w-full p-8 mx-auto bg-neutral-900 shadow-2xl group h-full rounded-xl border border-neutral-800">
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center justify-center h-full space-y-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
