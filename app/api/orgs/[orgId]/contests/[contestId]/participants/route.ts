@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
-import { registerParticipantSchema } from "./validation";
+import { createParticipantSchema } from "@/lib/validations";
 import * as participantService from "./service";
 import { IdSchema } from "@/app/api/types";
 
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   try {
     const contestId = IdSchema.parse(params.contestId);
-    const data = registerParticipantSchema.parse(await request.json());
+    const data = createParticipantSchema.parse(await request.json());
 
     const participant = await participantService.registerParticipant(
       contestId,

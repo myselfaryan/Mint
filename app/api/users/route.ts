@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createUserSchema } from "./validation";
+import { createUserSchema } from "@/lib/validations";
 import * as userService from "./service";
 import { NextRequest } from "next/server";
 

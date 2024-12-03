@@ -4,7 +4,7 @@ import { createContest } from "./service";
 import { db } from "@/db/drizzle";
 import { contests } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
-import { createContestSchema } from "./validation";
+import { createContestSchema } from "@/lib/validations";
 import { IdSchema } from "@/app/api/types";
 
 export async function POST(

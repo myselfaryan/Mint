@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
-import { createGroupSchema } from "./validation";
+import { createGroupSchema } from "@/lib/validations";
 import * as groupService from "./service";
 import { IdSchema } from "@/app/api/types";
 

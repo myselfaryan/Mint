@@ -1,4 +1,4 @@
-import { updateUserSchema } from "../validation";
+import { updateUserSchema } from "@/lib/validations";
 import { IdSchema } from "../../types";
 import * as userService from "../service";
 import { NextRequest } from "next/server";

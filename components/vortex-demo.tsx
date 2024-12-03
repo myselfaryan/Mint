@@ -29,8 +29,9 @@ export function VortexDemo() {
             Transform Your Coding Education
           </h1>
           <p className="text-gray-300 text-lg md:text-2xl max-w-3xl mx-auto mb-8">
-            Empower your students with intelligent evaluation and collaborative learning tools. 
-            Create, manage, and grade coding assignments with ease.
+            Empower your students with intelligent evaluation and collaborative
+            learning tools. Create, manage, and grade coding assignments with
+            ease.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 rounded-full text-white font-medium text-lg shadow-lg hover:shadow-blue-500/25">

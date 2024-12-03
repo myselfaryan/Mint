@@ -6,18 +6,18 @@ import {
   SelectOrg,
   SelectMembership,
   memberships,
-  orgs
-} from '@/db/schema';
-import { db } from '@/db/drizzle';
-import { and, eq } from 'drizzle-orm';
-import { verifyPassword } from './password';
+  orgs,
+} from "@/db/schema";
+import { db } from "@/db/drizzle";
+import { and, eq } from "drizzle-orm";
+import { verifyPassword } from "./password";
 
-export type Membership = Pick<SelectMembership, 'role' | 'joinedAt'> &
+export type Membership = Pick<SelectMembership, "role" | "joinedAt"> &
   SelectUser & { orgNameId: string };
 
 export async function getUserByEmailAndPassword(
   email: string,
-  password: string
+  password: string,
 ): Promise<SelectUser | null> {
   const user = await db
     .select()
@@ -61,16 +61,16 @@ export async function getOrgMembers(): Promise<Membership[]> {
           orgNameId,
           orgName,
           role,
-          joinedAt
+          joinedAt,
         };
-      })
+      }),
     );
 
   return members;
 }
 
 export async function getUserContests(
-  username: string
+  username: string,
 ): Promise<SelectContest[]> {}
 
 /*

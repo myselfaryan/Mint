@@ -1,4 +1,4 @@
-import { createProblemSchema, createTestCaseSchema } from "./validation";
+import { createProblemSchema, createTestCaseSchema } from "@/lib/validations";
 import * as problemService from "./service";
 import { NextRequest } from "next/server";
 import { IdSchema } from "../../../types";

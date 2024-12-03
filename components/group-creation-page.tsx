@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ChevronLeft, Trash2, Users } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -57,12 +64,12 @@ export function GroupCreationPage() {
       .split(",")
       .map((email) => email.trim())
       .filter((email) => email.includes("@") && email !== ""); // Ensure email contains '@' and is not empty
-  
+
     if (newEmails.length === 0) {
       alert("Please enter valid email addresses."); // Optional: Provide feedback to the user
       return;
     }
-  
+
     const updatedMembers = [...new Set([...members, ...newEmails])];
     setMembers(updatedMembers);
     setValue("members", updatedMembers); // Update members in the form
@@ -79,16 +86,19 @@ export function GroupCreationPage() {
       {/* Top Navigation */}
       <nav className="bg-gray-800 p-4 flex items-center">
         <Link href="/groups">
-        <Button variant="ghost" size="icon" className="mr-4">
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+          <Button variant="ghost" size="icon" className="mr-4">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
         </Link>
         <h1 className="text-xl font-semibold">Create New Group</h1>
       </nav>
 
       {/* Main Content */}
       <div className="flex-1 p-6 max-w-4xl mx-auto w-full">
-        <form onSubmit={handleSubmit(handleCreateGroup)} className="bg-gray-800 rounded-lg p-6 shadow-lg">
+        <form
+          onSubmit={handleSubmit(handleCreateGroup)}
+          className="bg-gray-800 rounded-lg p-6 shadow-lg"
+        >
           <div className="mb-6">
             <Label htmlFor="groupName">Group Name</Label>
             <Input
@@ -97,7 +107,9 @@ export function GroupCreationPage() {
               className="mt-1 bg-gray-700 border-gray-600 text-gray-300"
               placeholder="Enter group name"
             />
-            {errors.groupName && <p className="text-red-500 text-sm">{errors.groupName.message}</p>}
+            {errors.groupName && (
+              <p className="text-red-500 text-sm">{errors.groupName.message}</p>
+            )}
           </div>
 
           <div className="mb-6">

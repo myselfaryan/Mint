@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { GalleryVerticalEnd } from "lucide-react"
+import * as React from "react";
+import { GalleryVerticalEnd } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { CheckIcon, CaretSortIcon } from "@radix-ui/react-icons"
+} from "@/components/ui/sidebar";
+import { CheckIcon, CaretSortIcon } from "@radix-ui/react-icons";
 
 export function VersionSwitcher({
   versions,
   defaultVersion,
 }: {
-  versions: string[]
-  defaultVersion: string
+  versions: string[];
+  defaultVersion: string;
 }) {
-  const [selectedVersion, setSelectedVersion] = React.useState(defaultVersion)
+  const [selectedVersion, setSelectedVersion] = React.useState(defaultVersion);
 
   return (
     <SidebarMenu>
@@ -54,12 +54,14 @@ export function VersionSwitcher({
                 onSelect={() => setSelectedVersion(version)}
               >
                 v{version}{" "}
-                {version === selectedVersion && <CheckIcon className="ml-auto" />}
+                {version === selectedVersion && (
+                  <CheckIcon className="ml-auto" />
+                )}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
