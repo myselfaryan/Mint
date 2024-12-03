@@ -129,6 +129,7 @@ export function ContestListPage() {
             />
           </div>
           <Button onClick={() => router.push("/contests/create")}>
+          <Button onClick={() => router.push('/contest/create')}>
             Add New Contest
           </Button>
         </div>
