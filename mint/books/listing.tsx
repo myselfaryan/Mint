@@ -155,116 +155,114 @@ export default function LibraryBookListing() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      {/* <h1 className="text-2xl font-bold mb-4">Library Book Listing</h1> */}
-      <div className="flex gap-4 mb-4">
-        <div className="relative flex-grow">
-          <Input
-            type="text"
-            placeholder="Search by book name or author"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-4 pr-10"
-          />
-          <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+    <>
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">Library Book Listing</h1>
+        <div className="flex gap-4 mb-4">
+          <div className="relative flex-grow">
+            <Input
+              type="text"
+              placeholder="Search by book name or author"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-4 pr-10"
+            />
+            <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          </div>
+          <Button onClick={addNewBook}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add New Book
+          </Button>
+          <Button onClick={downloadCSV}>
+            <Download className="mr-2 h-4 w-4" />
+            Download CSV
+          </Button>
         </div>
-        <Button onClick={addNewBook}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add New Book
-        </Button>
-        <Button onClick={downloadCSV}>
-          <Download className="mr-2 h-4 w-4" />
-          Download CSV
-        </Button>
-      </div>
-      <Table className="border border-gray-200 rounded-lg overflow-hidden">
-        <TableHeader className="bg-gray-50">
-          <TableRow>
-            <TableHead>
-              <Button variant="ghost" onClick={() => handleSort("name")}>
-                Book Name <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button variant="ghost" onClick={() => handleSort("author")}>
-                Author <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button variant="ghost" onClick={() => handleSort("pages")}>
-                Pages <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("publicationDate")}
-              >
-                Publication Date <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("copiesAvailable")}
-              >
-                Copies Available <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAndSortedBooks.map((book) => (
-            <TableRow key={book.id}>
-              <TableCell>{book.name}</TableCell>
-              <TableCell>{book.author}</TableCell>
-              <TableCell>{book.pages}</TableCell>
-              <TableCell>
-                {new Date(book.publicationDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                })}
-              </TableCell>
-              <TableCell>{book.copiesAvailable}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => editBook(book)}>
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => confirmDelete(book)}>
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+        <Table className="border border-gray-200 rounded-lg overflow-hidden">
+          <TableHeader className="bg-gray-50">
+            <TableRow>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort("name")}>
+                  Book Name <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort("author")}>
+                  Author <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort("pages")}>
+                  Pages <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("publicationDate")}
+                >
+                  Publication Date <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("copiesAvailable")}
+                >
+                  Copies Available <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <BookEditor
-        book={isEditorOpen && !selectedBook ? null : selectedBook}
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        onSave={handleSaveBook}
-      />
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={deleteBook}
-        itemName={bookToDelete?.name || ""}
-      />
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedBooks.map((book) => (
+              <TableRow key={book.id}>
+                <TableCell>{book.name}</TableCell>
+                <TableCell>{book.author}</TableCell>
+                <TableCell>{book.pages}</TableCell>
+                <TableCell>
+                  {new Date(book.publicationDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{book.copiesAvailable}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => editBook(book)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => confirmDelete(book)}>
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <BookEditor
+          book={isEditorOpen && !selectedBook ? null : selectedBook}
+          isOpen={isEditorOpen}
+          onClose={() => setIsEditorOpen(false)}
+          onSave={handleSaveBook}
+        />
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={deleteBook}
+          itemName={bookToDelete?.name || ""}
+        />
+      </div>
       {toast && (
         <Toast type={toast.type} message={toast.message} onClose={closeToast} />
       )}
-    </div>
+    </>
   );
 }

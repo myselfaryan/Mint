@@ -28,7 +28,7 @@ export function Toast({ type, message, onClose }: ToastProps) {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 p-4 rounded-md shadow-md flex items-center space-x-2 ${
+      className={`fixed bottom-0 right-0 m-4 p-4 rounded-md shadow-md flex items-center space-x-2 z-[9999] ${
         type === ToastType.SUCCESS ? "bg-green-500" : "bg-red-500"
       }`}
     >
