@@ -159,14 +159,14 @@ export default function LibraryBookListing() {
       <h1 className="text-2xl font-bold mb-4">Library Book Listing</h1>
       <div className="flex gap-4 mb-4">
         <div className="relative flex-grow">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
             type="text"
             placeholder="Search by book name or author"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4"
+            className="pl-4 pr-10"
           />
+          <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
         </div>
         <Button onClick={addNewBook}>
           <PlusCircle className="mr-2 h-4 w-4" />
