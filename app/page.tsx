@@ -5,6 +5,7 @@ import { VortexDemo } from "../components/landing/vortex-demo";
 import { Features } from "../components/landing/features";
 import { GeminiSection } from "../components/landing/gemini-section";
 import { AboutUs } from "../components/landing/about-us";
+import { Pricing } from "../components/landing/pricing";
 
 export default function Home() {
   return (
@@ -30,6 +31,12 @@ export default function Home() {
                 className="text-gray-300 hover:text-white transition-colors"
               >
                 How It Works
+              </a>
+              <a
+                href="#pricing"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Pricing
               </a>
               <a
                 href="#faq"
@@ -112,6 +119,11 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="relative bg-black py-20">
+          <Pricing />
         </section>
 
         {/* FAQ Section */}
