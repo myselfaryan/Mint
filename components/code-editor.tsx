@@ -87,7 +87,9 @@ export function CodeEditor() {
         <ResizablePanel defaultSize={40} minSize={30}>
           <div className="h-full flex flex-col border-r border-border">
             <div className="border-b border-border px-4 py-3 bg-muted">
-              <h2 className="text-lg font-medium text-foreground">Description</h2>
+              <h2 className="text-lg font-medium text-foreground">
+                Description
+              </h2>
             </div>
             <div className="p-4 overflow-auto">
               <div className="space-y-4">
