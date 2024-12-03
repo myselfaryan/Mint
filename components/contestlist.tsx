@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -18,6 +19,7 @@ const mockContests = [
 
 export function ContestListPage() {
   const [searchTerm, setSearchTerm] = useState('')
+  const router = useRouter()
 
   const filteredContests = mockContests.filter(contest =>
     contest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -26,6 +28,7 @@ export function ContestListPage() {
   )
 
   const handleViewContest = (contestId: string) => {
+    router.push(`/contest/&{id}`);
     console.log(`Viewing contest: ${contestId}`)
     // Implement view contest functionality here
   }
@@ -55,15 +58,17 @@ export function ContestListPage() {
       <div className="flex-1 p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">All Contests</h1>
-          <div className="flex items-center space-x-2">
+          <div className="flex gap-2 items-center">
             <Input
               placeholder="Search contests..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-64"
             />
-            <Button>Add New Contest</Button>
           </div>
+          <Button onClick={() => router.push('/contests/create')}>
+            Add New Contest
+          </Button>
         </div>
 
         <div className="bg-gray-800 rounded-lg overflow-hidden">
@@ -114,4 +119,3 @@ export function ContestListPage() {
     </div>
   )
 }
-

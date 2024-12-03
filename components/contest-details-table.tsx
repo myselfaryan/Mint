@@ -15,6 +15,13 @@ const mockParticipants = [
   { id: 5, name: 'Ethan Hunt', team: 'Code Wizards', status: 'In Progress', score: 85, lastSubmission: '2024-09-06 18:05' },
 ]
 
+const mockProblems = [
+  { seqNo: 1, name: 'Problem 1', marks: 100 },
+  { seqNo: 2, name: 'Problem 2', marks: 200 },
+  { seqNo: 3, name: 'Problem 3', marks: 150 },
+  { seqNo: 4, name: 'Problem 4', marks: 250 },
+]
+
 export function ContestDetailPage() {
   const [selectedTeam, setSelectedTeam] = useState('All')
 
@@ -65,8 +72,10 @@ export function ContestDetailPage() {
             <TabsTrigger value="participants" className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700">Participants</TabsTrigger>
             <TabsTrigger value="challenges" className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700">Challenges</TabsTrigger>
             <TabsTrigger value="leaderboard" className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700">Leaderboard</TabsTrigger>
-            <TabsTrigger value="analytics" className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700">Analytics</TabsTrigger>
+            {/* <TabsTrigger value="analytics" className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700">Analytics</TabsTrigger> */}
           </TabsList>
+
+          {/* Participants Tab */}
           <TabsContent value="participants">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Participants</h2>
@@ -112,7 +121,7 @@ export function ContestDetailPage() {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium
                           ${participant.status === 'Completed' ? 'bg-green-800 text-green-200' :
                             participant.status === 'In Progress' ? 'bg-yellow-800 text-yellow-200' :
-                            'bg-blue-800 text-blue-200'}`}>
+                            'bg-blue-800 text-blue-200'}`} >
                           {participant.status}
                         </span>
                       </TableCell>
@@ -123,22 +132,69 @@ export function ContestDetailPage() {
               </TableBody>
             </Table>
           </TabsContent>
-          {/* Add content for other tabs */}
+
+          {/* Challenges Tab */}
           <TabsContent value="challenges">
             <h2 className="text-2xl font-bold mb-4">Contest Challenges</h2>
-            <p>Challenge details will be displayed here.</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Seq No.</TableHead>
+                  <TableHead>Problem Name</TableHead>
+                  <TableHead>Marks</TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockProblems.map((problem) => (
+                  <TableRow key={problem.seqNo}>
+                    <TableCell>{problem.seqNo}</TableCell>
+                    <TableCell>{problem.name}</TableCell>
+                    <TableCell>{problem.marks}</TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm">
+                        Attempt
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </TabsContent>
+
+          {/* Leaderboard Tab */}
           <TabsContent value="leaderboard">
-            <h2 className="text-2xl font-bold mb-4">Contest Leaderboard</h2>
-            <p>Leaderboard will be displayed here.</p>
+            <h2 className="text-2xl font-bold mb-4">Leaderboard</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Team</TableHead>
+                  <TableHead>Score</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockParticipants
+                  .filter(participant => participant.score !== null)
+                  .sort((a, b) => b.score - a.score)  // Sort by score in descending order
+                  .map((participant) => (
+                    <TableRow key={participant.id}>
+                      <TableCell>{participant.name}</TableCell>
+                      <TableCell>{participant.team}</TableCell>
+                      <TableCell>{participant.score}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
           </TabsContent>
-          <TabsContent value="analytics">
+
+          {/* Analytics Tab */}
+          {/* <TabsContent value="analytics">
             <h2 className="text-2xl font-bold mb-4">Contest Analytics</h2>
             <p>Analytics data will be displayed here.</p>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>
   )
 }
-
