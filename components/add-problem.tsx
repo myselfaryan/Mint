@@ -74,9 +74,9 @@ export function AddProblem() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-2 flex items-center justify-between">
+      <nav className="bg-muted p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ChevronLeft className="h-4 w-4" />
@@ -99,16 +99,16 @@ export function AddProblem() {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <Tabs defaultValue="problem" className="w-full">
-          <TabsList className="w-full bg-gray-800 p-0 mb-6">
+          <TabsList className="w-full bg-muted p-0 mb-6">
             <TabsTrigger
               value="problem"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-muted data-[state=active]:bg-muted-foreground/20"
             >
               Problem Statement
             </TabsTrigger>
             <TabsTrigger
               value="testcases"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-muted data-[state=active]:bg-muted-foreground/20"
             >
               Test Cases
             </TabsTrigger>
@@ -126,7 +126,7 @@ export function AddProblem() {
                 <Input
                   id="title"
                   placeholder="Enter problem title"
-                  className="bg-gray-800 border-gray-700"
+                  className="bg-muted border-border"
                 />
               </div>
 
@@ -140,7 +140,7 @@ export function AddProblem() {
                 <Textarea
                   id="description"
                   placeholder="Enter problem description"
-                  className="bg-gray-800 border-gray-700 min-h-[200px]"
+                  className="bg-muted border-border min-h-[200px]"
                 />
               </div>
             </div>
@@ -151,7 +151,7 @@ export function AddProblem() {
               {testCases.map((testCase, index) => (
                 <div
                   key={index}
-                  className="bg-gray-800 p-4 rounded-md space-y-2"
+                  className="bg-muted p-4 rounded-md space-y-2"
                 >
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-medium">
@@ -179,7 +179,7 @@ export function AddProblem() {
                         updateTestCase(index, "input", e.target.value)
                       }
                       placeholder="Enter test case input"
-                      className="bg-gray-700 border-gray-600"
+                      className="bg-muted-foreground/20 border-border"
                     />
                   </div>
                   <div>
@@ -196,7 +196,7 @@ export function AddProblem() {
                         updateTestCase(index, "expectedOutput", e.target.value)
                       }
                       placeholder="Enter expected output"
-                      className="bg-gray-700 border-gray-600"
+                      className="bg-muted-foreground/20 border-border"
                     />
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export function AddProblem() {
                 <Textarea
                   id="solution"
                   placeholder="Enter the solution code"
-                  className="bg-gray-800 border-gray-700 min-h-[300px] font-mono"
+                  className="bg-muted border-border min-h-[300px] font-mono"
                 />
               </div>
               <div>
@@ -232,7 +232,7 @@ export function AddProblem() {
                 <Textarea
                   id="explanation"
                   placeholder="Explain the solution"
-                  className="bg-gray-800 border-gray-700"
+                  className="bg-muted border-border"
                 />
               </div>
             </div>
@@ -240,7 +240,7 @@ export function AddProblem() {
         </Tabs>
 
         <div className="mt-6 flex justify-end">
-          <Button className="bg-green-600 hover:bg-green-700">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
             Save Problem
           </Button>
         </div>
