@@ -128,8 +128,7 @@ export function ContestListPage() {
               className="w-64"
             />
           </div>
-          <Button onClick={() => router.push("/contests/create")}>
-          <Button onClick={() => router.push('/contest/create')}>
+          <Button onClick={() => router.push("/contest/create")}>
             Add New Contest
           </Button>
         </div>
