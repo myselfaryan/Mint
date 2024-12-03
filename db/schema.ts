@@ -8,7 +8,6 @@ import {
   varchar,
   index,
   uniqueIndex,
-  pgEnum
 } from 'drizzle-orm/pg-core';
 
 export const userEmails = pgTable('user_emails', {
@@ -123,8 +122,19 @@ export const contestParticipants = pgTable(
   }
 );
 
-export const programmingTestCases = pgTable(
-  'programming_test_cases',
+export const problems = pgTable('problems', {
+  id: serial('id').primaryKey(),
+
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  allowedLanguages: text('allowed_languages').array().notNull(),
+  orgId: integer('org_id')
+    .references(() => orgs.id, { onDelete: 'cascade' })
+    .notNull(),
+});
+
+export const testCases = pgTable(
+  'test_cases',
   {
     id: serial('id').primaryKey(),
 
@@ -132,27 +142,16 @@ export const programmingTestCases = pgTable(
     output: text('output').notNull(),
     kind: text('kind', { enum: ['example', 'test'] }).default('test'),
 
-    contestProblemId: integer('contest_problem_id')
-      .references(() => contestProblems.id, { onDelete: 'cascade' })
+    problemId: integer('problem_id')
+      .references(() => problems.id, { onDelete: 'cascade' })
       .notNull()
   },
   (table) => {
     return {
-      contestProblemIdIdx: index('contest_problem_id_idx').on(
-        table.contestProblemId
-      )
+      problemIdIdx: index('problem_id_idx').on(table.problemId)
     };
   }
 );
-
-export const programmingProblems = pgTable('programming_problems', {
-  id: serial('id').primaryKey(),
-
-  description: text('description').notNull(),
-  allowedLanguages: text('allowed_languages').array().notNull()
-});
-
-export const problemKindEnum = pgEnum('problem_kind', ['programming', 'mcq']);
 
 export const contestProblems = pgTable(
   'contest_problems',
@@ -162,8 +161,7 @@ export const contestProblems = pgTable(
     contestId: integer('contest_id')
       .notNull()
       .references(() => contests.id, { onDelete: 'cascade' }),
-    problemId: integer('problem_id').notNull(),
-    problemKind: problemKindEnum('problem_kind').notNull(),
+    problemId: integer('problem_id').notNull().references(() => problems.id),
 
     order: integer('order').notNull()
   },
@@ -172,7 +170,6 @@ export const contestProblems = pgTable(
       uniqueConstraint: uniqueIndex('contest_problem_unique_constraint').on(
         table.contestId,
         table.problemId,
-        table.problemKind
       ),
       contestIdx: index('contest_idx').on(table.contestId),
       orderIdx: index('order_idx').on(table.contestId, table.order)
@@ -180,8 +177,8 @@ export const contestProblems = pgTable(
   }
 );
 
-export const programmingSubmissions = pgTable(
-  'programming_submissions',
+export const problemSubmissions = pgTable(
+  'problem_submissions',
   {
     id: serial('id').primaryKey(),
 
@@ -229,18 +226,18 @@ export type InsertContest = typeof contests.$inferInsert;
 export type SelectContestParticipant = typeof contestParticipants.$inferSelect;
 export type InsertContestParticipant = typeof contestParticipants.$inferInsert;
 
-export type SelectProgrammingTestCase =
-  typeof programmingTestCases.$inferSelect;
-export type InsertProgrammingTestCase =
-  typeof programmingTestCases.$inferInsert;
+export type SelectTestCase =
+  typeof testCases.$inferSelect;
+export type InsertTestCase =
+  typeof testCases.$inferInsert;
 
-export type SelectProgrammingProblem = typeof programmingProblems.$inferSelect;
-export type InsertProgrammingProblem = typeof programmingProblems.$inferInsert;
+export type SelectProblem = typeof problems.$inferSelect;
+export type InsertProblem = typeof problems.$inferInsert;
 
 export type SelectContestProblem = typeof contestProblems.$inferSelect;
 export type InsertContestProblem = typeof contestProblems.$inferInsert;
 
-export type SelectProgrammingSubmission =
-  typeof programmingSubmissions.$inferSelect;
-export type InsertProgrammingSubmission =
-  typeof programmingSubmissions.$inferInsert;
+export type SelectProblemSubmission =
+  typeof problemSubmissions.$inferSelect;
+export type InsertProblemSubmission =
+  typeof problemSubmissions.$inferInsert;
