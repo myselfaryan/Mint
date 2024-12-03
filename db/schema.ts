@@ -63,6 +63,42 @@ export const memberships = pgTable(
   }
 );
 
+export const groups = pgTable('groups', {
+  id: serial('id').primaryKey(),
+
+  nameId: text('name_id').notNull().unique(),
+  name: text('name').notNull(),
+
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+
+  about: text('about'),
+  avatar: text('avatar'),
+
+  orgId: integer('org_id')
+    .notNull()
+    .references(() => orgs.id, { onDelete: 'cascade' }),
+});
+
+export const groupMemberships = pgTable(
+  'group_memberships',
+  {
+    groupId: integer('group_id')
+      .notNull()
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    joinedAt: timestamp('joined_at').defaultNow().notNull()
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.groupId, table.userId] }),
+      groupIdIdx: index('group_id_idx').on(table.groupId),
+      userIdIdx: index('user_id_idx').on(table.userId)
+    };
+  }
+);
+
 export const contests = pgTable(
   'contests',
   {
