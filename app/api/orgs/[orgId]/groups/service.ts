@@ -2,7 +2,7 @@ import { z } from "zod";
 import { db } from "@/db/drizzle";
 import { groups, groupMemberships } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { createGroupSchema } from "./validation";
+import { createGroupSchema } from "@/lib/validations";
 
 export async function createGroup(
   orgId: number,

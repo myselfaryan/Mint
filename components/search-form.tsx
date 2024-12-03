@@ -1,10 +1,10 @@
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarInput,
-} from "@/components/ui/sidebar"
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons"
+} from "@/components/ui/sidebar";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   return (
@@ -23,5 +23,5 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         </SidebarGroupContent>
       </SidebarGroup>
     </form>
-  )
+  );
 }

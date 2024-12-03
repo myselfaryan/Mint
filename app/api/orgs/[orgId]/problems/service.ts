@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { problems, testCases } from "@/db/schema";
 import { z } from "zod";
-import { createProblemSchema, createTestCaseSchema } from "./validation";
+import { createProblemSchema, createTestCaseSchema } from "@/lib/validations";
 
 export async function createProblem(
   orgId: number,

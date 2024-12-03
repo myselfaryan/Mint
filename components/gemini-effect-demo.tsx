@@ -38,7 +38,8 @@ export function GeminiEffectDemo() {
                 Empowering Education
               </h2>
               <p className="text-lg md:text-xl text-neutral-300 max-w-2xl mx-auto px-4">
-                Transform your coding assignments into an engaging learning experience with our intelligent evaluation system.
+                Transform your coding assignments into an engaging learning
+                experience with our intelligent evaluation system.
               </p>
             </div>
           </div>

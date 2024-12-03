@@ -65,7 +65,9 @@ const extensions = {
 
 export function CodeEditor() {
   const [code, setCode] = useState("");
-  const [language, setLanguage] = useState<"javascript" | "python" | "cpp">("cpp");
+  const [language, setLanguage] = useState<"javascript" | "python" | "cpp">(
+    "cpp",
+  );
   const [theme, setTheme] = useState<keyof typeof themes>("VS Code Dark");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -81,14 +83,8 @@ export function CodeEditor() {
 
   return (
     <div className="h-screen bg-gray-900">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-screen"
-      >
-        <ResizablePanel
-          defaultSize={40}
-          minSize={30}
-        >
+      <ResizablePanelGroup direction="horizontal" className="min-h-screen">
+        <ResizablePanel defaultSize={40} minSize={30}>
           <div className="h-full flex flex-col border-r border-gray-800">
             <div className="border-b border-gray-800 px-4 py-3 bg-gray-800">
               <h2 className="text-lg font-medium text-gray-300">Description</h2>
@@ -99,8 +95,8 @@ export function CodeEditor() {
                   2028. Find Missing Observations
                 </h1>
                 <p className="text-sm text-gray-300">
-                  You have observations of n + m 6-sided dice rolls with each face
-                  numbered from 1 to 6...
+                  You have observations of n + m 6-sided dice rolls with each
+                  face numbered from 1 to 6...
                 </p>
               </div>
             </div>
@@ -129,7 +125,9 @@ export function CodeEditor() {
                   </Select>
                   <Select
                     value={theme}
-                    onValueChange={(value: keyof typeof themes) => setTheme(value)}
+                    onValueChange={(value: keyof typeof themes) =>
+                      setTheme(value)
+                    }
                   >
                     <SelectTrigger className="w-[180px] bg-gray-900 text-gray-300 border-gray-700">
                       <SelectValue placeholder="Select Theme" />
@@ -144,7 +142,7 @@ export function CodeEditor() {
                   </Select>
                 </div>
                 <div className="flex space-x-2">
-                  <Button 
+                  <Button
                     variant="outline"
                     className="w-[100px] h-10 bg-gray-900 text-gray-300 hover:bg-gray-700 border-gray-700"
                   >
@@ -156,7 +154,7 @@ export function CodeEditor() {
                   >
                     Submit
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     size="icon"
                     className="h-10 bg-gray-900 text-gray-300 hover:bg-gray-700 border-gray-700"

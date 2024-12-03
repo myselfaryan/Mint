@@ -29,7 +29,7 @@ export const GoogleGeminiEffect = ({
           `Scroll this component and see the bottom SVG come to life wow this
         works!`}
       </p>
-      
+
       <svg
         width="1440"
         height="890"

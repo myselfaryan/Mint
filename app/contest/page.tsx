@@ -1,6 +1,5 @@
-import { ContestListPage } from '@/components/contestlist'
+import { ContestListPage } from "@/components/contestlist";
 
 export default function ContestList() {
-  return <ContestListPage />
+  return <ContestListPage />;
 }
-

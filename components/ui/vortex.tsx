@@ -85,7 +85,7 @@ export const Vortex = (props: VortexProps) => {
     ttl: number,
     radius: number,
     hue: number,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
   ) => {
     ctx.save();
     ctx.lineCap = "round";
@@ -149,8 +149,10 @@ export const Vortex = (props: VortexProps) => {
 
         if (particleProps[index] < 0) particleProps[index] = canvas.width;
         if (particleProps[index] > canvas.width) particleProps[index] = 0;
-        if (particleProps[index + 1] < 0) particleProps[index + 1] = canvas.height;
-        if (particleProps[index + 1] > canvas.height) particleProps[index + 1] = 0;
+        if (particleProps[index + 1] < 0)
+          particleProps[index + 1] = canvas.height;
+        if (particleProps[index + 1] > canvas.height)
+          particleProps[index + 1] = 0;
 
         particleProps[index + 4]++;
 
@@ -158,17 +160,7 @@ export const Vortex = (props: VortexProps) => {
           initParticle(index);
         }
 
-        drawParticle(
-          x,
-          y,
-          x + vx * 2,
-          y + vy * 2,
-          life,
-          ttl,
-          radius,
-          hue,
-          ctx
-        );
+        drawParticle(x, y, x + vx * 2, y + vy * 2, life, ttl, radius, hue, ctx);
       }
 
       tick++;
@@ -180,7 +172,16 @@ export const Vortex = (props: VortexProps) => {
     return () => {
       window.removeEventListener("resize", resizeCanvas);
     };
-  }, [backgroundColor, particleCount, baseHue, rangeHue, baseSpeed, rangeSpeed, baseRadius, rangeRadius]);
+  }, [
+    backgroundColor,
+    particleCount,
+    baseHue,
+    rangeHue,
+    baseSpeed,
+    rangeSpeed,
+    baseRadius,
+    rangeRadius,
+  ]);
 
   return (
     <div className={cn("relative h-full w-full", props.containerClassName)}>
@@ -193,7 +194,9 @@ export const Vortex = (props: VortexProps) => {
         <canvas ref={canvasRef}></canvas>
       </motion.div>
 
-      <div className={cn("relative z-10", props.className)}>{props.children}</div>
+      <div className={cn("relative z-10", props.className)}>
+        {props.children}
+      </div>
     </div>
   );
 };

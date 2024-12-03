@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { testCaseSchema } from "./validation";
+import { createTestCaseSchema } from "@/lib/validations";
 import * as testCaseService from "./service";
 import { IdSchema } from "@/app/api/types";
 import { z } from "zod";
@@ -26,7 +26,7 @@ export async function POST(
 ) {
   try {
     const problemId = IdSchema.parse(params.problemId);
-    const data = testCaseSchema.parse(await request.json());
+    const data = createTestCaseSchema.parse(await request.json());
 
     const testCase = await testCaseService.addTestCase(problemId, data);
     return Response.json(testCase, { status: 201 });

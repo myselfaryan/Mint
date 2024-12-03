@@ -1,12 +1,38 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ChevronLeft, ChevronRight, Search, Bell, User, MoreHorizontal, Eye, Trash2, Users, FileText, CheckCircle, Clock, ArrowUpDown } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Bell,
+  User,
+  MoreHorizontal,
+  Eye,
+  Trash2,
+  Users,
+  FileText,
+  CheckCircle,
+  Clock,
+  ArrowUpDown,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Mock data for group statistics
 const groupStats = {
@@ -14,67 +40,79 @@ const groupStats = {
   totalContestsGiven: 15,
   totalSubmissions: 350,
   pendingSubmissions: 42,
-}
+};
 
 // Mock data for group participants
 const mockParticipants = [
-  { id: 'P001', name: 'Alice Johnson', submissions: 28, pending: 2 },
-  { id: 'P002', name: 'Bob Smith', submissions: 22, pending: 1 },
-  { id: 'P003', name: 'Charlie Brown', submissions: 30, pending: 0 },
-  { id: 'P004', name: 'Diana Ross', submissions: 18, pending: 3 },
-  { id: 'P005', name: 'Ethan Hunt', submissions: 25, pending: 1 },
-]
+  { id: "P001", name: "Alice Johnson", submissions: 28, pending: 2 },
+  { id: "P002", name: "Bob Smith", submissions: 22, pending: 1 },
+  { id: "P003", name: "Charlie Brown", submissions: 30, pending: 0 },
+  { id: "P004", name: "Diana Ross", submissions: 18, pending: 3 },
+  { id: "P005", name: "Ethan Hunt", submissions: 25, pending: 1 },
+];
 
-type SortKey = 'id' | 'pending'
+type SortKey = "id" | "pending";
 
 export function GroupDetailPage() {
-  const [participants, setParticipants] = useState(mockParticipants)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortKey, setSortKey] = useState<SortKey>('id')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-    const router = useRouter();
+  const [participants, setParticipants] = useState(mockParticipants);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("id");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const router = useRouter();
   const handleRemoveParticipant = (id: string) => {
-    setParticipants(participants.filter(participant => participant.id !== id))
-  }
+    setParticipants(
+      participants.filter((participant) => participant.id !== id),
+    );
+  };
 
   const handleViewParticipant = (id: string) => {
     // Implement view functionality
-    router.push('/student');
-    console.log(`Viewing participant with id: ${id}`)
-  }
+    router.push("/student");
+    console.log(`Viewing participant with id: ${id}`);
+  };
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      setSortKey(key)
-      setSortOrder('asc')
+      setSortKey(key);
+      setSortOrder("asc");
     }
-  }
+  };
 
   const sortedParticipants = [...participants].sort((a, b) => {
-    if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1
-    if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1
-    return 0
-  })
+    if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1;
+    if (a[sortKey] > b[sortKey]) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
 
-  const filteredParticipants = sortedParticipants.filter(participant =>
-    participant.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredParticipants = sortedParticipants.filter((participant) =>
+    participant.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
       {/* Top Navigation */}
       <nav className="bg-gray-800 p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon"><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
           <span className="text-lg font-semibold">Group: Code Wizards</span>
-          <Button variant="ghost" size="icon"><ChevronRight className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon"><Search className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon"><Bell className="h-4 w-4" /></Button>
-          <Button variant="ghost" size="icon"><User className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon">
+            <Search className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Bell className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <User className="h-4 w-4" />
+          </Button>
         </div>
       </nav>
 
@@ -92,7 +130,9 @@ export function GroupDetailPage() {
           <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400">Total Contests Given</p>
-              <p className="text-xl font-bold">{groupStats.totalContestsGiven}</p>
+              <p className="text-xl font-bold">
+                {groupStats.totalContestsGiven}
+              </p>
             </div>
             <FileText className="h-8 w-8 text-green-400" />
           </div>
@@ -106,7 +146,9 @@ export function GroupDetailPage() {
           <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400">Pending Submissions</p>
-              <p className="text-xl font-bold">{groupStats.pendingSubmissions}</p>
+              <p className="text-xl font-bold">
+                {groupStats.pendingSubmissions}
+              </p>
             </div>
             <Clock className="h-8 w-8 text-red-400" />
           </div>
@@ -126,13 +168,19 @@ export function GroupDetailPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('id')}>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort("id")}
+                >
                   ID
                   <ArrowUpDown className="h-4 w-4 inline ml-2" />
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Submissions</TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('pending')}>
+                <TableHead
+                  className="cursor-pointer"
+                  onClick={() => handleSort("pending")}
+                >
                   Pending
                   <ArrowUpDown className="h-4 w-4 inline ml-2" />
                 </TableHead>
@@ -153,12 +201,23 @@ export function GroupDetailPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-gray-800 text-gray-300 border-gray-700">
-                        <DropdownMenuItem onClick={() => handleViewParticipant(participant.id)} className="cursor-pointer">
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-gray-800 text-gray-300 border-gray-700"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => handleViewParticipant(participant.id)}
+                          className="cursor-pointer"
+                        >
                           <Eye className="h-4 w-4 mr-2" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleRemoveParticipant(participant.id)} className="cursor-pointer text-red-500 focus:text-red-500">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleRemoveParticipant(participant.id)
+                          }
+                          className="cursor-pointer text-red-500 focus:text-red-500"
+                        >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Remove
                         </DropdownMenuItem>
@@ -172,6 +231,5 @@ export function GroupDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

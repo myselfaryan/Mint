@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
-import { addMemberSchema } from "./validation";
+import { createMembershipSchema } from "@/lib/validations";
 import * as memberService from "./service";
 import { IdSchema } from "@/app/api/types";
 
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   try {
     const groupId = IdSchema.parse(params.groupId);
-    const data = addMemberSchema.parse(await request.json());
+    const data = createMembershipSchema.parse(await request.json());
 
     const member = await memberService.addMember(groupId, data.userId);
     return Response.json(member, { status: 201 });

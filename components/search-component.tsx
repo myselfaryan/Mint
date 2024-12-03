@@ -1,65 +1,72 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import { Search, X } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect, useRef } from "react";
+import { Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SearchComponentProps {
-  onSearch: (query: string) => void
-  placeholder?: string
-  className?: string
+  onSearch: (query: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export function SearchComponentComponent({ onSearch, placeholder = "Search...", className = "" }: SearchComponentProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const inputRef = useRef<HTMLInputElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
+export function SearchComponentComponent({
+  onSearch,
+  placeholder = "Search...",
+  className = "",
+}: SearchComponentProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }, [isExpanded])
+  }, [isExpanded]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (overlayRef.current && !overlayRef.current.contains(event.target as Node)) {
-        handleCollapse()
+      if (
+        overlayRef.current &&
+        !overlayRef.current.contains(event.target as Node)
+      ) {
+        handleCollapse();
       }
-    }
+    };
 
     if (isExpanded) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isExpanded])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isExpanded]);
 
   const handleExpand = () => {
-    setIsExpanded(true)
-    document.body.style.overflow = 'hidden'
-  }
+    setIsExpanded(true);
+    document.body.style.overflow = "hidden";
+  };
 
   const handleCollapse = () => {
-    setIsExpanded(false)
-    setSearchQuery("")
-    document.body.style.overflow = 'auto'
-  }
+    setIsExpanded(false);
+    setSearchQuery("");
+    document.body.style.overflow = "auto";
+  };
 
   const handleSearch = () => {
-    onSearch(searchQuery)
-    handleCollapse()
-  }
+    onSearch(searchQuery);
+    handleCollapse();
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch()
+    if (e.key === "Enter") {
+      handleSearch();
     }
-  }
+  };
 
   return (
     <>
@@ -75,7 +82,10 @@ export function SearchComponentComponent({ onSearch, placeholder = "Search...", 
 
       {isExpanded && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm">
-          <div ref={overlayRef} className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl">
+          <div
+            ref={overlayRef}
+            className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl"
+          >
             <div className="flex items-center mb-4">
               <Input
                 ref={inputRef}
@@ -113,5 +123,5 @@ export function SearchComponentComponent({ onSearch, placeholder = "Search...", 
         </div>
       )}
     </>
-  )
+  );
 }
