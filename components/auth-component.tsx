@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,8 +48,13 @@ const registerSchema = loginSchema
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export function AuthComponent() {
-  const [isLogin, setIsLogin] = useState(true);
+export function AuthComponent({
+  initialMode = "login",
+}: {
+  initialMode?: "login" | "register";
+}) {
+  const [isLogin, setIsLogin] = useState(initialMode === "login");
+  const router = useRouter();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -203,7 +209,11 @@ export function AuthComponent() {
         <Button
           variant="link"
           className="w-full"
-          onClick={() => setIsLogin(!isLogin)}
+          onClick={() => {
+            const newMode = isLogin ? "register" : "login";
+            setIsLogin(!isLogin);
+            router.push(`/auth?mode=${newMode}`, { scroll: false });
+          }}
         >
           {isLogin
             ? "Don't have an account? Register"

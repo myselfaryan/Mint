@@ -1,7 +1,13 @@
 import Image from "next/image";
-import { AuthComponent } from "@/components/AuthComponent";
+import { AuthComponent } from "@/components/auth-component";
 
-export default function AuthPage() {
+export default function AuthPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const mode = searchParams?.mode === "register" ? "register" : "login";
+
   return (
     <div className="flex h-screen">
       <div className="w-1/2 relative">
@@ -13,7 +19,7 @@ export default function AuthPage() {
         />
       </div>
       <div className="w-1/2 flex items-center justify-center">
-        <AuthComponent />
+        <AuthComponent initialMode={mode} />
       </div>
     </div>
   );
