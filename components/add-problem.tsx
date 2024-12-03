@@ -149,10 +149,7 @@ export function AddProblem() {
           <TabsContent value="testcases">
             <div className="space-y-4">
               {testCases.map((testCase, index) => (
-                <div
-                  key={index}
-                  className="bg-muted p-4 rounded-md space-y-2"
-                >
+                <div key={index} className="bg-muted p-4 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-medium">
                       Test Case {index + 1}
