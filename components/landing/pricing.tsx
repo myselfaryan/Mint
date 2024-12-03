@@ -80,18 +80,25 @@ const cardVariants = {
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-b from-black to-gray-900">
+    <section
+      id="pricing"
+      className="py-24 bg-gradient-to-b from-black to-gray-900"
+    >
       <div className="container px-4 mx-auto">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h2>
-          <p className="text-gray-400 text-lg">Start free and scale as you grow</p>
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Choose Your Plan
+          </h2>
+          <p className="text-gray-400 text-lg">
+            Start free and scale as you grow
+          </p>
         </motion.div>
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -116,9 +123,13 @@ export function Pricing() {
                 </div>
               )}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {plan.name}
+                </h3>
                 <div className="flex items-baseline mb-2">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
+                  <span className="text-4xl font-bold text-white">
+                    {plan.price}
+                  </span>
                   {plan.period && (
                     <span className="text-gray-400 ml-1">{plan.period}</span>
                   )}
@@ -127,8 +138,8 @@ export function Pricing() {
               </div>
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature) => (
-                  <motion.li 
-                    key={feature} 
+                  <motion.li
+                    key={feature}
                     className="flex items-center text-gray-300"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}

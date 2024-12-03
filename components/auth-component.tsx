@@ -89,7 +89,9 @@ export function AuthComponent({
   return (
     <Card className="w-[400px]">
       <CardHeader className="space-y-1 pb-2">
-        <CardTitle className="text-2xl font-bold">{isLogin ? "Login" : "Register"}</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          {isLogin ? "Login" : "Register"}
+        </CardTitle>
         <CardDescription>
           {isLogin ? "Enter your credentials to login" : "Create a new account"}
         </CardDescription>
