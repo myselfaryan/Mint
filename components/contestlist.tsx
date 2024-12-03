@@ -28,6 +28,7 @@ export function ContestListPage() {
   )
 
   const handleViewContest = (contestId: string) => {
+    router.push(`/contest/&{id}`);
     console.log(`Viewing contest: ${contestId}`)
     // Implement view contest functionality here
   }

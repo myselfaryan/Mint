@@ -3,11 +3,10 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'  
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export function CreateContest() {
-  const router = useRouter()
   const [contestData, setContestData] = useState({
     name: '',
     duration: '',
@@ -20,7 +19,6 @@ export function CreateContest() {
     }
     // Store contest data before navigating
     localStorage.setItem('pendingContest', JSON.stringify(contestData))
-    router.push('/problems/add')
   }
 
   return (
@@ -28,7 +26,12 @@ export function CreateContest() {
       {/* Top Navigation */}
       <nav className="bg-[#0F172A] p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}><ChevronLeft className="h-4 w-4" /></Button>
+          {/* Using Link for navigation */}
+          <Link href="/create">
+            <Button variant="ghost" size="icon">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </Link>
           <span className="text-lg font-semibold">Create New Contest</span>
           <Button variant="ghost" size="icon"><ChevronRight className="h-4 w-4" /></Button>
         </div>
@@ -55,7 +58,7 @@ export function CreateContest() {
               
               <div>
                 <label htmlFor="duration" className="block text-sm font-medium mb-2">
-                  Duration (in MInutes)
+                  Duration (in Minutes)
                 </label>
                 <Input
                   id="duration"
