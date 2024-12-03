@@ -1,9 +1,10 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { FAQ } from "@/components/faq";
-import { VortexDemo } from "@/components/vortex-demo";
-import { Features } from "@/components/features";
-import { GeminiSection } from "@/components/gemini-section";
+import { Button } from "../components/ui/button";
+import { FAQ } from "../components/landing/faq";
+import { VortexDemo } from "../components/landing/vortex-demo";
+import { Features } from "../components/landing/features";
+import { GeminiSection } from "../components/landing/gemini-section";
+import { AboutUs } from "../components/landing/about-us";
 
 export default function Home() {
   return (
@@ -60,6 +61,11 @@ export default function Home() {
 
         {/* Gemini Effect Section */}
         <GeminiSection />
+
+        {/* About Us Section */}
+        <section className="relative bg-black">
+          <AboutUs />
+        </section>
 
         {/* Features Section */}
         <section className="relative bg-black">
