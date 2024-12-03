@@ -83,6 +83,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 // This is sample data.
 const data = {
@@ -111,31 +113,31 @@ const data = {
   navMain: [
     {
       title: "Users",
-      url: "/users",
+      url: "users",
       icon: Users,
       items: [],
     },
     {
       title: "Contests",
-      url: "/contests",
+      url: "contests",
       icon: Trophy,
       items: [],
     },
     {
       title: "Problems",
-      url: "/problems",
+      url: "problems",
       icon: FileCode,
       items: [],
     },
     {
       title: "Submissions",
-      url: "/submissions",
+      url: "submissions",
       icon: FileCheck,
       items: [],
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "settings",
       icon: Settings,
       items: [],
     },
@@ -185,6 +187,10 @@ function ThemeItems() {
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
+  const pathname = usePathname();
+
+  // Get the base path (e.g., /[orgId])
+  const basePath = pathname.split("/").slice(0, 2).join("/");
 
   return (
     <ThemeProvider>
@@ -258,10 +264,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                 {data.navMain.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild tooltip={item.title}>
-                      <a href={item.url}>
+                      <Link href={`${basePath}/${item.url}`}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
