@@ -39,7 +39,10 @@ export function AddProblem() {
     const updatedProblems = [...problems];
     updatedProblems[currentProblemIndex] = {
       ...currentProblem,
-      testCases: [...currentProblem.testCases, { input: "", expectedOutput: "" }],
+      testCases: [
+        ...currentProblem.testCases,
+        { input: "", expectedOutput: "" },
+      ],
     };
     setProblems(updatedProblems);
   };
@@ -60,7 +63,7 @@ export function AddProblem() {
   ) => {
     const updatedProblems = [...problems];
     const updatedTestCases = currentProblem.testCases.map((testCase, i) =>
-      i === index ? { ...testCase, [field]: value } : testCase
+      i === index ? { ...testCase, [field]: value } : testCase,
     );
     updatedProblems[currentProblemIndex] = {
       ...currentProblem,
@@ -69,7 +72,10 @@ export function AddProblem() {
     setProblems(updatedProblems);
   };
 
-  const updateProblemField = (field: "title" | "description", value: string) => {
+  const updateProblemField = (
+    field: "title" | "description",
+    value: string,
+  ) => {
     const updatedProblems = [...problems];
     updatedProblems[currentProblemIndex] = {
       ...currentProblem,
@@ -93,7 +99,9 @@ export function AddProblem() {
     if (problems.length === 1) return;
     const updatedProblems = problems.filter((_, i) => i !== index);
     setProblems(updatedProblems);
-    setCurrentProblemIndex(Math.min(currentProblemIndex, updatedProblems.length - 1));
+    setCurrentProblemIndex(
+      Math.min(currentProblemIndex, updatedProblems.length - 1),
+    );
   };
 
   const handleCreateContest = () => {
@@ -190,7 +198,9 @@ export function AddProblem() {
                 <Textarea
                   id="description"
                   value={currentProblem.description}
-                  onChange={(e) => updateProblemField("description", e.target.value)}
+                  onChange={(e) =>
+                    updateProblemField("description", e.target.value)
+                  }
                   placeholder="Enter problem description"
                   className="bg-muted border-border min-h-[200px]"
                 />
