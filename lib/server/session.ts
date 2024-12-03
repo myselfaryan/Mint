@@ -1,4 +1,5 @@
-import { db, User, Session, userTable, sessionTable } from "./db";
+import { db } from '@/db/drizzle';
+import { User, Session, users, sessionTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import {
   encodeBase32LowerCaseNoPadding,
@@ -10,7 +11,7 @@ import { cache } from "react";
 
 export const getCurrentSession = cache(
   async (): Promise<SessionValidationResult> => {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const token = cookieStore.get("session")?.value ?? null;
     if (token === null) {
       return { session: null, user: null };
@@ -46,9 +47,9 @@ export async function validateSessionToken(
 ): Promise<SessionValidationResult> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const result = await db
-    .select({ user: userTable, session: sessionTable })
+    .select({ user: users, session: sessionTable })
     .from(sessionTable)
-    .innerJoin(userTable, eq(sessionTable.userId, userTable.id))
+    .innerJoin(users, eq(sessionTable.userId, users.id))
     .where(eq(sessionTable.id, sessionId));
   if (result.length < 1) {
     return { session: null, user: null };
