@@ -1,51 +1,56 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Bell,
-  User,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+
+interface TestCase {
+  input: string;
+  expectedOutput: string;
+}
+
+interface Problem {
+  id: string;
+  title: string;
+  description: string;
+  testCases: TestCase[];
+}
 
 export function AddProblem() {
   const router = useRouter();
-  const [testCases, setTestCases] = useState([
-    { input: "", expectedOutput: "" },
+  const { toast } = useToast();
+  const [problems, setProblems] = useState<Problem[]>([
+    {
+      id: "1",
+      title: "",
+      description: "",
+      testCases: [{ input: "", expectedOutput: "" }],
+    },
   ]);
-  const [pendingContest, setPendingContest] = useState<{
-    name: string;
-    duration: string;
-  } | null>(null);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
 
-  useEffect(() => {
-    // Load pending contest data from localStorage
-    const contestData = localStorage.getItem("pendingContest");
-    if (contestData) {
-      setPendingContest(JSON.parse(contestData));
-    }
-  }, []);
+  const currentProblem = problems[currentProblemIndex];
 
   const addTestCase = () => {
-    setTestCases([...testCases, { input: "", expectedOutput: "" }]);
+    const updatedProblems = [...problems];
+    updatedProblems[currentProblemIndex] = {
+      ...currentProblem,
+      testCases: [...currentProblem.testCases, { input: "", expectedOutput: "" }],
+    };
+    setProblems(updatedProblems);
   };
 
   const removeTestCase = (index: number) => {
-    setTestCases(testCases.filter((_, i) => i !== index));
+    const updatedProblems = [...problems];
+    updatedProblems[currentProblemIndex] = {
+      ...currentProblem,
+      testCases: currentProblem.testCases.filter((_, i) => i !== index),
+    };
+    setProblems(updatedProblems);
   };
 
   const updateTestCase = (
@@ -53,51 +58,94 @@ export function AddProblem() {
     field: "input" | "expectedOutput",
     value: string,
   ) => {
-    const updatedTestCases = testCases.map((testCase, i) =>
-      i === index ? { ...testCase, [field]: value } : testCase,
+    const updatedProblems = [...problems];
+    const updatedTestCases = currentProblem.testCases.map((testCase, i) =>
+      i === index ? { ...testCase, [field]: value } : testCase
     );
-    setTestCases(updatedTestCases);
+    updatedProblems[currentProblemIndex] = {
+      ...currentProblem,
+      testCases: updatedTestCases,
+    };
+    setProblems(updatedProblems);
+  };
+
+  const updateProblemField = (field: "title" | "description", value: string) => {
+    const updatedProblems = [...problems];
+    updatedProblems[currentProblemIndex] = {
+      ...currentProblem,
+      [field]: value,
+    };
+    setProblems(updatedProblems);
+  };
+
+  const addNewProblem = () => {
+    const newProblem: Problem = {
+      id: (problems.length + 1).toString(),
+      title: "",
+      description: "",
+      testCases: [{ input: "", expectedOutput: "" }],
+    };
+    setProblems([...problems, newProblem]);
+    setCurrentProblemIndex(problems.length);
+  };
+
+  const removeProblem = (index: number) => {
+    if (problems.length === 1) return;
+    const updatedProblems = problems.filter((_, i) => i !== index);
+    setProblems(updatedProblems);
+    setCurrentProblemIndex(Math.min(currentProblemIndex, updatedProblems.length - 1));
   };
 
   const handleCreateContest = () => {
-    if (!pendingContest) return;
-
     // TODO: Add API call to create contest with problems
-    console.log("Creating contest:", pendingContest);
-    console.log("With test cases:", testCases);
-
-    // Clear the pending contest data
-    localStorage.removeItem("pendingContest");
-
-    // Navigate back to contests page
+    console.log("Creating contest with problems:", problems);
+    toast({
+      title: "Success!",
+      description: "Contest created successfully",
+      duration: 3000,
+    });
     router.push("/contests");
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Top Navigation */}
-      <nav className="bg-muted p-2 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-lg font-semibold">Add New Problem</span>
-          <Button variant="ghost" size="icon">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        {pendingContest && (
+      <div className="flex-1 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-2">
+            {problems.map((problem, index) => (
+              <Button
+                key={problem.id}
+                variant={currentProblemIndex === index ? "default" : "outline"}
+                onClick={() => setCurrentProblemIndex(index)}
+                className="relative"
+              >
+                Problem {index + 1}
+                {problems.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeProblem(index);
+                    }}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                  >
+                    ×
+                  </button>
+                )}
+              </Button>
+            ))}
+            <Button variant="outline" onClick={addNewProblem}>
+              <Plus className="h-4 w-4 mr-2" /> Add Problem
+            </Button>
+          </div>
+
           <Button
             onClick={handleCreateContest}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             Create Contest
           </Button>
-        )}
-      </nav>
+        </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-6">
         <Tabs defaultValue="problem" className="w-full">
           <TabsList className="w-full bg-muted p-0 mb-6">
             <TabsTrigger
@@ -125,6 +173,8 @@ export function AddProblem() {
                 </label>
                 <Input
                   id="title"
+                  value={currentProblem.title}
+                  onChange={(e) => updateProblemField("title", e.target.value)}
                   placeholder="Enter problem title"
                   className="bg-muted border-border"
                 />
@@ -139,6 +189,8 @@ export function AddProblem() {
                 </label>
                 <Textarea
                   id="description"
+                  value={currentProblem.description}
+                  onChange={(e) => updateProblemField("description", e.target.value)}
                   placeholder="Enter problem description"
                   className="bg-muted border-border min-h-[200px]"
                 />
@@ -148,7 +200,7 @@ export function AddProblem() {
 
           <TabsContent value="testcases">
             <div className="space-y-4">
-              {testCases.map((testCase, index) => (
+              {currentProblem.testCases.map((testCase, index) => (
                 <div key={index} className="bg-muted p-4 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-medium">
@@ -203,44 +255,7 @@ export function AddProblem() {
               </Button>
             </div>
           </TabsContent>
-
-          <TabsContent value="solution">
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="solution"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Solution
-                </label>
-                <Textarea
-                  id="solution"
-                  placeholder="Enter the solution code"
-                  className="bg-muted border-border min-h-[300px] font-mono"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="explanation"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Explanation
-                </label>
-                <Textarea
-                  id="explanation"
-                  placeholder="Explain the solution"
-                  className="bg-muted border-border"
-                />
-              </div>
-            </div>
-          </TabsContent>
         </Tabs>
-
-        <div className="mt-6 flex justify-end">
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            Save Problem
-          </Button>
-        </div>
       </div>
     </div>
   );
