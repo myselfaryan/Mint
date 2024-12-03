@@ -1,8 +1,16 @@
 import { config } from 'dotenv';
-import { neon } from '@neondatabase/serverless';
-import { Pool } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import * as schema from './schema';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 config({ path: '.env.local' });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
-export const db = drizzle(pool);
+
+/*
+export const db = drizzle({
+  connection: {
+    connectionString: process.env.DATABASE_URL,
+    // ssl: true
+  }
+}, { schema });
+*/
+
+export const db = drizzle(process.env.DATABASE_URL!, { schema });
