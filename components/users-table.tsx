@@ -7,8 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search, Bell, User, Download, MoreHorizontal, Eye, Trash2 } from 'lucide-react'
-import Image from 'next/image'
-
+import { useRouter } from 'next/navigation';
+import Link from 'next/link'
 const mockUsers = [
   { id: 'U001', name: 'Alice Johnson', avatar: '/placeholder.svg?height=32&width=32', submissions: 15, pending: 2 },
   { id: 'U002', name: 'Bob Smith', avatar: '/placeholder.svg?height=32&width=32', submissions: 8, pending: 1 },
@@ -25,6 +25,8 @@ export function UserListPage() {
   const [filterStatus, setFilterStatus] = useState('All')
   const [sortField, setSortField] = useState<SortField>('id')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+
+  const router = useRouter();
 
   const sortedAndFilteredUsers = useMemo(() => {
     return mockUsers
@@ -52,6 +54,7 @@ export function UserListPage() {
   }
 
   const handleViewUser = (userId: string) => {
+    router.push('/student');
     console.log(`Viewing user: ${userId}`)
     // Implement view user functionality here
   }
@@ -82,6 +85,9 @@ export function UserListPage() {
         </div>
       </nav>
 
+
+      
+
       {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="flex justify-between items-center mb-6">
@@ -103,9 +109,12 @@ export function UserListPage() {
                 <SelectItem value="No Pending">No Pending</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon">
-              <Download className="h-4 w-4" />
+            <Link href="/users/new">
+            <Button variant="outline" size="lg">
+              {/* <Download className="h-4 w-4" /> */}
+              +Add User
             </Button>
+            </Link>
           </div>
         </div>
 
@@ -151,13 +160,13 @@ export function UserListPage() {
               {sortedAndFilteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="flex items-center space-x-2">
-                    <Image
+                    {/* <Image
                       src={user.avatar}
                       alt={`${user.name}'s avatar`}
                       width={32}
                       height={32}
                       className="rounded-full"
-                    />
+                    /> */}
                     <span className="font-medium">{user.name}</span>
                   </TableCell>
                   <TableCell>{user.id}</TableCell>
