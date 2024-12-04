@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,6 +30,7 @@ import {
   Users,
   Award,
 } from "lucide-react";
+import { DateOfContestCard, TotalMembersCard, TotalSubmissionsCard } from "./cards/statistics";
 
 const mockParticipants = [
   {
@@ -84,8 +85,43 @@ const mockProblems = [
 export function ContestDetailPage() {
   const [selectedTeam, setSelectedTeam] = useState("All");
 
+  const [participants, setParticipants] = useState([]);
+  const [problems, setProblems] = useState([]);
+  
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true); 
+        
+        const participantsResponse = await fetch(`/api/orgs/${id}/stats?stat=total-members`);
+        const participantsData = await participantsResponse.json();
+        console.log("participant data: ",participantsData);
+        
+      
+        const problemsResponse = await fetch(`/api/orgs/${id}/stats?stat=total-submissions`);
+        const problemsData = await problemsResponse.json();
+        console.log(problemsData);
+        
+        setParticipants(participantsData.value || []); 
+        setProblems(problemsData.value || []); 
+        
+        setLoading(false); 
+      } catch (error) {
+        setError("Failed to fetch data. Please try again later.");
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  
   return (
-    <div className="min-h-screen bg-background text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
       <nav className="bg-background-default p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -115,46 +151,50 @@ export function ContestDetailPage() {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          {/* <div className="bg-background p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400">Start Date</p>
               <p className="text-xl font-bold">Sep 15, 2024</p>
             </div>
             <Calendar className="h-8 w-8 text-blue-400" />
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          </div> */}
+          <DateOfContestCard dateOfContest={"Sep 15, 2024"}/>
+
+          {/* <div className="bg-background p-4 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Participants</p>
+              <p className="text-sm text-foreground">Participants</p>
               <p className="text-xl font-bold">128</p>
             </div>
             <Users className="h-8 w-8 text-green-400" />
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          </div> */}
+          <TotalMembersCard totalMembers={8}/>
+          {/* <div className="bg-background p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400">Total Prize</p>
               <p className="text-xl font-bold">$10,000</p>
             </div>
             <Award className="h-8 w-8 text-yellow-400" />
-          </div>
+          </div> */}
+          <TotalSubmissionsCard totalSubmissions={23}/>
         </div>
 
         <Tabs defaultValue="participants" className="w-full">
-          <TabsList className="w-full bg-gray-800 p-0 mb-6">
+          <TabsList className="w-full bg-muted p-0 mb-6">
             <TabsTrigger
               value="participants"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-muted data-[state=active]:bg-muted-default"
             >
               Participants
             </TabsTrigger>
             <TabsTrigger
               value="challenges"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-muted data-[state=active]:bg-muted-default"
             >
               Challenges
             </TabsTrigger>
             <TabsTrigger
               value="leaderboard"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-muted data-[state=active]:bg-muted-default"
             >
               Leaderboard
             </TabsTrigger>
