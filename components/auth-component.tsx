@@ -1,8 +1,12 @@
 "use client";
+import { RegisterInput } from "@/lib/validations";
+import { registerSchema } from "@/lib/validations";
+import { LoginInput } from "@/lib/validations";
+import { loginSchema } from "@/lib/validations";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { z } from "zod";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -24,29 +28,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters long" }),
-});
+// const loginSchema = z.object({
+//   email: z.string().email({ message: "Invalid email address" }),
+//   password: z
+//     .string()
+//     .min(8, { message: "Password must be at least 8 characters long" }),
+// });
 
-const registerSchema = loginSchema
-  .extend({
-    name: z
-      .string()
-      .min(2, { message: "Name must be at least 2 characters long" }),
-    confirmPassword: z
-      .string()
-      .min(8, { message: "Password must be at least 8 characters long" }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+// const registerSchema = loginSchema
+//   .extend({
+//     name: z
+//       .string()
+//       .min(2, { message: "Name must be at least 2 characters long" }),
+//     confirmPassword: z
+//       .string()
+//       .min(8, { message: "Password must be at least 8 characters long" }),
+//   })
+//   .refine((data) => data.password === data.confirmPassword, {
+//     message: "Passwords do not match",
+//     path: ["confirmPassword"],
+//   });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-type RegisterFormValues = z.infer<typeof registerSchema>;
+// type LoginFormValues = z.infer<typeof loginSchema>;
+// type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function AuthComponent({
   initialMode = "login",
@@ -56,7 +60,7 @@ export function AuthComponent({
   const [isLogin, setIsLogin] = useState(initialMode === "login");
   const router = useRouter();
 
-  const loginForm = useForm<LoginFormValues>({
+  const loginForm = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -64,7 +68,7 @@ export function AuthComponent({
     },
   });
 
-  const registerForm = useForm<RegisterFormValues>({
+  const registerForm = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
@@ -74,16 +78,16 @@ export function AuthComponent({
     },
   });
 
-  function onLoginSubmit(values: LoginFormValues) {
+  function onLoginSubmit(values: LoginInput) {
     console.log(values);
   }
 
-  function onRegisterSubmit(values: RegisterFormValues) {
+  function onRegisterSubmit(values: RegisterInput) {
     console.log(values);
   }
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-[350px] ">
       <CardHeader>
         <CardTitle>{isLogin ? "Login" : "Register"}</CardTitle>
         <CardDescription>

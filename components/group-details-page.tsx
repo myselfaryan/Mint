@@ -91,9 +91,9 @@ export function GroupDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-2 flex items-center justify-between">
+      <nav className="bg-background p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <ChevronLeft className="h-4 w-4" />
@@ -120,32 +120,32 @@ export function GroupDetailPage() {
       <div className="flex-1 p-6">
         {/* Statistic Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Members</p>
+              <p className="text-sm text-foreground">Total Members</p>
               <p className="text-xl font-bold">{groupStats.totalMembers}</p>
             </div>
             <Users className="h-8 w-8 text-blue-400" />
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Contests Given</p>
+              <p className="text-sm text-foreground">Total Contests Given</p>
               <p className="text-xl font-bold">
                 {groupStats.totalContestsGiven}
               </p>
             </div>
             <FileText className="h-8 w-8 text-green-400" />
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Submissions</p>
+              <p className="text-sm text-foreground">Total Submissions</p>
               <p className="text-xl font-bold">{groupStats.totalSubmissions}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-yellow-400" />
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+          <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Pending Submissions</p>
+              <p className="text-sm text-foreground">Pending Submissions</p>
               <p className="text-xl font-bold">
                 {groupStats.pendingSubmissions}
               </p>
@@ -155,14 +155,14 @@ export function GroupDetailPage() {
         </div>
 
         {/* Participants Table */}
-        <div className="bg-gray-800 rounded-lg p-4">
+        <div className="bg-background rounded-lg p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">Participants</h2>
             <Input
               placeholder="Search participants..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm bg-gray-700 text-gray-300 border-gray-600"
+              className="max-w-sm bg-background text-foreground border-gray-600"
             />
           </div>
           <Table>
@@ -203,7 +203,7 @@ export function GroupDetailPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="bg-gray-800 text-gray-300 border-gray-700"
+                        className="bg-muted text-foreground border-background"
                       >
                         <DropdownMenuItem
                           onClick={() => handleViewParticipant(participant.id)}

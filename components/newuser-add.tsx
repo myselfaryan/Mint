@@ -40,15 +40,15 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-900 text-gray-300 p-6">
-      <div className="bg-gray-800 shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-semibold text-gray-100 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-accent-default text-background p-6">
+      <div className="bg-muted shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 className="text-2xl font-semibold text-foreground mb-6">
           Create New User
         </h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* User Name */}
           <div>
-            <Label htmlFor="userName" className="text-gray-300">
+            <Label htmlFor="userName" className="text-foreground">
               User Name
             </Label>
             <Input
@@ -56,7 +56,7 @@ export default function CreateUserPage() {
               type="text"
               {...register("userName")}
               placeholder="Enter user name"
-              className="mt-1 bg-gray-700 border-gray-600 text-gray-300 w-full"
+              className="mt-1 bg-muted border-foreground text-foreground w-full"
             />
             {errors.userName && (
               <p className="text-red-500 text-sm mt-1">
@@ -67,7 +67,7 @@ export default function CreateUserPage() {
 
           {/* Email */}
           <div>
-            <Label htmlFor="email" className="text-gray-300">
+            <Label htmlFor="email" className="text-foreground">
               Email
             </Label>
             <Input
@@ -75,7 +75,7 @@ export default function CreateUserPage() {
               type="email"
               {...register("email")}
               placeholder="Enter email"
-              className="mt-1 bg-gray-700 border-gray-600 text-gray-300 w-full"
+              className="mt-1 bg-muted border-foreground text-foreground w-full"
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">
@@ -86,7 +86,7 @@ export default function CreateUserPage() {
 
           {/* Name ID */}
           <div>
-            <Label htmlFor="nameId" className="text-gray-300">
+            <Label htmlFor="nameId" className="text-foreground">
               Name ID
             </Label>
             <Input
@@ -94,7 +94,7 @@ export default function CreateUserPage() {
               type="text"
               {...register("nameId")}
               placeholder="Enter name ID"
-              className="mt-1 bg-gray-700 border-gray-600 text-gray-300 w-full"
+              className="mt-1 bg-muted border-foreground text-foreground w-full"
             />
             {errors.nameId && (
               <p className="text-red-500 text-sm mt-1">

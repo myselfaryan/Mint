@@ -82,9 +82,9 @@ export function GroupCreationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-secondary-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-4 flex items-center">
+      <nav className="bg-background p-4 flex items-center">
         <Link href="/groups">
           <Button variant="ghost" size="icon" className="mr-4">
             <ChevronLeft className="h-4 w-4" />
@@ -97,14 +97,14 @@ export function GroupCreationPage() {
       <div className="flex-1 p-6 max-w-4xl mx-auto w-full">
         <form
           onSubmit={handleSubmit(handleCreateGroup)}
-          className="bg-gray-800 rounded-lg p-6 shadow-lg"
+          className="bg-background rounded-lg p-6 shadow-lg"
         >
           <div className="mb-6">
             <Label htmlFor="groupName">Group Name</Label>
             <Input
               id="groupName"
               {...register("groupName")}
-              className="mt-1 bg-gray-700 border-gray-600 text-gray-300"
+              className="mt-1 bg-background border-destructive-default text-foreground"
               placeholder="Enter group name"
             />
             {errors.groupName && (
@@ -118,13 +118,13 @@ export function GroupCreationPage() {
               id="emailIds"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              className="mt-1 bg-gray-700 border-gray-600 text-gray-300"
+              className="mt-1 bg-background border-background-default text-foreground"
               placeholder="Enter comma-separated email addresses"
             />
             <Button
               type="button"
               onClick={handleAddMembers}
-              className="mt-2 bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200 cursor-pointer"
+              className="mt-2 bg-green-600 text-foreground font-semibold hover:bg-green-700 transition-colors duration-200 cursor-pointer"
               disabled={!emailInput.trim()}
             >
               Add Members

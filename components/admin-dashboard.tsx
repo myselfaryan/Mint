@@ -97,7 +97,7 @@ export function AdminDashboard() {
   const [cpuHours, setCpuHours] = useState(5000);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background  text-gray-300 flex flex-col">
       {/* Top Navigation */}
       <nav className="bg-gray-800 p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -126,7 +126,7 @@ export function AdminDashboard() {
       <div className="flex-1 p-6 overflow-auto">
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-background  border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Teachers
@@ -137,7 +137,7 @@ export function AdminDashboard() {
               <div className="text-2xl font-bold">{totalTeachers}</div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-background-card-default border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Students
