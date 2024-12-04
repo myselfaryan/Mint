@@ -87,19 +87,21 @@ export function AuthComponent({
   }
 
   return (
-    <Card className="w-[350px] ">
-      <CardHeader>
-        <CardTitle>{isLogin ? "Login" : "Register"}</CardTitle>
+    <Card className="w-[400px]">
+      <CardHeader className="space-y-1 pb-2">
+        <CardTitle className="text-2xl font-bold">
+          {isLogin ? "Login" : "Register"}
+        </CardTitle>
         <CardDescription>
           {isLogin ? "Enter your credentials to login" : "Create a new account"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         {isLogin ? (
           <Form {...loginForm}>
             <form
               onSubmit={loginForm.handleSubmit(onLoginSubmit)}
-              className="space-y-8"
+              className="space-y-4"
             >
               <FormField
                 control={loginForm.control}
@@ -140,7 +142,7 @@ export function AuthComponent({
           <Form {...registerForm}>
             <form
               onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
-              className="space-y-8"
+              className="space-y-4"
             >
               <FormField
                 control={registerForm.control}
@@ -209,7 +211,7 @@ export function AuthComponent({
           </Form>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col space-y-4 pt-4">
         <Button
           variant="link"
           className="w-full"

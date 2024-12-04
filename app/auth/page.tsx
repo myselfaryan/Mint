@@ -12,10 +12,10 @@ export default function AuthPage({
     <div className="flex h-screen">
       <div className="w-1/2 relative">
         <Image
-          src="/placeholder.svg"
+          src="/image/interactive-learning.jpg"
           alt="Authentication"
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: "cover" }}
         />
       </div>
       <div className="w-1/2 flex items-center justify-center">
