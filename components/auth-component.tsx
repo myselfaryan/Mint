@@ -3,7 +3,7 @@ import { RegisterInput } from "@/lib/validations";
 import { registerSchema } from "@/lib/validations";
 import { LoginInput } from "@/lib/validations";
 import { loginSchema } from "@/lib/validations";
-
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +34,9 @@ export function AuthComponent({
 }: {
   initialMode?: "login" | "register";
 }) {
+  const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(initialMode === "login");
+
   const router = useRouter();
 
   const loginForm = useForm<LoginInput>({
@@ -64,7 +66,11 @@ export function AuthComponent({
       router.push("/"); // Redirect to home page after successful login
     } catch (error) {
       console.error(error);
-      throw error;
+      toast({
+        title: "Error in login",
+        description: `${error}`,
+        variant: "destructive",
+      });
     }
   }
 
@@ -77,7 +83,11 @@ export function AuthComponent({
       router.push("/"); // Redirect to home page after successful registration
     } catch (error) {
       console.error(error);
-      throw error;
+      toast({
+        title: "Error in registering",
+        description: `${error}`,
+        variant: "destructive",
+      });
     }
   }
 
