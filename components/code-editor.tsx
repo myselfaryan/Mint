@@ -64,14 +64,24 @@ const extensions = {
 };
 
 export function CodeEditor() {
-  const [code, setCode] = useState("");
+  // Editor state - manages the current code content
+  const [code, setCode] = useState<string>(() => defaultCode["cpp"]);
+
+  // Language state - controls the programming language selection
   const [language, setLanguage] = useState<"javascript" | "python" | "cpp">(
     "cpp",
   );
+
+  // Theme state - manages the editor's visual theme
   const [theme, setTheme] = useState<keyof typeof themes>("VS Code Dark");
+
+  // UI state - controls fullscreen mode
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Execution state - manages code running status and output
   const [output, setOutput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
+  const [executionError, setExecutionError] = useState<string | null>(null);
 
   const languageVersions = {
     javascript: "18.15.0",
@@ -85,9 +95,36 @@ export function CodeEditor() {
     cpp: "cpp",
   };
 
+  // Handle language change with state updates
+  const handleLanguageChange = (
+    newLanguage: "javascript" | "python" | "cpp",
+  ) => {
+    try {
+      console.log(`Changing language to: ${newLanguage}`);
+      setLanguage(newLanguage);
+      // Reset code to default for new language
+      setCode(defaultCode[newLanguage]);
+    } catch (error) {
+      console.error("Error changing language:", error);
+    }
+  };
+
+  // Handle theme change with state updates
+  const handleThemeChange = (newTheme: keyof typeof themes) => {
+    try {
+      console.log(`Changing theme to: ${newTheme}`);
+      setTheme(newTheme);
+    } catch (error) {
+      console.error("Error changing theme:", error);
+    }
+  };
+
   const runCode = async () => {
+    console.log("Starting code execution...");
     setIsRunning(true);
     setOutput("");
+    setExecutionError(null);
+
     try {
       const response = await fetch("/api/code", {
         method: "POST",
@@ -116,6 +153,8 @@ export function CodeEditor() {
       });
 
       const result = await response.json();
+      console.log("Code execution result:", result);
+
       if (result.run?.output) {
         setOutput(result.run.output);
       } else if (result.compile?.output) {
@@ -123,22 +162,35 @@ export function CodeEditor() {
       } else if (result.message) {
         setOutput(result.message);
       } else if (result.error) {
-        setOutput(result.error);
+        const errorMsg = `Execution Error: ${result.error}`;
+        console.error(errorMsg);
+        setExecutionError(errorMsg);
+        setOutput(errorMsg);
       }
     } catch (error) {
-      setOutput("Error executing code: " + (error as Error).message);
+      const errorMsg = `Runtime Error: ${(error as Error).message}`;
+      console.error("Code execution failed:", error);
+      setExecutionError(errorMsg);
+      setOutput(errorMsg);
     } finally {
       setIsRunning(false);
+      console.log("Code execution completed");
     }
   };
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+    try {
+      if (!document.fullscreenElement) {
+        console.log("Entering fullscreen mode");
+        document.documentElement.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        console.log("Exiting fullscreen mode");
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      console.error("Fullscreen toggle failed:", error);
     }
   };
 
@@ -171,12 +223,7 @@ export function CodeEditor() {
             <div className="border-b border-border p-2 bg-muted">
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
-                  <Select
-                    value={language}
-                    onValueChange={(value: "javascript" | "python" | "cpp") =>
-                      setLanguage(value)
-                    }
-                  >
+                  <Select value={language} onValueChange={handleLanguageChange}>
                     <SelectTrigger className="w-[180px] bg-background text-foreground border-border">
                       <SelectValue placeholder="Select Language" />
                     </SelectTrigger>
@@ -186,12 +233,7 @@ export function CodeEditor() {
                       <SelectItem value="cpp">C++</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select
-                    value={theme}
-                    onValueChange={(value: keyof typeof themes) =>
-                      setTheme(value)
-                    }
-                  >
+                  <Select value={theme} onValueChange={handleThemeChange}>
                     <SelectTrigger className="w-[180px] bg-background text-foreground border-border">
                       <SelectValue placeholder="Select Theme" />
                     </SelectTrigger>
@@ -231,67 +273,91 @@ export function CodeEditor() {
               </div>
             </div>
             <div className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-hidden">
-                <CodeMirror
-                  value={code}
-                  height="100%"
-                  theme={themes[theme]}
-                  extensions={extensions[language]}
-                  onChange={(value) => setCode(value)}
-                  className="h-full"
-                />
-              </div>
-              <div className="h-[250px] border-t border-border">
-                <div className="flex h-full">
-                  <div className="flex-1 border-r border-border">
-                    <div className="flex items-center px-4 py-2 border-b border-border bg-muted">
-                      <h2 className="text-sm font-medium text-foreground">
-                        Test Cases
-                      </h2>
-                    </div>
-                    <div className="p-2 space-y-2 overflow-auto h-[calc(100%-36px)]">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 px-2 py-1">
-                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                          <span className="text-sm text-foreground">
-                            Case 1
-                          </span>
+              <ResizablePanelGroup direction="vertical" className="h-full">
+                <ResizablePanel defaultSize={70} minSize={30}>
+                  <div className="h-full overflow-hidden">
+                    <CodeMirror
+                      value={code}
+                      height="100%"
+                      theme={themes[theme]}
+                      extensions={extensions[language]}
+                      onChange={(value) => setCode(value)}
+                      className="h-full"
+                    />
+                  </div>
+                </ResizablePanel>
+                <ResizableHandle className="h-2 bg-muted hover:bg-muted-foreground/20 transition-colors" />
+                <ResizablePanel defaultSize={30} minSize={20}>
+                  <ResizablePanelGroup
+                    direction="horizontal"
+                    className="h-full border-t border-border"
+                  >
+                    <ResizablePanel defaultSize={50} minSize={30}>
+                      <div className="h-full flex flex-col border-r border-border">
+                        <div className="flex items-center px-4 py-2 border-b border-border bg-muted">
+                          <h2 className="text-sm font-medium text-foreground">
+                            Test Cases
+                          </h2>
                         </div>
-                        <div className="bg-muted rounded p-2">
-                          <div className="text-sm font-mono">
-                            <span className="text-muted-foreground">x = </span>
-                            <span className="text-foreground">121</span>
+                        <div className="p-2 space-y-2 overflow-auto flex-1">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 px-2 py-1">
+                              <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                              <span className="text-sm text-foreground">
+                                Case 1
+                              </span>
+                            </div>
+                            <div className="bg-muted rounded p-2">
+                              <div className="text-sm font-mono">
+                                <span className="text-muted-foreground">
+                                  x ={" "}
+                                </span>
+                                <span className="text-foreground">121</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 px-2 py-1">
+                              <div className="h-2 w-2 rounded-full bg-muted"></div>
+                              <span className="text-sm text-foreground">
+                                Case 2
+                              </span>
+                            </div>
+                            <div className="bg-muted rounded p-2">
+                              <div className="text-sm font-mono">
+                                <span className="text-muted-foreground">
+                                  x ={" "}
+                                </span>
+                                <span className="text-foreground">-121</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 px-2 py-1">
-                          <div className="h-2 w-2 rounded-full bg-muted"></div>
-                          <span className="text-sm text-foreground">
-                            Case 2
-                          </span>
+                    </ResizablePanel>
+                    <ResizableHandle className="w-2 bg-muted hover:bg-muted-foreground/20 transition-colors" />
+                    <ResizablePanel defaultSize={50} minSize={30}>
+                      <div className="h-full flex flex-col">
+                        <div className="flex items-center px-4 py-2 border-b border-border bg-muted">
+                          <h2 className="text-sm font-medium text-foreground">
+                            Test Results
+                          </h2>
                         </div>
-                        <div className="bg-muted rounded p-2">
-                          <div className="text-sm font-mono">
-                            <span className="text-muted-foreground">x = </span>
-                            <span className="text-foreground">-121</span>
-                          </div>
+                        <div className="p-4 font-mono text-sm text-foreground overflow-auto flex-1">
+                          {executionError ? (
+                            <div className="text-red-500">{output}</div>
+                          ) : (
+                            <div>
+                              {output ||
+                                "Run your code to see the test results..."}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center px-4 py-2 border-b border-border bg-muted">
-                      <h2 className="text-sm font-medium text-foreground">
-                        Test Results
-                      </h2>
-                    </div>
-                    <div className="p-4 font-mono text-sm text-foreground overflow-auto h-[calc(100%-36px)]">
-                      {output || "Run your code to see the test results..."}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                </ResizablePanel>
+              </ResizablePanelGroup>
             </div>
           </div>
         </ResizablePanel>
