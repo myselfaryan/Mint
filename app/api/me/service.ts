@@ -1,6 +1,6 @@
-import { db } from '@/db/drizzle';
-import { users, memberships, orgs } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "@/db/drizzle";
+import { users, memberships, orgs } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 interface Org {
   id: number;
@@ -28,17 +28,9 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
       role: memberships.role,
     })
     .from(users)
-    .leftJoin(
-      memberships,
-      eq(users.id, memberships.userId)
-    )
-    .leftJoin(
-      orgs,
-      eq(memberships.orgId, orgs.id)
-    )
-    .where(
-      eq(users.id, userId)
-    );
+    .leftJoin(memberships, eq(users.id, memberships.userId))
+    .leftJoin(orgs, eq(memberships.orgId, orgs.id))
+    .where(eq(users.id, userId));
 
   if (result.length === 0) {
     return null;
@@ -52,8 +44,8 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
     email: userData.email,
     name: userData.name,
     orgs: result
-      .filter(row => row.orgId !== null) // Filter out null orgs from left join
-      .map(row => ({
+      .filter((row) => row.orgId !== null) // Filter out null orgs from left join
+      .map((row) => ({
         id: row.orgId!,
         name: row.orgName!,
         nameId: row.orgNameId!,
