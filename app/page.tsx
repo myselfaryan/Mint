@@ -51,7 +51,7 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
-                className="text-gray-300 hover:text-white"
+                className="text-gray-300 hover:text-white hover:bg-gray-800"
                 onClick={() => router.push("/auth")}
               >
                 Sign In
