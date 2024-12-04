@@ -1,17 +1,17 @@
 "use client";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ChartComponents"; 
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui";
+} from "@/components/ui/chart";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 interface GraphCardProps {
   data: {
@@ -39,9 +39,7 @@ export const GraphCard = ({ data, restingHR, variability }: GraphCardProps) => {
           <CardDescription>Variability</CardDescription>
           <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
             {variability}
-            <span className="text-sm font-normal tracking-normal text-muted-foreground">
-              
-            </span>
+            <span className="text-sm font-normal tracking-normal text-muted-foreground"></span>
           </CardTitle>
         </div>
       </CardHeader>
