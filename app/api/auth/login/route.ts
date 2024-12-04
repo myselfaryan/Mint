@@ -5,7 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { generateSessionToken, createSession } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
-import { Argon2id } from "oslo/password";
+import { verifyPassword } from "@/lib/password";
 
 export async function POST(request: Request) {
   try {
@@ -23,8 +23,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const argon2id = new Argon2id();
-    const isValidPassword = await argon2id.verify(
+    const isValidPassword = await verifyPassword(
       user.hashedPassword,
       validatedData.password,
     );
