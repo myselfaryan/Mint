@@ -192,6 +192,18 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   // Get the base path (e.g., /[orgId])
   const basePath = pathname.split("/").slice(0, 2).join("/");
 
+  // Utility function to generate breadcrumbs from pathname
+  const generateBreadcrumbs = (pathname: string) => {
+    const paths = pathname.split("/").filter(Boolean);
+    return paths.map((path) => ({
+      href: "/" + paths.slice(0, paths.indexOf(path) + 1).join("/"),
+      label: path
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
+    }));
+  };
+
   return (
     <ThemeProvider>
       <SidebarProvider>
@@ -383,15 +395,24 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               <Separator orientation="vertical" className="mr-2 h-4" />
               <Breadcrumb>
                 <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                  </BreadcrumbItem>
+                  {generateBreadcrumbs(usePathname()).map(
+                    (crumb, index, array) => (
+                      <React.Fragment key={crumb.href}>
+                        <BreadcrumbItem className="hidden md:block">
+                          {index === array.length - 1 ? (
+                            <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink href={crumb.href}>
+                              {crumb.label}
+                            </BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                        {index < array.length - 1 && (
+                          <BreadcrumbSeparator className="hidden md:block" />
+                        )}
+                      </React.Fragment>
+                    ),
+                  )}
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
