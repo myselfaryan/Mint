@@ -10,13 +10,9 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const userEmails = pgTable("user_emails", {
-  email: text("email").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
-});
-
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: varchar("email").notNull().unique(),
 
   nameId: text("name_id").notNull().unique(),
   name: text("name").notNull(),

@@ -83,3 +83,17 @@ export const createTestCaseSchema = z.object({
 export const createParticipantSchema = z.object({
   userId: z.number().int().positive(),
 });
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  fullName: z.string().min(2),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
