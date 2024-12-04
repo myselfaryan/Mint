@@ -1,4 +1,4 @@
-import bcryptjs from 'bcryptjs';
+import bcryptjs from "bcryptjs";
 
 export async function hashPassword(password: string) {
   return await bcryptjs.hash(password, 12);

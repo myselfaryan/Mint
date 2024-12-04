@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "../components/ui/button";
 import { FAQ } from "../components/landing/faq";
 import { VortexDemo } from "../components/landing/vortex-demo";
@@ -56,7 +56,8 @@ export default function Home() {
               >
                 Sign In
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700"
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
                 onClick={() => router.push("/auth?mode=register")}
               >
                 Get Started

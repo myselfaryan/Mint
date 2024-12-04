@@ -58,10 +58,10 @@ export function AuthComponent({
   async function onLoginSubmit(values: LoginInput) {
     try {
       await fetchApi("auth/login", {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(values),
       });
-      router.push('/'); // Redirect to home page after successful login
+      router.push("/"); // Redirect to home page after successful login
     } catch (error) {
       console.error(error);
       throw error;
@@ -71,10 +71,10 @@ export function AuthComponent({
   async function onRegisterSubmit(values: RegisterInput) {
     try {
       await fetchApi("auth/register", {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(values),
       });
-      router.push('/'); // Redirect to home page after successful registration
+      router.push("/"); // Redirect to home page after successful registration
     } catch (error) {
       console.error(error);
       throw error;
