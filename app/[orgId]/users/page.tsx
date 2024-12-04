@@ -4,17 +4,8 @@ import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { GenericEditor, Field } from "@/mint/generic-editor";
 import { inviteUserSchema } from "@/lib/validations";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 
-interface User {
-  id: number;
-  name: string;
-  nameId: string;
-  avatar?: string;
-  about?: string;
-  role: "owner" | "organizer" | "member";
-  joinedAt: string;
-}
+import { User, mockUsers } from "./mockUsers";
 
 interface InviteUserData {
   email: string;
@@ -35,8 +26,6 @@ const columns: ColumnDef<User>[] = [
 
 const fields: Field[] = [
   { name: "email", label: "Email", type: "text" },
-  { name: "role", label: "Role", type: "text" },
-  /*
   {
     name: "role",
     label: "Role",
@@ -44,16 +33,16 @@ const fields: Field[] = [
     options: [
       { value: "member", label: "Member" },
       { value: "organizer", label: "Organizer" },
-      { value: "owner", label: "Owner" }
-    ]
-  }
-  */
+      { value: "owner", label: "Owner" },
+    ],
+  },
 ];
 
-export default function UsersPage() {
-  const params = useParams();
-  const orgId = params.orgId as string;
-
+export default function UsersPage({
+  params: { orgId },
+}: {
+  params: { orgId: string };
+}) {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -70,6 +59,7 @@ export default function UsersPage() {
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
+      setUsers(mockUsers);
     }
   };
 
@@ -157,7 +147,7 @@ export default function UsersPage() {
         onSave={selectedUser ? updateRole : inviteUser}
         schema={inviteUserSchema}
         fields={fields}
-        title={selectedUser ? "Update Role" : "Invite User"}
+        title={selectedUser ? "Role" : "User to Organization"}
       />
     </>
   );
