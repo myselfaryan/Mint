@@ -4,39 +4,13 @@ import { useToast } from "@/hooks/use-toast";
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { GenericEditor, Field } from "@/mint/generic-editor";
 import { useEffect, useState } from "react";
-import { createProblemSchema } from "@/lib/validations";
-
-// interface Problem {
-//   id: number;
-//   title: string;
-//   description: string;
-//   allowedLanguages: string[];
-//   createdAt: Date;
-//   orgId: number;
-// }
+import { z } from "zod";
 
 const columns: ColumnDef<Problem>[] = [
+  { header: "Problem Code", accessorKey: "nameId", sortable: true },
   { header: "Title", accessorKey: "title", sortable: true },
-  { header: "Description", accessorKey: "description" },
   { header: "Allowed Languages", accessorKey: "allowedLanguages" },
   { header: "Created At", accessorKey: "createdAt", sortable: true },
-];
-
-const fields: Field[] = [
-  { name: "title", label: "Title", type: "text" },
-  { name: "description", label: "Description", type: "text" },
-  {
-    name: "allowedLanguages",
-    label: "Allowed Languages",
-    type: "select",
-    options: [
-      { value: "python", label: "Python" },
-      { value: "javascript", label: "JavaScript" },
-      { value: "typescript", label: "TypeScript" },
-      { value: "java", label: "Java" },
-      { value: "cpp", label: "C++" },
-    ],
-  },
 ];
 
 export default function ProblemsPage({
@@ -46,7 +20,7 @@ export default function ProblemsPage({
 }) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  //   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -134,22 +108,12 @@ export default function ProblemsPage({
         data={problems}
         columns={columns}
         title="Problems"
-        searchableFields={["title", "description"]}
+        searchableFields={["nameId", "title"]}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
         allowDownload={true}
         addPage="new"
-      />
-
-      <GenericEditor
-        data={selectedProblem}
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        onSave={handleSave}
-        schema={createProblemSchema}
-        fields={fields}
-        title="Problems"
       />
     </>
   );
