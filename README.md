@@ -1,3 +1,17 @@
+# pariksa
+
+## Migrations
+
+```bash
+npx drizzle-kit generate  # generate SQL migration files based on your Drizzle schema
+npx drizzle-kit migrate  # apply generated SQL migration files to your database
+```
+
+> [!NOTE]
+> Use `bun` instead of `npx` if you are using `bun`.
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
