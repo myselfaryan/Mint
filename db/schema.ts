@@ -161,7 +161,7 @@ export const contestParticipants = pgTable(
 
 export const problems = pgTable("problems", {
   id: serial("id").primaryKey(),
-
+  code: text("code").notNull().unique(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   allowedLanguages: text("allowed_languages").array().notNull(),

@@ -97,12 +97,14 @@ export default function UsersPage({
 
       if (!response.ok) {
         // TODO: remove
-        setUsers(mockUsers.map((u) => {
-          return {
-            ...u,
-            role: user.role,
-          }
-        }));
+        setUsers(
+          mockUsers.map((u) => {
+            return {
+              ...u,
+              role: user.role,
+            };
+          }),
+        );
 
         const error = await response.json();
         throw new Error(error.message || "Failed to update role");

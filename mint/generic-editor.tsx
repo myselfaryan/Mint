@@ -66,6 +66,9 @@ export function GenericEditor<T>({
 
   const onSubmit = (formData: T) => {
     // If this is a new entry, add an id
+    console.log("onSubmit in GenericEditor");
+    console.log("formData", formData);
+
     if (!data) {
       formData = {
         ...formData,
