@@ -3,7 +3,7 @@ export interface Problem {
   title: string;
   description: string;
   allowedLanguages: string[];
-  createdAt: Date;
+  createdAt: string;
   orgId: number;
 }
 
@@ -14,7 +14,7 @@ export const mockProblems: Problem[] = [
     description:
       "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
     allowedLanguages: ["python", "javascript", "java"],
-    createdAt: new Date("2024-01-01"),
+    createdAt: "2024-01-01",
     orgId: 1,
   },
   {
@@ -23,7 +23,7 @@ export const mockProblems: Problem[] = [
     description:
       "Write a function that reverses a string. The input string is given as an array of characters.",
     allowedLanguages: ["python", "cpp", "javascript"],
-    createdAt: new Date("2024-01-02"),
+    createdAt: "2024-01-02",
     orgId: 1,
   },
   {
@@ -32,7 +32,7 @@ export const mockProblems: Problem[] = [
     description:
       "Implement a binary search algorithm to find a target value in a sorted array.",
     allowedLanguages: ["python", "typescript", "java", "cpp"],
-    createdAt: new Date("2024-01-03"),
+    createdAt: "2024-01-03",
     orgId: 1,
   },
 ];
