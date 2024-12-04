@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const register = async (
     email: string,
     password: string,
-    fullName: string
+    fullName: string,
   ): Promise<User> => {
     try {
       const data = await fetchApi<User>("/auth/register", {

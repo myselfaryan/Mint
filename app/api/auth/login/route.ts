@@ -19,20 +19,20 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const argon2id = new Argon2id();
     const isValidPassword = await argon2id.verify(
       user.hashedPassword,
-      validatedData.password
+      validatedData.password,
     );
 
     if (!isValidPassword) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 

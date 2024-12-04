@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
 
-
 export async function setSessionTokenCookie(
   token: string,
-  expiresAt: Date
+  expiresAt: Date,
 ): Promise<void> {
   const cookieStore = cookies();
   cookieStore.set("session", token, {

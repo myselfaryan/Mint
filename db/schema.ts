@@ -56,7 +56,7 @@ export const memberships = pgTable(
       orgIdIdx: index("org_id_idx").on(table.orgId),
       userIdIdx: index("user_id_idx").on(table.userId),
     };
-  }
+  },
 );
 
 export const groups = pgTable("groups", {
@@ -92,7 +92,7 @@ export const groupMemberships = pgTable(
       groupIdIdx: index("group_id_idx").on(table.groupId),
       userIdIdx: index("user_id_idx").on(table.userId),
     };
-  }
+  },
 );
 
 export const contests = pgTable(
@@ -127,7 +127,7 @@ export const contests = pgTable(
       startTimeIdx: index("start_time_idx").on(table.startTime),
       endTimeIdx: index("end_time_idx").on(table.endTime),
     };
-  }
+  },
 );
 
 export const contestParticipants = pgTable(
@@ -145,13 +145,13 @@ export const contestParticipants = pgTable(
     return {
       pk: primaryKey({ columns: [table.contestId, table.userId] }),
       contestParticipantContestIdx: index("contest_participant_contest_idx").on(
-        table.contestId
+        table.contestId,
       ),
       contestParticipantUserIdx: index("contest_participant_user_idx").on(
-        table.userId
+        table.userId,
       ),
     };
-  }
+  },
 );
 
 export const problems = pgTable("problems", {
@@ -182,7 +182,7 @@ export const testCases = pgTable(
     return {
       problemIdIdx: index("problem_id_idx").on(table.problemId),
     };
-  }
+  },
 );
 
 export const contestProblems = pgTable(
@@ -203,12 +203,12 @@ export const contestProblems = pgTable(
     return {
       uniqueConstraint: uniqueIndex("contest_problem_unique_constraint").on(
         table.contestId,
-        table.problemId
+        table.problemId,
       ),
       contestIdx: index("contest_idx").on(table.contestId),
       orderIdx: index("order_idx").on(table.contestId, table.order),
     };
-  }
+  },
 );
 
 export const problemSubmissions = pgTable(
@@ -235,11 +235,11 @@ export const problemSubmissions = pgTable(
     return {
       userIdx: index("user_idx").on(table.userId),
       contestProblemIdx: index("contest_problem_idx").on(
-        table.contestProblemId
+        table.contestProblemId,
       ),
       submittedAtIdx: index("submitted_at_idx").on(table.submittedAt),
     };
-  }
+  },
 );
 
 export const sessionTable = pgTable("session", {
