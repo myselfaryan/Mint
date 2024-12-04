@@ -69,8 +69,8 @@ export function GenericListing<T extends { id: number | string }>({
     return data
       .filter((item) =>
         searchableFields.some((field) =>
-          String(item[field]).toLowerCase().includes(searchTerm.toLowerCase())
-        )
+          String(item[field]).toLowerCase().includes(searchTerm.toLowerCase()),
+        ),
       )
       .sort((a, b) => {
         const aVal = a[sortField];
@@ -95,7 +95,7 @@ export function GenericListing<T extends { id: number | string }>({
     const csvContent = [
       headers.join(","),
       ...filteredAndSortedData.map((item) =>
-        columns.map((col) => item[col.accessorKey]).join(",")
+        columns.map((col) => item[col.accessorKey]).join(","),
       ),
     ].join("\n");
 
