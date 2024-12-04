@@ -21,13 +21,13 @@ import { GenericEditor, Field } from "@/mint/generic-editor";
 import { useState } from "react";
 import { z } from "zod";
 import router from "next/router";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Org {
-  id: number;
+  id?: number;
   name: string;
   nameId: string;
-  role: string;
+  // role: string;
 }
 
 const fields: Field[] = [
@@ -47,12 +47,13 @@ export default function OrgOnboarding() {
   const [org, setOrg] = useState<Org | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
-  const { toast } = useToast();
+  // setOrg(null);
+  // const { toast } = useToast();
 
   const saveOrg = async (data: Org) => {
     console.log("Saving org:", data);
-    setOrg(data);
-    setIsEditorOpen(false);
+    // setOrg(data);
+
     try {
       const response = await fetch("/api/orgs", {
         method: "POST",
@@ -66,24 +67,26 @@ export default function OrgOnboarding() {
         setOrg(orgData);
         router.push(`/org/${orgData.nameId}`);
       } else {
-        toast({
-          title: "Error creating organization",
-          description: `${orgData.error}`,
-          variant: "destructive",
-        });
+        // toast({
+        //   title: "Error creating organization",
+        //   description: `${orgData.error}`,
+        //   variant: "destructive",
+        // });
       }
     } catch (error) {
       console.error(error);
-      toast({
-        title: "Error creating organization",
-        description: `${error}`,
-        variant: "destructive",
-      });
+      // toast({
+      //   title: "Error creating organization",
+      //   description: `${error}`,
+      //   variant: "destructive",
+      // });
     }
 
     // redirect to /org.nameId
 
     // handle error and show error message in toast
+
+    setIsEditorOpen(false);
   };
 
   const orgSchema = z.object({
@@ -98,9 +101,9 @@ export default function OrgOnboarding() {
         message:
           "Organization ID must only contain letters, numbers and dashes",
       }),
-    role: z.enum(["owner", "admin", "member"], {
-      required_error: "Role is required",
-    }),
+    // role: z.enum(["owner", "admin", "member"], {
+    //   required_error: "Role is required",
+    // }),
   });
 
   return (
