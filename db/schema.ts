@@ -256,9 +256,6 @@ export const sessionTable = pgTable("session", {
   }).notNull(),
 });
 
-export type SelectUserEmail = typeof userEmails.$inferSelect;
-export type InsertUserEmail = typeof userEmails.$inferInsert;
-
 export type SelectUser = typeof users.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;

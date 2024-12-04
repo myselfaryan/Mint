@@ -179,7 +179,7 @@ export async function getOrgRecentGroups(orgId: number, period: Period) {
 
 export async function getOrgSubmissionsCount(orgId: number) {
   const result = await db
-    .select({ value: sql<number>`count(ps.*)` })
+    .select({ value: sql<number>`count(problemSubmissions.*)` })
     .from(problemSubmissions)
     .innerJoin(
       contestProblems,
