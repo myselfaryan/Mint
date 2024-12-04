@@ -135,9 +135,9 @@ export function UserListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-2 flex items-center justify-between">
+      <nav className="bg-background p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <ChevronLeft className="h-4 w-4" />
@@ -181,7 +181,7 @@ export function UserListPage() {
                 <SelectItem value="No Pending">No Pending</SelectItem>
               </SelectContent>
             </Select>
-            <Link href="/users/new">
+            <Link href="/${id}/users/new">
               <Button variant="outline" size="lg">
                 {/* <Download className="h-4 w-4" /> */}
                 +Add User
@@ -190,7 +190,7 @@ export function UserListPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg overflow-hidden">
+        <div className="bg-background rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

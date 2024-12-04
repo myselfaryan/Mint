@@ -75,26 +75,26 @@ export function GroupsInfoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-4 flex items-center justify-between">
+      <nav className="bg-background p-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="hover:bg-gray-700">
+          <Button variant="ghost" size="icon" className="hover:bg-muted">
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-lg font-semibold">Groups Information</span>
-          <Button variant="ghost" size="icon" className="hover:bg-gray-700">
+          <Button variant="ghost" size="icon" className="hover:bg-muted">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="hover:bg-gray-700">
+          <Button variant="ghost" size="icon" className="hover:bg-muted">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-gray-700">
+          <Button variant="ghost" size="icon" className="hover:bg-muted">
             <Bell className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-gray-700">
+          <Button variant="ghost" size="icon" className="hover:bg-muted">
             <User className="h-4 w-4" />
           </Button>
         </div>
@@ -118,12 +118,12 @@ export function GroupsInfoPage() {
             placeholder="Search groups..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm bg-gray-800 text-gray-300 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="max-w-sm bg-background text-foreground border border-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
         {/* Table */}
-        <div className="bg-gray-800 p-4 rounded-lg shadow-md">
+        <div className="bg-background p-4  ">
           <Table>
             <TableHeader>
               <TableRow>
@@ -155,7 +155,7 @@ export function GroupsInfoPage() {
               {filteredGroups.map((group) => (
                 <TableRow
                   key={group.id}
-                  className="hover:bg-gray-700 transition-colors"
+                  className="hover:bg-muted transition-colors"
                 >
                   <TableCell className="font-medium">{group.name}</TableCell>
                   <TableCell>{group.participants}</TableCell>
@@ -166,25 +166,25 @@ export function GroupsInfoPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="hover:bg-gray-700"
+                          className="hover:bg-background"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="bg-gray-800 text-gray-300 border-gray-700 rounded-lg shadow-lg"
+                        className="bg-background text-foreground border-accent-default rounded-lg shadow-lg"
                       >
                         <DropdownMenuItem
                           onClick={() => handleViewGroup(group.id)}
-                          className="hover:bg-gray-700 transition-colors"
+                          className="hover:bg-foreground transition-colors"
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           View
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleRemoveGroup(group.id)}
-                          className="text-red-500 hover:bg-gray-700 transition-colors"
+                          className="text-red-500 hover:bg-foreground transition-colors"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Remove

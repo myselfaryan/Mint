@@ -89,11 +89,19 @@ export const loginSchema = z.object({
   password: z.string().min(6),
 });
 
-export const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  fullName: z.string().min(2),
-});
+export const registerSchema = loginSchema
+  .extend({
+    name: z
+      .string()
+      .min(2, { message: "Name must be at least 2 characters long" }),
+    confirmPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

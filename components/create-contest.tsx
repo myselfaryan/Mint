@@ -26,7 +26,7 @@ export function CreateContest() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-muted p-2 flex items-center justify-between">
+      <nav className="bg-background p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Using Link for navigation */}
           <Link href="/create">
