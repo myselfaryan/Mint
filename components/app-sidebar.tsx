@@ -63,6 +63,8 @@ import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AuthContext } from "@/contexts/auth-context";
+import { useContext } from "react";
 
 // This is sample data.
 const data = {
@@ -164,6 +166,12 @@ function ThemeItems() {
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    logout();
+  };
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -346,7 +354,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
