@@ -104,7 +104,7 @@ export default function ProblemsPage({
   };
 
   return (
-    <div className="container mx-auto py-10">
+    <>
       <GenericListing
         data={problems}
         columns={columns}
@@ -126,6 +126,6 @@ export default function ProblemsPage({
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

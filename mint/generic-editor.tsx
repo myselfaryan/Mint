@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -25,8 +26,9 @@ import { z } from "zod";
 export interface Field {
   name: string;
   label: string;
-  type: "text" | "number" | "date" | "select";
+  type: "text" | "number" | "date" | "select" | "textarea";
   options?: { value: string; label: string }[];
+  placeholder?: string;
 }
 
 interface GenericEditorProps<T> {
@@ -113,7 +115,9 @@ export function GenericEditor<T>({
                           : ""
                       }
                     >
-                      <SelectValue placeholder="Select an option" />
+                      <SelectValue
+                        placeholder={field.placeholder || "Select an option"}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {field.options.map((option) => (
@@ -123,10 +127,22 @@ export function GenericEditor<T>({
                       ))}
                     </SelectContent>
                   </Select>
+                ) : field.type === "textarea" ? (
+                  <Textarea
+                    id={field.name}
+                    placeholder={field.placeholder || ""}
+                    {...register(field.name as any)}
+                    className={
+                      errors[field.name as keyof typeof errors]
+                        ? "border-red-500"
+                        : ""
+                    }
+                  />
                 ) : (
                   <Input
                     id={field.name}
                     type={field.type}
+                    placeholder={field.placeholder || ""}
                     {...register(field.name as any, {
                       valueAsNumber: field.type === "number",
                     })}
