@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -25,6 +25,8 @@ import {
   Trash2,
   Copy,
 } from "lucide-react";
+import { DeleteConfirmationModal } from "@/mint/delete-confirm";
+import { Toast, ToastType } from "@/mint/toast";
 
 export interface ColumnDef<T> {
   header: string;
@@ -34,17 +36,19 @@ export interface ColumnDef<T> {
 
 interface GenericListingProps<T> {
   data: T[];
+  setData: (data: T[]) => void;
   columns: ColumnDef<T>[];
   title: string;
   searchableFields: (keyof T)[];
   onAdd?: () => void;
   onEdit?: (item: T) => void;
-  onDelete?: (item: T) => void;
+  onDelete?: (item: T) => Promise<void>;
   allowDownload?: boolean;
 }
 
 export function GenericListing<T extends { id: number | string }>({
   data,
+  setData,
   columns,
   title,
   searchableFields,
@@ -56,6 +60,12 @@ export function GenericListing<T extends { id: number | string }>({
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof T>(columns[0].accessorKey);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<T | null>(null);
+  const [toast, setToast] = useState<{
+    type: ToastType;
+    message: string;
+  } | null>(null);
 
   const filteredAndSortedData = useMemo(() => {
     return data
@@ -99,6 +109,35 @@ export function GenericListing<T extends { id: number | string }>({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const confirmDelete = (item: T) => {
+    setItemToDelete(item);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (itemToDelete && onDelete) {
+      try {
+        await onDelete(itemToDelete);
+        setData(data.filter((item) => item.id !== itemToDelete.id));
+        setToast({
+          type: ToastType.SUCCESS,
+          message: `Item has been deleted successfully.`,
+        });
+      } catch (error) {
+        setToast({
+          type: ToastType.FAILURE,
+          message: `Failed to delete item: ${error instanceof Error ? error.message : "Unknown error"}`,
+        });
+      }
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const closeToast = () => {
+    setToast(null);
   };
 
   return (
@@ -198,7 +237,7 @@ export function GenericListing<T extends { id: number | string }>({
                           {onDelete && (
                             <DropdownMenuItem
                               className="text-red-600"
-                              onClick={() => onDelete(item)}
+                              onClick={() => confirmDelete(item)}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
@@ -214,6 +253,20 @@ export function GenericListing<T extends { id: number | string }>({
           </TableBody>
         </Table>
       </div>
+      {isDeleteModalOpen && itemToDelete && (
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setItemToDelete(null);
+          }}
+          onConfirm={handleDelete}
+          itemName={String(itemToDelete.id)}
+        />
+      )}
+      {toast && (
+        <Toast type={toast.type} message={toast.message} onClose={closeToast} />
+      )}
     </div>
   );
 }

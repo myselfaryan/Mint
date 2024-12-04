@@ -32,10 +32,31 @@ export default function BooksPage() {
     setBooks(mockBooks);
   }, []);
 
+  const handleDelete = async (book: Book) => {
+    // Here you would typically make an API call to delete the book
+    // For now, we'll just simulate an API call
+    console.log("Attempting to delete", book);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    // The actual state update will be handled by the GenericListing component
+  };
+
+  const handleSave = async (book: Book) => {
+    // Here you would typically make an API call to save the book
+    if (selectedBook) {
+      // Update existing book
+      setBooks(books.map((b) => (b.id === book.id ? book : b)));
+    } else {
+      // Add new book
+      setBooks([...books, { ...book, id: Date.now() }]);
+    }
+    setIsEditorOpen(false);
+  };
+
   return (
     <>
       <GenericListing
         data={books}
+        setData={setBooks}
         columns={columns}
         title="Books"
         searchableFields={["name", "author"]}
@@ -47,20 +68,14 @@ export default function BooksPage() {
           setSelectedBook(book);
           setIsEditorOpen(true);
         }}
-        onDelete={(book) => {
-          // Handle delete
-          console.log(book);
-        }}
+        onDelete={handleDelete}
       />
 
       <GenericEditor
         data={selectedBook}
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
-        onSave={(book) => {
-          console.log(book);
-          // Handle save
-        }}
+        onSave={handleSave}
         schema={bookSchema}
         fields={fields}
         title="Book"
