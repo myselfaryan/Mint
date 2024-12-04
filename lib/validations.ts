@@ -23,6 +23,15 @@ export const updateUserSchema = createUserSchema
   .partial()
   .omit({ email: true });
 
+export const inviteUserSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(["owner", "organizer", "member"]),
+});
+
+export const updateUserRoleSchema = z.object({
+  role: z.enum(["owner", "organizer", "member"]),
+});
+
 // Organization Schemas
 export const createOrgSchema = z.object({
   nameId: NameIdSchema,

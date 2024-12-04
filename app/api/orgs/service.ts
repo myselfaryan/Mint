@@ -1,27 +1,18 @@
 import { db } from "@/db/drizzle";
 import { orgs, memberships } from "@/db/schema";
+import { z } from "zod";
+import { createOrgSchema } from "./validation";
 
-export async function createOrg(data: {
-  nameId: string;
-  name: string;
-  about?: string;
-  avatar?: string;
-  ownerId: number;
-}) {
+export async function createOrg(
+  userId: number,
+  data: z.infer<typeof createOrgSchema>,
+) {
   return await db.transaction(async (tx) => {
-    const [org] = await tx
-      .insert(orgs)
-      .values({
-        nameId: data.nameId,
-        name: data.name,
-        about: data.about,
-        avatar: data.avatar,
-      })
-      .returning();
+    const [org] = await tx.insert(orgs).values(data).returning();
 
     await tx.insert(memberships).values({
       orgId: org.id,
-      userId: data.ownerId,
+      userId,
       role: "owner",
     });
 

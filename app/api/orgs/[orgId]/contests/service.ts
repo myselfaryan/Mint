@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/db/drizzle";
 import { contests } from "@/db/schema";
-import { createContestSchema } from "./validation";
+import { createContestSchema } from "@/lib/validations";
 
 export async function createContest(
   orgId: number,
