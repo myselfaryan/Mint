@@ -1,21 +1,24 @@
-import { z } from 'zod';
+import { z } from "zod";
 import { IdSchema } from "@/app/api/types";
 import { NextRequest, NextResponse } from "next/server";
-import * as submissionService from '../service';
+import * as submissionService from "../service";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { orgId: string; submissionId: string } }
+  { params }: { params: { orgId: string; submissionId: string } },
 ) {
   try {
     const orgId = IdSchema.parse(params.orgId);
     const submissionId = IdSchema.parse(params.submissionId);
 
-    const submission = await submissionService.getSubmission(orgId, submissionId);
+    const submission = await submissionService.getSubmission(
+      orgId,
+      submissionId,
+    );
     if (!submission) {
       return NextResponse.json(
         { message: "Submission not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -26,7 +29,7 @@ export async function GET(
     }
     return NextResponse.json(
       { message: "Failed to fetch submission" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

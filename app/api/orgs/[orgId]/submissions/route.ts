@@ -1,18 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createSubmissionSchema, getSubmissionsQuerySchema } from './validation';
-import * as submissionService from './service';
-import { IdSchema } from '@/app/api/types';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  createSubmissionSchema,
+  getSubmissionsQuerySchema,
+} from "./validation";
+import * as submissionService from "./service";
+import { IdSchema } from "@/app/api/types";
+import { z } from "zod";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: { orgId: string } },
 ) {
   try {
     const orgId = IdSchema.parse(params.orgId);
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
     const filters = getSubmissionsQuerySchema.parse(searchParams);
-    
+
     const submissions = await submissionService.getSubmissions(orgId, filters);
     return NextResponse.json(submissions);
   } catch (error) {
@@ -21,19 +24,19 @@ export async function GET(
     }
     return NextResponse.json(
       { message: "Failed to fetch submissions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: { orgId: string } },
 ) {
   try {
     const orgId = IdSchema.parse(params.orgId);
     const data = createSubmissionSchema.parse(await request.json());
-    
+
     const submission = await submissionService.createSubmission(orgId, data);
     return NextResponse.json(submission, { status: 201 });
   } catch (error) {
@@ -45,7 +48,7 @@ export async function POST(
     }
     return NextResponse.json(
       { message: "Failed to create submission" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
