@@ -309,9 +309,6 @@ export function CodeEditor() {
                             </div>
                             <div className="bg-muted rounded p-2">
                               <div className="text-sm font-mono">
-                                <span className="text-muted-foreground">
-                                  x ={" "}
-                                </span>
                                 <span className="text-foreground">121</span>
                               </div>
                             </div>
@@ -325,9 +322,6 @@ export function CodeEditor() {
                             </div>
                             <div className="bg-muted rounded p-2">
                               <div className="text-sm font-mono">
-                                <span className="text-muted-foreground">
-                                  x ={" "}
-                                </span>
                                 <span className="text-foreground">-121</span>
                               </div>
                             </div>

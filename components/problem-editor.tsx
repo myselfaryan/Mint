@@ -7,28 +7,53 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  mockProblems,
+  Problem as ListProblem,
+} from "@/app/[orgId]/problems/mockProblems";
 
 interface TestCase {
   input: string;
-  expectedOutput: string;
+  output: string;
+  kind: "example" | "test";
 }
 
 interface Problem {
-  id: string;
+  id?: string;
+  code: string;
   title: string;
   description: string;
+  allowedLanguages: string[];
   testCases: TestCase[];
 }
 
-export function AddProblem() {
+interface ProblemEditorProps {
+  problem?: ListProblem | null;
+  onClose?: () => void;
+  onSave?: (problem: ListProblem) => void;
+}
+
+export function ProblemEditor({
+  problem,
+  onClose,
+  onSave,
+}: ProblemEditorProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [problems, setProblems] = useState<Problem[]>([
     {
-      id: "1",
-      title: "",
-      description: "",
-      testCases: [{ input: "", expectedOutput: "" }],
+      id: problem?.id?.toString() || "1",
+      code: problem?.nameId || "",
+      title: problem?.title || "",
+      description: problem?.description || "",
+      allowedLanguages: problem?.allowedLanguages || [
+        "python",
+        "javascript",
+        "typescript",
+      ],
+      testCases: problem?.testCases || [
+        { input: "", output: "", kind: "example" },
+      ],
     },
   ]);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
@@ -41,7 +66,7 @@ export function AddProblem() {
       ...currentProblem,
       testCases: [
         ...currentProblem.testCases,
-        { input: "", expectedOutput: "" },
+        { input: "", output: "", kind: "example" },
       ],
     };
     setProblems(updatedProblems);
@@ -58,7 +83,7 @@ export function AddProblem() {
 
   const updateTestCase = (
     index: number,
-    field: "input" | "expectedOutput",
+    field: "input" | "output" | "kind",
     value: string,
   ) => {
     const updatedProblems = [...problems];
@@ -73,8 +98,8 @@ export function AddProblem() {
   };
 
   const updateProblemField = (
-    field: "title" | "description",
-    value: string,
+    field: "code" | "title" | "description" | "allowedLanguages",
+    value: string | string[],
   ) => {
     const updatedProblems = [...problems];
     updatedProblems[currentProblemIndex] = {
@@ -87,9 +112,11 @@ export function AddProblem() {
   const addNewProblem = () => {
     const newProblem: Problem = {
       id: (problems.length + 1).toString(),
+      code: "",
       title: "",
       description: "",
-      testCases: [{ input: "", expectedOutput: "" }],
+      allowedLanguages: ["python", "javascript", "typescript"],
+      testCases: [{ input: "", output: "", kind: "example" }],
     };
     setProblems([...problems, newProblem]);
     setCurrentProblemIndex(problems.length);
@@ -115,9 +142,84 @@ export function AddProblem() {
     router.push("/contests");
   };
 
+  const handleSaveProblem = async () => {
+    try {
+      // Validate required fields
+      if (!currentProblem.title || !currentProblem.description) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate test cases
+      if (currentProblem.testCases.some((tc) => !tc.input || !tc.output)) {
+        toast({
+          title: "Error",
+          description: "Please fill in all test cases",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If editing an existing problem
+      if (problem) {
+        const updatedProblem: ListProblem = {
+          ...problem,
+          title: currentProblem.title,
+          allowedLanguages: currentProblem.allowedLanguages,
+        };
+        onSave?.(updatedProblem);
+        onClose?.();
+        return;
+      }
+
+      // Creating a new problem
+      const nameId = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const newProblem: ListProblem = {
+        id: mockProblems.length + 1,
+        nameId,
+        title: currentProblem.title,
+        allowedLanguages: currentProblem.allowedLanguages,
+        createdAt: new Date().toISOString().split("T")[0],
+        orgId: 1,
+      };
+
+      mockProblems.push(newProblem);
+
+      toast({
+        title: "Success!",
+        description: "Problem saved successfully",
+      });
+
+      // Get orgId from URL
+      const pathSegments = window.location.pathname.split("/");
+      const orgId = pathSegments[1];
+
+      // Redirect to problems page
+      router.push(`/${orgId}/problems`);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save problem",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <div className="flex-1 p-6">
+        <div className="flex justify-end mb-4">
+          <Button
+            onClick={handleSaveProblem}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            Save Problem
+          </Button>
+        </div>
         {/* <div className="flex justify-between items-center mb-6">
           <div className="flex gap-2">
             {problems.map((problem, index) => (
@@ -174,6 +276,22 @@ export function AddProblem() {
             <div className="space-y-4">
               <div>
                 <label
+                  htmlFor="code"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Problem Code
+                </label>
+                <Input
+                  id="code"
+                  value={currentProblem.code}
+                  onChange={(e) => updateProblemField("code", e.target.value)}
+                  placeholder="Enter problem code"
+                  className="bg-muted border-border"
+                />
+              </div>
+
+              <div>
+                <label
                   htmlFor="title"
                   className="block text-sm font-medium mb-1"
                 >
@@ -203,6 +321,27 @@ export function AddProblem() {
                   }
                   placeholder="Enter problem description"
                   className="bg-muted border-border min-h-[200px]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="allowedLanguages"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Allowed Languages
+                </label>
+                <Input
+                  id="allowedLanguages"
+                  value={currentProblem.allowedLanguages.join(", ")}
+                  onChange={(e) =>
+                    updateProblemField(
+                      "allowedLanguages",
+                      e.target.value.split(", "),
+                    )
+                  }
+                  placeholder="Enter allowed languages"
+                  className="bg-muted border-border"
                 />
               </div>
             </div>
@@ -250,9 +389,9 @@ export function AddProblem() {
                     </label>
                     <Textarea
                       id={`output-${index}`}
-                      value={testCase.expectedOutput}
+                      value={testCase.output}
                       onChange={(e) =>
-                        updateTestCase(index, "expectedOutput", e.target.value)
+                        updateTestCase(index, "output", e.target.value)
                       }
                       placeholder="Enter expected output"
                       className="bg-muted-foreground/20 border-border"
