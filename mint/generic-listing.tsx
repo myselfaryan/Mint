@@ -58,8 +58,8 @@ export function GenericListing<T extends { id: number | string }>({
     return data
       .filter((item) =>
         searchableFields.some((field) =>
-          String(item[field]).toLowerCase().includes(searchTerm.toLowerCase()),
-        ),
+          String(item[field]).toLowerCase().includes(searchTerm.toLowerCase())
+        )
       )
       .sort((a, b) => {
         const aVal = a[sortField];
@@ -84,7 +84,7 @@ export function GenericListing<T extends { id: number | string }>({
     const csvContent = [
       headers.join(","),
       ...filteredAndSortedData.map((item) =>
-        columns.map((col) => item[col.accessorKey]).join(","),
+        columns.map((col) => item[col.accessorKey]).join(",")
       ),
     ].join("\n");
 
@@ -99,26 +99,27 @@ export function GenericListing<T extends { id: number | string }>({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="px-6 py-2 space-y-6">
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
+        {/* <h2 className="text-3xl font-bold tracking-tight">{title}</h2> */}
         <div className="flex items-center space-x-2">
-          <Search className="h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64"
-          />
-        </div>
-        <div className="flex space-x-2">
+          <div className="flex items-center space-x-2">
+            <Search className="h-4 w-4 text-gray-500" />
+            <Input
+              placeholder={`Search ${title} by ${searchableFields.join(", ")} `}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 md:w-[200px] lg:w-[300px]"
+            />
+          </div>
           {allowDownload && (
-            <Button variant="outline" onClick={downloadCSV}>
+            <Button variant="outline" size="sm" onClick={downloadCSV}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
           )}
           {onAdd && (
-            <Button onClick={onAdd}>
+            <Button size="sm" onClick={onAdd}>
               <PlusCircle className="h-4 w-4 mr-2" />
               Add New
             </Button>
@@ -126,65 +127,80 @@ export function GenericListing<T extends { id: number | string }>({
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => (
-              <TableHead key={String(column.accessorKey)}>
-                {column.sortable !== false ? (
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort(column.accessorKey)}
-                  >
-                    {column.header}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </Button>
-                ) : (
-                  column.header
-                )}
-              </TableHead>
-            ))}
-            {(onEdit || onDelete) && <TableHead>Actions</TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAndSortedData.map((item) => (
-            <TableRow key={String(item.id)}>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
               {columns.map((column) => (
-                <TableCell key={String(column.accessorKey)}>
-                  {String(item[column.accessorKey])}
-                </TableCell>
+                <TableHead key={String(column.accessorKey)}>
+                  {column.sortable !== false ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="-ml-4"
+                      onClick={() => handleSort(column.accessorKey)}
+                    >
+                      {column.header}
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : (
+                    column.header
+                  )}
+                </TableHead>
               ))}
-              {(onEdit || onDelete) && (
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {onEdit && (
-                        <DropdownMenuItem onClick={() => onEdit(item)}>
-                          Edit
-                        </DropdownMenuItem>
-                      )}
-                      {onDelete && (
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => onDelete(item)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              )}
+              {(onEdit || onDelete) && <TableHead>Actions</TableHead>}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+                  className="h-24 text-center"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredAndSortedData.map((item) => (
+                <TableRow key={String(item.id)}>
+                  {columns.map((column) => (
+                    <TableCell key={String(column.accessorKey)}>
+                      {String(item[column.accessorKey])}
+                    </TableCell>
+                  ))}
+                  {(onEdit || onDelete) && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {onEdit && (
+                            <DropdownMenuItem onClick={() => onEdit(item)}>
+                              Edit
+                            </DropdownMenuItem>
+                          )}
+                          {onDelete && (
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => onDelete(item)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
