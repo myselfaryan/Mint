@@ -52,7 +52,7 @@ export default function LibraryBookListing() {
       .filter(
         (book) =>
           book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchTerm.toLowerCase()),
+          book.author.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
         if (a[sortField] < b[sortField]) return sortOrder === "asc" ? -1 : 1;
@@ -87,7 +87,7 @@ export default function LibraryBookListing() {
           book.pages,
           book.publicationDate,
           book.copiesAvailable,
-        ].join(","),
+        ].join(",")
       ),
     ].join("\n");
 
@@ -134,7 +134,7 @@ export default function LibraryBookListing() {
   const handleSaveBook = (savedBook: BookSchema) => {
     if (selectedBook) {
       setBooks(
-        books.map((book) => (book.id === savedBook.id ? savedBook : book)),
+        books.map((book) => (book.id === savedBook.id ? savedBook : book))
       );
       setToast({
         type: ToastType.SUCCESS,
@@ -157,7 +157,6 @@ export default function LibraryBookListing() {
   return (
     <>
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Library Book Listing</h1>
         <div className="flex gap-4 mb-4">
           <div className="relative flex-grow">
             <Input
@@ -222,7 +221,11 @@ export default function LibraryBookListing() {
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.pages}</TableCell>
                 <TableCell>
-                  {new Date(book.publicationDate).toLocaleDateString()}
+                  {new Date(book.publicationDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
                 </TableCell>
                 <TableCell>{book.copiesAvailable}</TableCell>
                 <TableCell>
