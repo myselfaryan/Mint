@@ -18,7 +18,7 @@ export function UnauthorizedPage() {
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     await logout();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   return (

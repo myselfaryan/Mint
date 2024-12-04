@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Area,
@@ -17,7 +17,7 @@ import {
   ReferenceLine,
   XAxis,
   YAxis,
-} from "recharts"
+} from "recharts";
 
 import {
   Card,
@@ -26,15 +26,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/chart";
+import { Separator } from "@/components/ui/separator";
 
-export const description = "A collection of health charts."
+export const description = "A collection of health charts.";
 
 interface ChartData {
   submissions: {
@@ -69,9 +69,7 @@ export default function Charts({ data }: { data: ChartData }) {
   return (
     <div className="chart-wrapper mx-auto flex max-w-6xl flex-col flex-wrap items-start justify-center gap-6 p-6 sm:flex-row sm:p-8">
       <div className="grid w-full gap-6 sm:grid-cols-2 lg:max-w-[22rem] lg:grid-cols-1 xl:max-w-[25rem]">
-        <Card
-          className="lg:max-w-md" x-chunk="charts-01-chunk-0"
-        >
+        <Card className="lg:max-w-md" x-chunk="charts-01-chunk-0">
           <CardHeader className="space-y-0 pb-2">
             <CardDescription>Submissions</CardDescription>
             <CardTitle className="text-4xl tabular-nums">
@@ -113,7 +111,7 @@ export default function Charts({ data }: { data: ChartData }) {
                   tickFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       weekday: "short",
-                    })
+                    });
                   }}
                 />
                 <ChartTooltip
@@ -126,7 +124,7 @@ export default function Charts({ data }: { data: ChartData }) {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
-                        })
+                        });
                       }}
                     />
                   }
@@ -159,27 +157,25 @@ export default function Charts({ data }: { data: ChartData }) {
           <CardFooter className="flex-col items-start gap-1">
             <CardDescription>
               Over the past 7 days, you have submitted{" "}
-              <span className="font-medium text-foreground">{data.submissions.weeklyTotal}</span> problems.
+              <span className="font-medium text-foreground">
+                {data.submissions.weeklyTotal}
+              </span>{" "}
+              problems.
             </CardDescription>
-            
           </CardFooter>
         </Card>
-        <Card
-          className="flex flex-col lg:max-w-md" x-chunk="charts-01-chunk-1"
-        >
+        <Card className="flex flex-col lg:max-w-md" x-chunk="charts-01-chunk-1">
           <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-2 [&>div]:flex-1">
             <div>
               <CardDescription>Upcomming Contest</CardDescription>
               <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
                 {data.upcomingContest.count}
-                
               </CardTitle>
             </div>
             <div>
               <CardDescription>Variability</CardDescription>
               <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
                 {data.upcomingContest.variability}
-                
               </CardTitle>
             </div>
           </CardHeader>
@@ -217,7 +213,7 @@ export default function Charts({ data }: { data: ChartData }) {
                   tickFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       weekday: "short",
-                    })
+                    });
                   }}
                 />
                 <Line
@@ -242,7 +238,7 @@ export default function Charts({ data }: { data: ChartData }) {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
-                        })
+                        });
                       }}
                     />
                   }
@@ -254,12 +250,9 @@ export default function Charts({ data }: { data: ChartData }) {
         </Card>
       </div>
       <div className="grid w-full flex-1 gap-6 lg:max-w-[20rem]">
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-2"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-2">
           <CardHeader>
             <CardTitle>Contest Details</CardTitle>
-            
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid auto-rows-min gap-2">
@@ -366,14 +359,10 @@ export default function Charts({ data }: { data: ChartData }) {
             </div>
           </CardContent>
         </Card>
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-3"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-3">
           <CardHeader className="p-4 pb-0">
             <CardTitle>total contest </CardTitle>
-            <CardDescription>
-              
-            </CardDescription>
+            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-0">
             <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none">
@@ -449,9 +438,7 @@ export default function Charts({ data }: { data: ChartData }) {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-4"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-4">
           <CardContent className="flex gap-4 p-4 pb-2">
             <ChartContainer
               config={{
@@ -528,23 +515,24 @@ export default function Charts({ data }: { data: ChartData }) {
                 <div className="text-xs text-muted-foreground">submissions</div>
                 <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
                   562
-                  
                 </div>
               </div>
               <Separator orientation="vertical" className="mx-2 h-10 w-px" />
               <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-xs text-muted-foreground">correct submission</div>
+                <div className="text-xs text-muted-foreground">
+                  correct submission
+                </div>
                 <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
                   73
-                 
                 </div>
               </div>
               <Separator orientation="vertical" className="mx-2 h-10 w-px" />
               <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-xs text-muted-foreground">wrong submission</div>
+                <div className="text-xs text-muted-foreground">
+                  wrong submission
+                </div>
                 <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
                   14
-                  
                 </div>
               </div>
             </div>
@@ -552,30 +540,29 @@ export default function Charts({ data }: { data: ChartData }) {
         </Card>
       </div>
       <div className="grid w-full flex-1 gap-6">
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-5"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-5">
           <CardContent className="flex gap-4 p-4">
             <div className="grid items-center gap-2">
               <div className="grid flex-1 auto-rows-min gap-0.5">
                 <div className="text-sm text-muted-foreground">Submissions</div>
                 <div className="flex items-baseline gap-1 text-xl font-bold tabular-nums leading-none">
                   562/600
-                  
                 </div>
               </div>
               <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-sm text-muted-foreground">correct submissions</div>
+                <div className="text-sm text-muted-foreground">
+                  correct submissions
+                </div>
                 <div className="flex items-baseline gap-1 text-xl font-bold tabular-nums leading-none">
                   73/120
-                  
                 </div>
               </div>
               <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-sm text-muted-foreground">wrong submission</div>
+                <div className="text-sm text-muted-foreground">
+                  wrong submission
+                </div>
                 <div className="flex items-baseline gap-1 text-xl font-bold tabular-nums leading-none">
                   8/12
-                  
                 </div>
               </div>
             </div>
@@ -636,17 +623,13 @@ export default function Charts({ data }: { data: ChartData }) {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-6"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-6">
           <CardHeader className="p-4 pb-0">
             <CardTitle>contests last month</CardTitle>
-           
           </CardHeader>
           <CardContent className="flex flex-row items-baseline gap-4 p-4 pt-2">
             <div className="flex items-baseline gap-2 text-3xl font-bold tabular-nums leading-none">
               1,254
-             
             </div>
             <ChartContainer
               config={{
@@ -715,9 +698,7 @@ export default function Charts({ data }: { data: ChartData }) {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card
-          className="max-w-xs" x-chunk="charts-01-chunk-7"
-        >
+        <Card className="max-w-xs" x-chunk="charts-01-chunk-7">
           <CardHeader className="space-y-0 pb-0">
             <CardDescription>Time in platform</CardDescription>
             <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
@@ -823,5 +804,5 @@ export default function Charts({ data }: { data: ChartData }) {
         </Card>
       </div>
     </div>
-  )
+  );
 }
