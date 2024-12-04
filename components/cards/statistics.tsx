@@ -1,7 +1,11 @@
 "use client";
-import { Users, FileText, CheckCircle, Clock,Calendar } from "lucide-react";
+import { Users, FileText, CheckCircle, Clock, Calendar } from "lucide-react";
 
-export const TotalMembersCard = ({ totalMembers }: { totalMembers: number }) => (
+export const TotalMembersCard = ({
+  totalMembers,
+}: {
+  totalMembers: number;
+}) => (
   <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
     <div>
       <p className="text-sm text-foreground">Total Members</p>
@@ -54,25 +58,29 @@ export const TotalSubmissionsCard = ({
 // );
 
 export const SubmissionsLastWeekCard = ({
-    submissionsLastWeek,
-  }: {
-    submissionsLastWeek: number;
-  }) => (
-    <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
-      <div>
-        <p className="text-sm text-foreground">Submissions Last Week</p>
-        <p className="text-xl font-bold">{submissionsLastWeek}</p>
-      </div>
-      <Calendar className="h-8 w-8 text-purple-400" />
+  submissionsLastWeek,
+}: {
+  submissionsLastWeek: number;
+}) => (
+  <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
+    <div>
+      <p className="text-sm text-foreground">Submissions Last Week</p>
+      <p className="text-xl font-bold">{submissionsLastWeek}</p>
     </div>
-  );
+    <Calendar className="h-8 w-8 text-purple-400" />
+  </div>
+);
 
-  export const DateOfContestCard = ({ dateOfContest }: { dateOfContest: string }) => (
-    <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
-      <div>
-        <p className="text-sm text-foreground">Date of Contest</p>
-        <p className="text-xl font-bold">{dateOfContest}</p>
-      </div>
-      <Calendar className="h-8 w-8 text-purple-400" />
+export const DateOfContestCard = ({
+  dateOfContest,
+}: {
+  dateOfContest: string;
+}) => (
+  <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
+    <div>
+      <p className="text-sm text-foreground">Date of Contest</p>
+      <p className="text-xl font-bold">{dateOfContest}</p>
     </div>
-  );
+    <Calendar className="h-8 w-8 text-purple-400" />
+  </div>
+);

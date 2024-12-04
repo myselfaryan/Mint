@@ -30,7 +30,11 @@ import {
   Users,
   Award,
 } from "lucide-react";
-import { DateOfContestCard, TotalMembersCard, TotalSubmissionsCard } from "./cards/statistics";
+import {
+  DateOfContestCard,
+  TotalMembersCard,
+  TotalSubmissionsCard,
+} from "./cards/statistics";
 
 const mockParticipants = [
   {
@@ -87,29 +91,31 @@ export function ContestDetailPage() {
 
   const [participants, setParticipants] = useState([]);
   const [problems, setProblems] = useState([]);
-  
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        setLoading(true); 
-        
-        const participantsResponse = await fetch(`/api/orgs/${id}/stats?stat=total-members`);
+        setLoading(true);
+
+        const participantsResponse = await fetch(
+          `/api/orgs/${id}/stats?stat=total-members`,
+        );
         const participantsData = await participantsResponse.json();
-        console.log("participant data: ",participantsData);
-        
-      
-        const problemsResponse = await fetch(`/api/orgs/${id}/stats?stat=total-submissions`);
+        console.log("participant data: ", participantsData);
+
+        const problemsResponse = await fetch(
+          `/api/orgs/${id}/stats?stat=total-submissions`,
+        );
         const problemsData = await problemsResponse.json();
         console.log(problemsData);
-        
-        setParticipants(participantsData.value || []); 
-        setProblems(problemsData.value || []); 
-        
-        setLoading(false); 
+
+        setParticipants(participantsData.value || []);
+        setProblems(problemsData.value || []);
+
+        setLoading(false);
       } catch (error) {
         setError("Failed to fetch data. Please try again later.");
         setLoading(false);
@@ -119,7 +125,6 @@ export function ContestDetailPage() {
     fetchData();
   }, []);
 
-  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
@@ -158,7 +163,7 @@ export function ContestDetailPage() {
             </div>
             <Calendar className="h-8 w-8 text-blue-400" />
           </div> */}
-          <DateOfContestCard dateOfContest={"Sep 15, 2024"}/>
+          <DateOfContestCard dateOfContest={"Sep 15, 2024"} />
 
           {/* <div className="bg-background p-4 rounded-lg flex items-center justify-between">
             <div>
@@ -167,7 +172,7 @@ export function ContestDetailPage() {
             </div>
             <Users className="h-8 w-8 text-green-400" />
           </div> */}
-          <TotalMembersCard totalMembers={8}/>
+          <TotalMembersCard totalMembers={8} />
           {/* <div className="bg-background p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-400">Total Prize</p>
@@ -175,7 +180,7 @@ export function ContestDetailPage() {
             </div>
             <Award className="h-8 w-8 text-yellow-400" />
           </div> */}
-          <TotalSubmissionsCard totalSubmissions={23}/>
+          <TotalSubmissionsCard totalSubmissions={23} />
         </div>
 
         <Tabs defaultValue="participants" className="w-full">
