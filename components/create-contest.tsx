@@ -24,9 +24,9 @@ export function CreateContest() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1120] text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-[#0F172A] p-2 flex items-center justify-between">
+      <nav className="bg-muted p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Using Link for navigation */}
           <Link href="/create">
@@ -44,7 +44,7 @@ export function CreateContest() {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="max-w-2xl mx-auto space-y-6">
-          <div className="bg-[#0F172A] rounded-lg p-6 space-y-6">
+          <div className="bg-muted rounded-lg p-6 space-y-6">
             <div className="space-y-4">
               <div>
                 <label
@@ -61,7 +61,7 @@ export function CreateContest() {
                   }
                   placeholder="Enter contest name"
                   required
-                  className="w-full bg-[#1E293B] border-gray-700 text-white placeholder-gray-500 focus:border-blue-500"
+                  className="w-full bg-background border-border text-foreground placeholder-muted-foreground focus:border-ring"
                 />
               </div>
 
@@ -81,14 +81,14 @@ export function CreateContest() {
                   }
                   placeholder="Enter duration in Minutes"
                   required
-                  className="w-full bg-[#1E293B] border-gray-700 text-white placeholder-gray-500 focus:border-blue-500"
+                  className="w-full bg-background border-border text-foreground placeholder-muted-foreground focus:border-ring"
                 />
               </div>
             </div>
 
             <Button
               onClick={handleSetProblems}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Set Problems
             </Button>

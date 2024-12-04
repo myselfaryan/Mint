@@ -82,19 +82,21 @@ export function CodeEditor() {
   };
 
   return (
-    <div className="h-screen bg-gray-900">
+    <div className="h-screen bg-background">
       <ResizablePanelGroup direction="horizontal" className="min-h-screen">
         <ResizablePanel defaultSize={40} minSize={30}>
-          <div className="h-full flex flex-col border-r border-gray-800">
-            <div className="border-b border-gray-800 px-4 py-3 bg-gray-800">
-              <h2 className="text-lg font-medium text-gray-300">Description</h2>
+          <div className="h-full flex flex-col border-r border-border">
+            <div className="border-b border-border px-4 py-3 bg-muted">
+              <h2 className="text-lg font-medium text-foreground">
+                Description
+              </h2>
             </div>
             <div className="p-4 overflow-auto">
               <div className="space-y-4">
-                <h1 className="text-xl font-bold text-gray-300">
+                <h1 className="text-xl font-bold text-foreground">
                   2028. Find Missing Observations
                 </h1>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-foreground">
                   You have observations of n + m 6-sided dice rolls with each
                   face numbered from 1 to 6...
                 </p>
@@ -102,10 +104,10 @@ export function CodeEditor() {
             </div>
           </div>
         </ResizablePanel>
-        <ResizableHandle className="w-2 bg-gray-800 hover:bg-gray-700 transition-colors" />
+        <ResizableHandle className="w-2 bg-muted hover:bg-muted-foreground/20 transition-colors" />
         <ResizablePanel defaultSize={60} minSize={30}>
           <div className="h-full flex flex-col">
-            <div className="border-b border-gray-800 p-2 bg-gray-800">
+            <div className="border-b border-border p-2 bg-muted">
               <div className="flex items-center justify-between">
                 <div className="flex space-x-2">
                   <Select
@@ -114,10 +116,10 @@ export function CodeEditor() {
                       setLanguage(value)
                     }
                   >
-                    <SelectTrigger className="w-[180px] bg-gray-900 text-gray-300 border-gray-700">
+                    <SelectTrigger className="w-[180px] bg-background text-foreground border-border">
                       <SelectValue placeholder="Select Language" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-700">
+                    <SelectContent className="bg-background border-border">
                       <SelectItem value="javascript">JavaScript</SelectItem>
                       <SelectItem value="python">Python</SelectItem>
                       <SelectItem value="cpp">C++</SelectItem>
@@ -129,10 +131,10 @@ export function CodeEditor() {
                       setTheme(value)
                     }
                   >
-                    <SelectTrigger className="w-[180px] bg-gray-900 text-gray-300 border-gray-700">
+                    <SelectTrigger className="w-[180px] bg-background text-foreground border-border">
                       <SelectValue placeholder="Select Theme" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-700">
+                    <SelectContent className="bg-background border-border">
                       {Object.keys(themes).map((theme) => (
                         <SelectItem key={theme} value={theme}>
                           {theme}
@@ -144,20 +146,20 @@ export function CodeEditor() {
                 <div className="flex space-x-2">
                   <Button
                     variant="outline"
-                    className="w-[100px] h-10 bg-gray-900 text-gray-300 hover:bg-gray-700 border-gray-700"
+                    className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
                   >
                     Run
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-[100px] h-10 bg-gray-900 text-gray-300 hover:bg-gray-700 border-gray-700"
+                    className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
                   >
                     Submit
                   </Button>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-10 bg-gray-900 text-gray-300 hover:bg-gray-700 border-gray-700"
+                    className="h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
                     onClick={toggleFullscreen}
                   >
                     <Expand className="h-4 w-4" />
