@@ -1,11 +1,9 @@
-import { Argon2id } from "oslo/password";
+import bcryptjs from "bcryptjs";
 
 export async function hashPassword(password: string) {
-  const argon2id = new Argon2id();
-  return await argon2id.hash(password);
+  return await bcryptjs.hash(password, 12);
 }
 
 export async function verifyPassword(hash: string, password: string) {
-  const argon2id = new Argon2id();
-  return await argon2id.verify(hash, password);
+  return await bcryptjs.compare(password, hash);
 }

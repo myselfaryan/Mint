@@ -1,4 +1,4 @@
-import Image from "next/image";
+"use client";
 import { Button } from "../components/ui/button";
 import { FAQ } from "../components/landing/faq";
 import { VortexDemo } from "../components/landing/vortex-demo";
@@ -6,8 +6,11 @@ import { Features } from "../components/landing/features";
 import { GeminiSection } from "../components/landing/gemini-section";
 import { AboutUs } from "../components/landing/about-us";
 import { Pricing } from "../components/landing/pricing";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <div className="relative bg-black text-white">
       {/* Header */}
@@ -49,10 +52,14 @@ export default function Home() {
               <Button
                 variant="ghost"
                 className="text-gray-300 hover:text-white"
+                onClick={() => router.push("/auth")}
               >
                 Sign In
               </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => router.push("/auth?mode=register")}
+              >
                 Get Started
               </Button>
             </div>

@@ -27,30 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-// const loginSchema = z.object({
-//   email: z.string().email({ message: "Invalid email address" }),
-//   password: z
-//     .string()
-//     .min(8, { message: "Password must be at least 8 characters long" }),
-// });
-
-// const registerSchema = loginSchema
-//   .extend({
-//     name: z
-//       .string()
-//       .min(2, { message: "Name must be at least 2 characters long" }),
-//     confirmPassword: z
-//       .string()
-//       .min(8, { message: "Password must be at least 8 characters long" }),
-//   })
-//   .refine((data) => data.password === data.confirmPassword, {
-//     message: "Passwords do not match",
-//     path: ["confirmPassword"],
-//   });
-
-// type LoginFormValues = z.infer<typeof loginSchema>;
-// type RegisterFormValues = z.infer<typeof registerSchema>;
+import { fetchApi } from "@/lib/client/fetch";
 
 export function AuthComponent({
   initialMode = "login",
@@ -78,12 +55,30 @@ export function AuthComponent({
     },
   });
 
-  function onLoginSubmit(values: LoginInput) {
-    console.log(values);
+  async function onLoginSubmit(values: LoginInput) {
+    try {
+      await fetchApi("auth/login", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+      router.push("/"); // Redirect to home page after successful login
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
-  function onRegisterSubmit(values: RegisterInput) {
-    console.log(values);
+  async function onRegisterSubmit(values: RegisterInput) {
+    try {
+      await fetchApi("auth/register", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+      router.push("/"); // Redirect to home page after successful registration
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   return (
