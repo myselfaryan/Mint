@@ -101,27 +101,27 @@ export function GenericListing<T extends { id: number | string }>({
   return (
     <div className="px-6 py-2 space-y-6">
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
-        {/* <h2 className="text-3xl font-bold tracking-tight">{title}</h2> */}
         <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-2">
-            <Search className="h-4 w-4 text-gray-500" />
+          <div className="relative w-full">
+            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
             <Input
               placeholder={`Search ${title} by ${searchableFields.join(", ")} `}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-9 md:w-[200px] lg:w-[300px]"
+              className="h-9 pl-8 md:w-[300px] lg:w-[400px]"
             />
           </div>
-          {allowDownload && (
-            <Button variant="outline" size="sm" onClick={downloadCSV}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
+
+          {onAdd && (
+            <Button size="default" onClick={onAdd}>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Add New {title}
             </Button>
           )}
-          {onAdd && (
-            <Button size="sm" onClick={onAdd}>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add New
+          {allowDownload && (
+            <Button size="default" onClick={downloadCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
             </Button>
           )}
         </div>
