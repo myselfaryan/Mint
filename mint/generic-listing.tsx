@@ -45,7 +45,8 @@ interface GenericListingProps<T> {
   allowDownload?: boolean;
 }
 
-export function GenericListing<T extends { id: number | string }>({
+// For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
+export function GenericListing<T extends { id: number | undefined }>({
   data,
   columns,
   title,
