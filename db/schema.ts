@@ -107,7 +107,9 @@ export const contests = pgTable(
     organizerKind: varchar("organizerKind", {
       length: 10,
       enum: ["user", "org"],
-    }).notNull(),
+    })
+      .notNull()
+      .default("org"),
 
     description: text("description").notNull(), // Use Markdown for description
     rules: text("rules").notNull(),
@@ -160,6 +162,7 @@ export const problems = pgTable("problems", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   allowedLanguages: text("allowed_languages").array().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   orgId: integer("org_id")
     .references(() => orgs.id, { onDelete: "cascade" })
     .notNull(),
