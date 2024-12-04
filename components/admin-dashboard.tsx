@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Charts from "./textfeature"
+import Charts from "./textfeature";
 import {
   ChevronLeft,
   ChevronRight,
@@ -34,7 +34,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TotalContestsCard, TotalMembersCard, TotalOrganizersCard, TotalProblemsCard } from "./cards/statistics";
+import {
+  TotalContestsCard,
+  TotalMembersCard,
+  TotalOrganizersCard,
+  TotalProblemsCard,
+} from "./cards/statistics";
 
 const mockRecentContests = [
   {
@@ -128,12 +133,10 @@ export function AdminDashboard() {
       <div className="flex-1 p-6 overflow-auto">
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          
-          <TotalOrganizersCard totalOrganizers={totalTeachers}/>
+          <TotalOrganizersCard totalOrganizers={totalTeachers} />
 
-          
-          <TotalMembersCard totalMembers={totalStudents}/>
-          
+          <TotalMembersCard totalMembers={totalStudents} />
+
           {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -145,7 +148,7 @@ export function AdminDashboard() {
               <div className="text-2xl font-bold">{totalContests}</div>
             </CardContent>
           </Card> */}
-          <TotalContestsCard totalContestsGiven={totalContests}/>
+          <TotalContestsCard totalContestsGiven={totalContests} />
 
           {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -159,7 +162,7 @@ export function AdminDashboard() {
             </CardContent>
           </Card> */}
 
-          <TotalProblemsCard totalProblems={totalProblems}/>
+          <TotalProblemsCard totalProblems={totalProblems} />
           {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -220,7 +223,7 @@ export function AdminDashboard() {
 
           <TabsContent value="system-health">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Charts/>
+              <Charts />
             </div>
           </TabsContent>
         </Tabs>

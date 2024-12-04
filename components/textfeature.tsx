@@ -157,9 +157,9 @@ const Charts = () => {
           <CardFooter className="flex-col items-start gap-1">
             <CardDescription>
               Over the past 1 month contests{" "}
-              <span className="font-medium text-foreground">5305</span> contests.
+              <span className="font-medium text-foreground">5305</span>{" "}
+              contests.
             </CardDescription>
-            
           </CardFooter>
         </Card>
         <Card className="flex flex-col lg:max-w-md" x-chunk="charts-01-chunk-1">
@@ -168,14 +168,12 @@ const Charts = () => {
               <CardDescription>Total Participants</CardDescription>
               <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
                 62
-                
               </CardTitle>
             </div>
             <div>
               <CardDescription>Last month participant</CardDescription>
               <CardTitle className="flex items-baseline gap-1 text-4xl tabular-nums">
                 35
-                
               </CardTitle>
             </div>
           </CardHeader>
