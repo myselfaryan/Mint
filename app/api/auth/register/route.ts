@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { registerSchema } from "@/lib/validations";
 import { db } from "@/db/drizzle";
 import { users } from "@/db/schema";
@@ -7,7 +7,7 @@ import { generateSessionToken, createSession } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
 import { Argon2id } from "oslo/password";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
@@ -32,6 +32,9 @@ export async function POST(request: Request) {
         email: validatedData.email,
         hashedPassword: hashedPassword,
         name: validatedData.fullName,
+
+        // TODO: Use a proper readable slug for nameId
+        nameId: validatedData.email,
       })
       .returning();
 
