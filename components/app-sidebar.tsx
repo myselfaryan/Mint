@@ -3,39 +3,24 @@
 import * as React from "react";
 import {
   AudioWaveform,
-  BadgeCheck,
-  Bell,
-  BookOpen,
-  Bot,
-  ChevronRight,
   ChevronsUpDown,
   Command,
-  CreditCard,
-  Folder,
-  Forward,
   Frame,
   GalleryVerticalEnd,
   LogOut,
   Map,
-  MoreHorizontal,
   PieChart,
   Plus,
-  Settings2,
-  Sparkles,
-  SquareTerminal,
-  Trash2,
   Users,
   Trophy,
   FileCode,
   FileCheck,
-  Settings,
   Sun,
   Moon,
   Monitor,
   Contact,
 } from "lucide-react";
 import { Check } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
@@ -45,11 +30,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,12 +53,8 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
@@ -117,7 +93,6 @@ const data = {
       title: "Users",
       url: "users",
       icon: Users,
-      items: [],
     },
     {
       title: "Groups",
@@ -143,12 +118,6 @@ const data = {
       icon: FileCheck,
       items: [],
     },
-    // {
-    //   title: "Settings",
-    //   url: "settings",
-    //   icon: Settings,
-    //   items: [],
-    // },
   ],
   projects: [
     {
@@ -285,16 +254,25 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             <SidebarGroup>
               <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
               <SidebarMenu>
-                {data.navMain.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link href={`${basePath}/${item.url}`}>
-                        {item.icon && <item.icon />}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {data.navMain.map((item) => {
+                  const isActive = pathname.includes(`${basePath}/${item.url}`);
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        className={`hover:bg-accent hover:text-accent-foreground ${
+                          isActive ? "bg-accent text-accent-foreground" : ""
+                        }`}
+                      >
+                        <Link href={`${basePath}/${item.url}`}>
+                          {item.icon && <item.icon />}
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroup>
           </SidebarContent>
