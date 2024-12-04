@@ -72,6 +72,7 @@ export const updateGroupSchema = createGroupSchema.partial();
 
 // Problem Schemas
 export const createProblemSchema = z.object({
+  orgId: z.number().int().positive(),
   nameId: NameIdSchema,
   name: z.string().min(2).max(100),
   statement: z.string(),
@@ -114,3 +115,8 @@ export const registerSchema = loginSchema
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const addProblemSchema = z.object({
+  problemId: z.number().int().positive(),
+  order: z.number().int().min(0).optional(),
+});

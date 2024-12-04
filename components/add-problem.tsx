@@ -118,7 +118,7 @@ export function AddProblem() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <div className="flex-1 p-6">
-        <div className="flex justify-between items-center mb-6">
+        {/* <div className="flex justify-between items-center mb-6">
           <div className="flex gap-2">
             {problems.map((problem, index) => (
               <Button
@@ -152,7 +152,7 @@ export function AddProblem() {
           >
             Create Contest
           </Button>
-        </div>
+        </div> */}
 
         <Tabs defaultValue="problem" className="w-full">
           <TabsList className="w-full bg-muted p-0 mb-6">
