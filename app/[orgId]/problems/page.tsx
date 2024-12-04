@@ -31,11 +31,11 @@ export default function ProblemsPage({
         setProblems(data);
       } catch (error) {
         console.error("Error fetching problems:", error);
-        toast({
-          title: "Error fetching problems",
-          description: "Using mock data as fallback",
-          variant: "destructive",
-        });
+        // toast({
+        //   title: "Error fetching problems",
+        //   description: "Using mock data as fallback",
+        //   variant: "destructive",
+        // });
         setProblems(mockProblems);
       }
     };
