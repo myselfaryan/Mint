@@ -26,7 +26,7 @@ import {
   Copy,
 } from "lucide-react";
 import { DeleteConfirmationModal } from "@/mint/delete-confirm";
-import { Toast, ToastType } from "@/mint/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export interface ColumnDef<T> {
   header: string;
@@ -63,11 +63,7 @@ export function GenericListing<T extends { id: number | undefined }>({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<T | null>(null);
-  const [toast, setToast] = useState<{
-    type: ToastType;
-    message: string;
-  } | null>(null);
-
+  const { toast } = useToast();
   const filteredAndSortedData = useMemo(() => {
     return data
       .filter((item) =>
@@ -128,22 +124,19 @@ export function GenericListing<T extends { id: number | undefined }>({
         await onDelete(itemToDelete);
 
         // Show success toast
-        setToast({
-          type: ToastType.SUCCESS,
-          message: `Item has been deleted successfully.`,
+        toast({
+          title: "Success",
+          description: `Item has been deleted successfully.`,
         });
       } catch (error) {
         // Show error toast
-        setToast({
-          type: ToastType.FAILURE,
-          message: `Failed to delete item: ${error instanceof Error ? error.message : "Unknown error"}`,
+        toast({
+          title: "Failed to delete item",
+          description: `Error happened ${error instanceof Error ? error.message : "Unknown error"}`,
         });
+        console.log(error);
       }
     }
-  };
-
-  const closeToast = () => {
-    setToast(null);
   };
 
   return (
@@ -280,9 +273,6 @@ export function GenericListing<T extends { id: number | undefined }>({
           onConfirm={handleDelete}
           itemName={String(itemToDelete.id)}
         />
-      )}
-      {toast && (
-        <Toast type={toast.type} message={toast.message} onClose={closeToast} />
       )}
     </div>
   );
