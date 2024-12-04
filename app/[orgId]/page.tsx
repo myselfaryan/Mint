@@ -1,9 +1,9 @@
 "use client";
-
+import { GraphCard } from "@/components/graphs/statistics";
 export default function Page() {
   return (
     <div>
-      <h1 className="bg-white">Page hello</h1>
+      <GraphCard/>
     </div>
   );
 }
