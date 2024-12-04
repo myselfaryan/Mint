@@ -26,7 +26,7 @@ import {
   Copy,
 } from "lucide-react";
 import { DeleteConfirmationModal } from "@/mint/delete-confirm";
-import { Toast, ToastType } from "@/mint/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export interface ColumnDef<T> {
   header: string;
@@ -43,6 +43,7 @@ interface GenericListingProps<T> {
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => Promise<void>;
   allowDownload?: boolean;
+  addPage?: string; // page to redirect to when user clicks add button
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -55,17 +56,14 @@ export function GenericListing<T extends { id: number | undefined }>({
   onEdit,
   onDelete,
   allowDownload = true,
+  addPage,
 }: GenericListingProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof T>(columns[0].accessorKey);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<T | null>(null);
-  const [toast, setToast] = useState<{
-    type: ToastType;
-    message: string;
-  } | null>(null);
-
+  const { toast } = useToast();
   const filteredAndSortedData = useMemo(() => {
     return data
       .filter((item) =>
@@ -126,22 +124,19 @@ export function GenericListing<T extends { id: number | undefined }>({
         await onDelete(itemToDelete);
 
         // Show success toast
-        setToast({
-          type: ToastType.SUCCESS,
-          message: `Item has been deleted successfully.`,
+        toast({
+          title: "Success",
+          description: `Item has been deleted successfully.`,
         });
       } catch (error) {
         // Show error toast
-        setToast({
-          type: ToastType.FAILURE,
-          message: `Failed to delete item: ${error instanceof Error ? error.message : "Unknown error"}`,
+        toast({
+          title: "Failed to delete item",
+          description: `Error happened ${error instanceof Error ? error.message : "Unknown error"}`,
         });
+        console.log(error);
       }
     }
-  };
-
-  const closeToast = () => {
-    setToast(null);
   };
 
   return (
@@ -158,8 +153,19 @@ export function GenericListing<T extends { id: number | undefined }>({
             />
           </div>
 
-          {onAdd && (
-            <Button size="default" onClick={onAdd}>
+          {(onAdd || addPage) && (
+            <Button
+              size="default"
+              onClick={() => {
+                if (addPage) {
+                  // Use window.location for client-side navigation
+                  window.location.href =
+                    window.location.pathname + "/" + addPage;
+                } else if (onAdd) {
+                  onAdd();
+                }
+              }}
+            >
               <PlusCircle className="h-4 w-4 mr-2" />
               Add New {title}
             </Button>
@@ -267,9 +273,6 @@ export function GenericListing<T extends { id: number | undefined }>({
           onConfirm={handleDelete}
           itemName={String(itemToDelete.id)}
         />
-      )}
-      {toast && (
-        <Toast type={toast.type} message={toast.message} onClose={closeToast} />
       )}
     </div>
   );
