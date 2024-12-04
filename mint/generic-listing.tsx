@@ -43,6 +43,7 @@ interface GenericListingProps<T> {
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => Promise<void>;
   allowDownload?: boolean;
+  addPage?: string; // page to redirect to when user clicks add button
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -55,6 +56,7 @@ export function GenericListing<T extends { id: number | undefined }>({
   onEdit,
   onDelete,
   allowDownload = true,
+  addPage,
 }: GenericListingProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<keyof T>(columns[0].accessorKey);
@@ -158,8 +160,19 @@ export function GenericListing<T extends { id: number | undefined }>({
             />
           </div>
 
-          {onAdd && (
-            <Button size="default" onClick={onAdd}>
+          {(onAdd || addPage) && (
+            <Button
+              size="default"
+              onClick={() => {
+                if (addPage) {
+                  // Use window.location for client-side navigation
+                  window.location.href =
+                    window.location.pathname + "/" + addPage;
+                } else if (onAdd) {
+                  onAdd();
+                }
+              }}
+            >
               <PlusCircle className="h-4 w-4 mr-2" />
               Add New {title}
             </Button>
