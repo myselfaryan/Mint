@@ -90,7 +90,7 @@ export const groupMemberships = pgTable(
     return {
       pk: primaryKey({ columns: [table.groupId, table.userId] }),
       groupIdIdx: index("group_id_idx").on(table.groupId),
-      userIdIdx: index("user_id_idx").on(table.userId),
+      groupUserIdIdx: index("group_user_id_idx").on(table.userId),
     };
   },
 );
