@@ -1,5 +1,5 @@
-import { AddProblem } from "@/components/add-problem";
+import { ProblemEditor } from "@/components/problem-editor";
 
-export default function AddProblemPage() {
-  return <AddProblem />;
+export default function NewProblemPage() {
+  return <ProblemEditor />;
 }

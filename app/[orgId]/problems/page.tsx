@@ -3,6 +3,8 @@ import { mockProblems, Problem } from "./mockProblems";
 import { useToast } from "@/hooks/use-toast";
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { useEffect, useState } from "react";
+import { ProblemEditor } from "@/components/problem-editor";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const columns: ColumnDef<Problem>[] = [
   { header: "Problem Code", accessorKey: "nameId", sortable: true },
@@ -18,7 +20,7 @@ export default function ProblemsPage({
 }) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
-  //   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -31,11 +33,6 @@ export default function ProblemsPage({
         setProblems(data);
       } catch (error) {
         console.error("Error fetching problems:", error);
-        // toast({
-        //   title: "Error fetching problems",
-        //   description: "Using mock data as fallback",
-        //   variant: "destructive",
-        // });
         setProblems(mockProblems);
       }
     };
@@ -64,7 +61,6 @@ export default function ProblemsPage({
       setProblems((prev) => prev.filter((p) => p.id !== problem.id));
     } catch (error) {
       console.error("Error deleting problem:", error);
-      // TODO: Add proper error handling
     }
   };
 
@@ -91,17 +87,24 @@ export default function ProblemsPage({
         }
         return [...prev, savedProblem];
       });
-
-      setIsEditorOpen(false);
-      setSelectedProblem(null);
     } catch (error) {
       console.error("Error saving problem:", error);
-      // TODO: Add proper error handling
     }
   };
 
+  const handleSavelocal = (updatedProblem: Problem) => {
+    setProblems(
+      problems.map((p) => (p.id === updatedProblem.id ? updatedProblem : p)),
+    );
+    toast({
+      title: "Success!",
+      description: "Problem updated successfully",
+    });
+    setIsEditorOpen(false);
+  };
+
   return (
-    <>
+    <div className="container mx-auto py-10">
       <GenericListing
         data={problems}
         columns={columns}
@@ -113,6 +116,16 @@ export default function ProblemsPage({
         allowDownload={true}
         addPage="new"
       />
-    </>
+
+      <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+        <DialogContent className="max-w-4xl">
+          <ProblemEditor
+            problem={selectedProblem}
+            onClose={() => setIsEditorOpen(false)}
+            onSave={handleSavelocal}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
