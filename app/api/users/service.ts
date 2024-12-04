@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
-import { users, userEmails } from "@/db/schema";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { hash } from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 
 export async function createUser(data: {
   nameId: string;
@@ -12,23 +12,19 @@ export async function createUser(data: {
   avatar?: string;
 }) {
   return await db.transaction(async (tx) => {
-    const hashedPassword = await hash(data.password, 12);
+    const hashedPassword = await hashPassword(data.password);
 
     const [user] = await tx
       .insert(users)
       .values({
         nameId: data.nameId,
         name: data.name,
+        email: data.email,
         hashedPassword,
         about: data.about,
         avatar: data.avatar,
       })
       .returning();
-
-    await tx.insert(userEmails).values({
-      email: data.email,
-      userId: user.id,
-    });
 
     return user;
   });
@@ -53,7 +49,6 @@ export async function updateUser(
 
 export async function deleteUser(id: number) {
   return await db.transaction(async (tx) => {
-    await tx.delete(userEmails).where(eq(userEmails.userId, id));
     const [deleted] = await tx
       .delete(users)
       .where(eq(users.id, id))
