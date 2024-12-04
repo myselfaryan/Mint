@@ -21,6 +21,8 @@ import {
   Download,
   PlusCircle,
   MoreHorizontal,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 export interface ColumnDef<T> {
@@ -180,6 +182,7 @@ export function GenericListing<T extends { id: number | string }>({
                         <DropdownMenuContent align="end">
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(item)}>
+                              <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
                           )}
@@ -188,6 +191,7 @@ export function GenericListing<T extends { id: number | string }>({
                               className="text-red-600"
                               onClick={() => onDelete(item)}
                             >
+                              <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
                           )}
