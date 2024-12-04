@@ -32,6 +32,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  Contact,
 } from "lucide-react";
 import { Check } from "lucide-react";
 
@@ -84,6 +85,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 // This is sample data.
@@ -118,6 +120,12 @@ const data = {
       items: [],
     },
     {
+      title: "Groups",
+      url: "groups",
+      icon: Contact,
+      items: [],
+    },
+    {
       title: "Contests",
       url: "contests",
       icon: Trophy,
@@ -135,12 +143,12 @@ const data = {
       icon: FileCheck,
       items: [],
     },
-    {
-      title: "Settings",
-      url: "settings",
-      icon: Settings,
-      items: [],
-    },
+    // {
+    //   title: "Settings",
+    //   url: "settings",
+    //   icon: Settings,
+    //   items: [],
+    // },
   ],
   projects: [
     {
@@ -188,6 +196,7 @@ function ThemeItems() {
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
   const pathname = usePathname();
+  const router = useRouter();
 
   // Get the base path (e.g., /[orgId])
   const basePath = pathname.split("/").slice(0, 2).join("/");
@@ -238,7 +247,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     sideOffset={4}
                   >
                     <DropdownMenuLabel className="text-xs text-muted-foreground">
-                      Teams
+                      Organizations
                     </DropdownMenuLabel>
                     {data.teams.map((team, index) => (
                       <DropdownMenuItem
@@ -256,12 +265,15 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 p-2">
+                    <DropdownMenuItem
+                      className="gap-2 p-2"
+                      onClick={() => router.push("/onboarding")}
+                    >
                       <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                         <Plus className="size-4" />
                       </div>
                       <div className="font-medium text-muted-foreground">
-                        Add team
+                        Create or Join a Org
                       </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -344,28 +356,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        <span>Upgrade to Pro</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <BadgeCheck className="mr-2 h-4 w-4" />
-                        <span>Account</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        <span>Billing</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Bell className="mr-2 h-4 w-4" />
-                        <span>Notifications</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                           <Sun className="mr-2 h-4 w-4" />
@@ -417,14 +407,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               </Breadcrumb>
             </div>
           </header>
-          {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-              <div className="aspect-video rounded-xl bg-muted/50" />
-              <div className="aspect-video rounded-xl bg-muted/50" />
-              <div className="aspect-video rounded-xl bg-muted/50" />
-            </div>
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-          </div> */}
+
           {children}
         </SidebarInset>
       </SidebarProvider>
