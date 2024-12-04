@@ -27,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { fetchApi } from "@/lib/client/fetch";
 
 export function AuthComponent({
   initialMode = "login",
@@ -54,12 +55,30 @@ export function AuthComponent({
     },
   });
 
-  function onLoginSubmit(values: LoginInput) {
-    console.log(values);
+  async function onLoginSubmit(values: LoginInput) {
+    try {
+      await fetchApi("auth/login", {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+      router.push('/'); // Redirect to home page after successful login
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
-  function onRegisterSubmit(values: RegisterInput) {
-    console.log(values);
+  async function onRegisterSubmit(values: RegisterInput) {
+    try {
+      await fetchApi("auth/register", {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+      router.push('/'); // Redirect to home page after successful registration
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   return (
