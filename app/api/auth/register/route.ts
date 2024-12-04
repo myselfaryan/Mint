@@ -5,7 +5,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { generateSessionToken, createSession } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
-import { Argon2id } from "oslo/password";
+import { hashPassword } from "@/lib/password";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,15 +23,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const argon2id = new Argon2id();
-    const hashedPassword = await argon2id.hash(validatedData.password);
+    const hashedPassword = await hashPassword(validatedData.password);
 
     const [user] = await db
       .insert(users)
       .values({
         email: validatedData.email,
         hashedPassword: hashedPassword,
-        name: validatedData.fullName,
+        name: validatedData.name,
 
         // TODO: Use a proper readable slug for nameId
         nameId: validatedData.email,
