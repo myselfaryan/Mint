@@ -8,19 +8,29 @@ import { z } from "zod";
 
 const columns: ColumnDef<Contest>[] = [
   { header: "Name", accessorKey: "name", sortable: true },
-  { header: "Description", accessorKey: "description" },
+  // { header: "Description", accessorKey: "description" },
   { header: "Start Time", accessorKey: "startTime", sortable: true },
   { header: "End Time", accessorKey: "endTime", sortable: true },
   { header: "Problems", accessorKey: "problems" },
 ];
 
 const fields: Field[] = [
-  { name: "name", label: "Name", type: "text" },
-  { name: "nameId", label: "Name ID", type: "text" },
-  { name: "description", label: "Description", type: "text" },
+  { name: "name", label: "Title", type: "text" },
+  {
+    name: "nameId",
+    label: "Contest ID",
+    type: "text",
+    placeholder: "Unique contest ID",
+  },
+  { name: "description", label: "Description", type: "textarea" },
   { name: "startTime", label: "Start Time", type: "date" },
   { name: "endTime", label: "End Time", type: "date" },
-  { name: "problems", label: "Problems", type: "text" },
+  {
+    name: "problems",
+    label: "Problems",
+    type: "text",
+    placeholder: "Comma-separated problem IDs",
+  },
 ];
 
 const contestSchema = z.object({
