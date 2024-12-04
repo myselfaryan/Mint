@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Charts from "./textfeature"
 import {
   ChevronLeft,
   ChevronRight,
@@ -33,6 +34,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { TotalContestsCard, TotalMembersCard, TotalOrganizersCard, TotalProblemsCard } from "./cards/statistics";
 
 const mockRecentContests = [
   {
@@ -97,9 +99,9 @@ export function AdminDashboard() {
   const [cpuHours, setCpuHours] = useState(5000);
 
   return (
-    <div className="min-h-screen bg-background  text-gray-300 flex flex-col">
+    <div className="min-h-screen bg-background  text-foreground flex flex-col">
       {/* Top Navigation */}
-      <nav className="bg-gray-800 p-2 flex items-center justify-between">
+      <nav className="bg-background p-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <ChevronLeft className="h-4 w-4" />
@@ -125,41 +127,14 @@ export function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 p-6 overflow-auto">
         {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <Card className="bg-background  border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Teachers
-              </CardTitle>
-              <Users className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalTeachers}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-background-card-default border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Students
-              </CardTitle>
-              <GraduationCap className="h-4 w-4 text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalStudents}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Contests (Past Month)
-              </CardTitle>
-              <Trophy className="h-4 w-4 text-yellow-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{recentContests}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          
+          <TotalOrganizersCard totalOrganizers={totalTeachers}/>
+
+          
+          <TotalMembersCard totalMembers={totalStudents}/>
+          
+          {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Contests
@@ -169,8 +144,10 @@ export function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{totalContests}</div>
             </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700">
+          </Card> */}
+          <TotalContestsCard totalContestsGiven={totalContests}/>
+
+          {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Problems
@@ -180,8 +157,10 @@ export function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{totalProblems}</div>
             </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700">
+          </Card> */}
+
+          <TotalProblemsCard totalProblems={totalProblems}/>
+          {/* <Card className="bg-gray-800 border-gray-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 CPU Hours (Execution)
@@ -191,20 +170,20 @@ export function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{cpuHours}</div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <Tabs defaultValue="recent-contests" className="w-full">
-          <TabsList className="w-full bg-gray-800 p-0 mb-6">
+          <TabsList className="w-full bg-background p-0 mb-6">
             <TabsTrigger
               value="recent-contests"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-background data-[state=active]:bg-muted"
             >
               Recent Contests
             </TabsTrigger>
             <TabsTrigger
               value="system-health"
-              className="flex-1 bg-gray-800 data-[state=active]:bg-gray-700"
+              className="flex-1 bg-background data-[state=active]:bg-muted"
             >
               System Health
             </TabsTrigger>
@@ -241,108 +220,7 @@ export function AdminDashboard() {
 
           <TabsContent value="system-health">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle>Server Uptime (Last 4 Weeks)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={mockServerUptimeData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9CA3AF" />
-                      <YAxis stroke="#9CA3AF" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#1F2937",
-                          border: "none",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="uptime"
-                        stroke="#3B82F6"
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle>Response Times (Last 24 Hours)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={mockResponseTimeData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9CA3AF" />
-                      <YAxis stroke="#9CA3AF" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#1F2937",
-                          border: "none",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="time"
-                        stroke="#10B981"
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle>Error Rates (Last 7 Days)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={mockErrorRateData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9CA3AF" />
-                      <YAxis stroke="#9CA3AF" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "#1F2937",
-                          border: "none",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="rate"
-                        stroke="#EF4444"
-                        strokeWidth={2}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle>Database Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Query Response Time</span>
-                      <span className="font-medium text-green-400">45ms</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Active Connections</span>
-                      <span className="font-medium">127</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Cache Hit Ratio</span>
-                      <span className="font-medium text-green-400">92%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <Charts/>
             </div>
           </TabsContent>
         </Tabs>

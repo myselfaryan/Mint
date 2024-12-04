@@ -1,5 +1,5 @@
 "use client";
-import { Users, FileText, CheckCircle, Clock, Calendar } from "lucide-react";
+import { Users, FileText, CheckCircle, Clock, Calendar ,UserCheck, ListChecks} from "lucide-react";
 
 export const TotalMembersCard = ({
   totalMembers,
@@ -84,3 +84,25 @@ export const DateOfContestCard = ({
     <Calendar className="h-8 w-8 text-purple-400" />
   </div>
 );
+
+
+
+export const TotalOrganizersCard = ({ totalOrganizers }: { totalOrganizers: number }) => (
+  <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
+    <div>
+      <p className="text-sm text-foreground">Total Organizers</p>
+      <p className="text-xl font-bold">{totalOrganizers}</p>
+    </div>
+    <UserCheck className="h-8 w-8 text-indigo-400" />
+  </div>
+);
+
+export const TotalProblemsCard = ({ totalProblems }: { totalProblems: number }) => (
+    <div className="bg-muted p-4 rounded-lg flex items-center justify-between">
+      <div>
+        <p className="text-sm text-foreground">Total Problems</p>
+        <p className="text-xl font-bold">{totalProblems}</p>
+      </div>
+      <ListChecks className="h-8 w-8 text-teal-400" />
+    </div>
+  );
