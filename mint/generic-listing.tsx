@@ -144,7 +144,7 @@ export function GenericListing<T extends { id: number | undefined }>({
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center space-x-2">
           <div className="relative w-full">
-            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+            <Search className="absolute left-2 top-1/2 h-8 w-5 -translate-y-1/2 text-muted-foreground " />
             <Input
               placeholder={`Search ${title} by ${searchableFields.join(", ")} `}
               value={searchTerm}
@@ -179,7 +179,7 @@ export function GenericListing<T extends { id: number | undefined }>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border mt-4">
         <Table>
           <TableHeader>
             <TableRow>

@@ -3,38 +3,24 @@
 import * as React from "react";
 import {
   AudioWaveform,
-  BadgeCheck,
-  Bell,
-  BookOpen,
-  Bot,
-  ChevronRight,
   ChevronsUpDown,
   Command,
-  CreditCard,
-  Folder,
-  Forward,
   Frame,
   GalleryVerticalEnd,
   LogOut,
   Map,
-  MoreHorizontal,
   PieChart,
   Plus,
-  Settings2,
-  Sparkles,
-  SquareTerminal,
-  Trash2,
   Users,
   Trophy,
   FileCode,
   FileCheck,
-  Settings,
   Sun,
   Moon,
   Monitor,
+  Contact,
 } from "lucide-react";
 import { Check } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
@@ -44,11 +30,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,19 +53,18 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AuthContext } from "@/contexts/auth-context";
+import { useContext } from "react";
 
 // This is sample data.
 const data = {
@@ -115,6 +95,11 @@ const data = {
       title: "Users",
       url: "users",
       icon: Users,
+    },
+    {
+      title: "Groups",
+      url: "groups",
+      icon: Contact,
       items: [],
     },
     {
@@ -133,12 +118,6 @@ const data = {
       title: "Submissions",
       url: "submissions",
       icon: FileCheck,
-      items: [],
-    },
-    {
-      title: "Settings",
-      url: "settings",
-      icon: Settings,
       items: [],
     },
   ],
@@ -187,7 +166,14 @@ function ThemeItems() {
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
+  const { logout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    logout();
+  };
+
   const pathname = usePathname();
+  const router = useRouter();
 
   // Get the base path (e.g., /[orgId])
   const basePath = pathname.split("/").slice(0, 2).join("/");
@@ -238,7 +224,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     sideOffset={4}
                   >
                     <DropdownMenuLabel className="text-xs text-muted-foreground">
-                      Teams
+                      Organizations
                     </DropdownMenuLabel>
                     {data.teams.map((team, index) => (
                       <DropdownMenuItem
@@ -256,12 +242,15 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 p-2">
+                    <DropdownMenuItem
+                      className="gap-2 p-2"
+                      onClick={() => router.push("/onboarding")}
+                    >
                       <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                         <Plus className="size-4" />
                       </div>
                       <div className="font-medium text-muted-foreground">
-                        Add team
+                        Create or Join a Org
                       </div>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -273,16 +262,25 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             <SidebarGroup>
               <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
               <SidebarMenu>
-                {data.navMain.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link href={`${basePath}/${item.url}`}>
-                        {item.icon && <item.icon />}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {data.navMain.map((item) => {
+                  const isActive = pathname.includes(`${basePath}/${item.url}`);
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={item.title}
+                        className={`hover:bg-accent hover:text-accent-foreground ${
+                          isActive ? "bg-accent text-accent-foreground" : ""
+                        }`}
+                      >
+                        <Link href={`${basePath}/${item.url}`}>
+                          {item.icon && <item.icon />}
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroup>
           </SidebarContent>
@@ -344,28 +342,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        <span>Upgrade to Pro</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <BadgeCheck className="mr-2 h-4 w-4" />
-                        <span>Account</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        <span>Billing</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Bell className="mr-2 h-4 w-4" />
-                        <span>Notifications</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                           <Sun className="mr-2 h-4 w-4" />
@@ -378,7 +354,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -417,14 +393,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               </Breadcrumb>
             </div>
           </header>
-          {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-              <div className="aspect-video rounded-xl bg-muted/50" />
-              <div className="aspect-video rounded-xl bg-muted/50" />
-              <div className="aspect-video rounded-xl bg-muted/50" />
-            </div>
-            <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-          </div> */}
+
           {children}
         </SidebarInset>
       </SidebarProvider>
