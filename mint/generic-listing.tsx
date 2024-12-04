@@ -36,7 +36,6 @@ export interface ColumnDef<T> {
 
 interface GenericListingProps<T> {
   data: T[];
-  setData: (data: T[]) => void;
   columns: ColumnDef<T>[];
   title: string;
   searchableFields: (keyof T)[];
@@ -48,7 +47,6 @@ interface GenericListingProps<T> {
 
 export function GenericListing<T extends { id: number | string }>({
   data,
-  setData,
   columns,
   title,
   searchableFields,
@@ -119,20 +117,25 @@ export function GenericListing<T extends { id: number | string }>({
   const handleDelete = async () => {
     if (itemToDelete && onDelete) {
       try {
+        // First close the modal
+        setIsDeleteModalOpen(false);
+        setItemToDelete(null);
+
+        // Then perform the delete operation
         await onDelete(itemToDelete);
-        setData(data.filter((item) => item.id !== itemToDelete.id));
+
+        // Show success toast
         setToast({
           type: ToastType.SUCCESS,
           message: `Item has been deleted successfully.`,
         });
       } catch (error) {
+        // Show error toast
         setToast({
           type: ToastType.FAILURE,
           message: `Failed to delete item: ${error instanceof Error ? error.message : "Unknown error"}`,
         });
       }
-      setIsDeleteModalOpen(false);
-      setItemToDelete(null);
     }
   };
 

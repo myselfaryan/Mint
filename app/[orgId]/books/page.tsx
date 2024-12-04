@@ -33,11 +33,16 @@ export default function BooksPage() {
   }, []);
 
   const handleDelete = async (book: Book) => {
-    // Here you would typically make an API call to delete the book
-    // For now, we'll just simulate an API call
-    console.log("Attempting to delete", book);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    // The actual state update will be handled by the GenericListing component
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Update the state after successful API call
+      setBooks((prevBooks) => prevBooks.filter((b) => b.id !== book.id));
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
   const handleSave = async (book: Book) => {
@@ -56,7 +61,6 @@ export default function BooksPage() {
     <>
       <GenericListing
         data={books}
-        setData={setBooks}
         columns={columns}
         title="Books"
         searchableFields={["name", "author"]}
