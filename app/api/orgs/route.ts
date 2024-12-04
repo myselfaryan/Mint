@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/drizzle";
 import { orgs } from "@/db/schema";
 import { count } from "drizzle-orm";
+import { createOrgSchema } from "@/lib/validations";
+import * as orgService from "./service";
+import { z } from "zod";
+import { getCurrentSession } from "@/lib/server/session";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -18,4 +22,25 @@ export async function GET(req: NextRequest) {
     limit,
     offset,
   });
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { user } = await getCurrentSession();
+    if (!user || !user.id)
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const userId = user.id;
+
+    const data = createOrgSchema.parse(await request.json());
+    const org = await orgService.createOrg(userId, data);
+    return NextResponse.json(org, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ errors: error.errors }, { status: 400 });
+    }
+    return NextResponse.json(
+      { message: "Failed to create organization" },
+      { status: 500 },
+    );
+  }
 }
