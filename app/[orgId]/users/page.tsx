@@ -46,6 +46,7 @@ export default function UsersPage({
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  console.log(`orgId: ${orgId}`);
 
   const fetchUsers = async () => {
     try {
@@ -89,7 +90,7 @@ export default function UsersPage({
 
   const updateRole = async (user: User) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/users/${user.id}`, {
+      const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: user.role }),
@@ -119,7 +120,7 @@ export default function UsersPage({
 
   const removeUser = async (user: User) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/users/${user.id}`, {
+      const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
         method: "DELETE",
       });
 
