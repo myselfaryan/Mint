@@ -47,14 +47,13 @@ export default function UsersPage({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [orgId]);
-
   const fetchUsers = async () => {
     try {
       const response = await fetch(`/api/orgs/${orgId}/users`);
-      if (!response.ok) throw new Error("Failed to fetch users");
+      if (!response.ok) {
+        setUsers(mockUsers);
+        throw new Error("Failed to fetch users");
+      }
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -62,6 +61,10 @@ export default function UsersPage({
       setUsers(mockUsers);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [orgId]);
 
   const inviteUser = async (data: InviteUserData) => {
     try {
@@ -93,6 +96,14 @@ export default function UsersPage({
       });
 
       if (!response.ok) {
+        // TODO: remove
+        setUsers(mockUsers.map((u) => {
+          return {
+            ...u,
+            role: user.role,
+          }
+        }));
+
         const error = await response.json();
         throw new Error(error.message || "Failed to update role");
       }
@@ -111,6 +122,8 @@ export default function UsersPage({
       });
 
       if (!response.ok) {
+        // TODO: remove
+        setUsers(users.filter((u) => u.id !== user.id));
         const error = await response.json();
         throw new Error(error.message || "Failed to remove user");
       }
