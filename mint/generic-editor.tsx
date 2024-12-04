@@ -9,6 +9,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,7 +23,8 @@ import { z } from "zod";
 export interface Field {
   name: string;
   label: string;
-  type: "text" | "number" | "date";
+  type: "text" | "number" | "date" | "select";
+  options?: { value: string; label: string }[];
 }
 
 interface GenericEditorProps<T> {
@@ -81,18 +89,49 @@ export function GenericEditor<T>({
             {fields.map((field) => (
               <div key={field.name} className="space-y-2">
                 <Label htmlFor={field.name}>{field.label}</Label>
-                <Input
-                  id={field.name}
-                  type={field.type}
-                  {...register(field.name as any, {
-                    valueAsNumber: field.type === "number",
-                  })}
-                  className={
-                    errors[field.name as keyof typeof errors]
-                      ? "border-red-500"
-                      : ""
-                  }
-                />
+                {field.type === "select" && field.options ? (
+                  <Select
+                    onValueChange={(value) => {
+                      const event = {
+                        target: { name: field.name, value },
+                      };
+                      register(field.name as any).onChange(event);
+                    }}
+                    defaultValue={
+                      data?.[field.name as keyof typeof data] as string
+                    }
+                  >
+                    <SelectTrigger
+                      className={
+                        errors[field.name as keyof typeof errors]
+                          ? "border-red-500"
+                          : ""
+                      }
+                    >
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {field.options.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={field.name}
+                    type={field.type}
+                    {...register(field.name as any, {
+                      valueAsNumber: field.type === "number",
+                    })}
+                    className={
+                      errors[field.name as keyof typeof errors]
+                        ? "border-red-500"
+                        : ""
+                    }
+                  />
+                )}
                 {errors[field.name as keyof typeof errors] && (
                   <p className="text-red-500 text-sm">
                     {

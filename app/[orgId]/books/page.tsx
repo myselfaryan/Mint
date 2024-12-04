@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 const columns: ColumnDef<{ id: string | number } & Book>[] = [
   { header: "Name", accessorKey: "name" as const },
   { header: "Author", accessorKey: "author" as const },
+  { header: "Book Type", accessorKey: "bookType" as const },
   { header: "Pages", accessorKey: "pages" as const },
   { header: "Publication Date", accessorKey: "publicationDate" as const },
   { header: "Copies Available", accessorKey: "copiesAvailable" as const },
@@ -18,6 +19,15 @@ const columns: ColumnDef<{ id: string | number } & Book>[] = [
 const fields: Field[] = [
   { name: "name", label: "Name", type: "text" },
   { name: "author", label: "Author", type: "text" },
+  {
+    name: "bookType",
+    label: "Book Type",
+    type: "select",
+    options: [
+      { value: "Fiction", label: "Fiction" },
+      { value: "Non-Fiction", label: "Non-Fiction" },
+    ],
+  },
   { name: "pages", label: "Pages", type: "number" },
   { name: "publicationDate", label: "Publication Date", type: "date" },
   { name: "copiesAvailable", label: "Copies Available", type: "number" },

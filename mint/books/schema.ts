@@ -4,6 +4,9 @@ export const bookSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, "Book name is required"),
   author: z.string().min(1, "Author name is required"),
+  bookType: z.enum(["Fiction", "Non-Fiction"], {
+    required_error: "Book type is required",
+  }),
   pages: z.number().int().positive("Pages must be a positive number"),
   publicationDate: z
     .string()
