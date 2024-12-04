@@ -128,7 +128,7 @@ export default function UsersPage({
         data={users}
         columns={columns}
         title="Organization Users"
-        searchableFields={["name", "nameId"]}
+        searchableFields={["name", "nameId", "role", "about"]}
         onAdd={() => {
           setSelectedUser(null);
           setIsEditorOpen(true);
