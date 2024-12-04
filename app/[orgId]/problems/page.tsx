@@ -2,9 +2,7 @@
 import { mockProblems, Problem } from "./mockProblems";
 import { useToast } from "@/hooks/use-toast";
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
-import { GenericEditor, Field } from "@/mint/generic-editor";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 
 const columns: ColumnDef<Problem>[] = [
   { header: "Problem Code", accessorKey: "nameId", sortable: true },
