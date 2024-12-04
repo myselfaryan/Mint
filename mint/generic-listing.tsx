@@ -23,6 +23,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Copy,
 } from "lucide-react";
 
 export interface ColumnDef<T> {
@@ -180,6 +181,14 @@ export function GenericListing<T extends { id: number | string }>({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              navigator.clipboard.writeText(String(item.id));
+                            }}
+                          >
+                            <Copy className="mr-2 h-4 w-4" />
+                            Copy ID
+                          </DropdownMenuItem>
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(item)}>
                               <Pencil className="mr-2 h-4 w-4" />
