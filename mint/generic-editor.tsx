@@ -57,6 +57,13 @@ export function GenericEditor<T>({
   }, [data, reset]);
 
   const onSubmit = (formData: T) => {
+    // If this is a new entry, add an id
+    if (!data) {
+      formData = {
+        ...formData,
+        id: Date.now(),
+      } as T;
+    }
     onSave(formData);
     onClose();
   };
@@ -77,7 +84,9 @@ export function GenericEditor<T>({
                 <Input
                   id={field.name}
                   type={field.type}
-                  {...register(field.name as any)}
+                  {...register(field.name as any, {
+                    valueAsNumber: field.type === "number",
+                  })}
                   className={
                     errors[field.name as keyof typeof errors]
                       ? "border-red-500"
