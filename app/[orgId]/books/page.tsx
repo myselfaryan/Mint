@@ -32,7 +32,7 @@ export default function BooksPage() {
     setBooks(mockBooks);
   }, []);
 
-  const handleDelete = async (book: Book) => {
+  const deleteBook = async (book: Book) => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -45,7 +45,7 @@ export default function BooksPage() {
     }
   };
 
-  const handleSave = async (book: Book) => {
+  const saveBook = async (book: Book) => {
     // Here you would typically make an API call to save the book
     if (selectedBook) {
       // Update existing book
@@ -72,14 +72,14 @@ export default function BooksPage() {
           setSelectedBook(book);
           setIsEditorOpen(true);
         }}
-        onDelete={handleDelete}
+        onDelete={deleteBook}
       />
 
       <GenericEditor
         data={selectedBook}
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
-        onSave={handleSave}
+        onSave={saveBook}
         schema={bookSchema}
         fields={fields}
         title="Book"
