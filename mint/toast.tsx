@@ -28,22 +28,28 @@ export function Toast({ type, message, onClose }: ToastProps) {
 
   return (
     <div
-      className={`fixed bottom-0 right-0 m-4 p-4 rounded-md shadow-md flex items-center space-x-2 z-[9999] ${
-        type === ToastType.SUCCESS ? "bg-green-500" : "bg-red-500"
+      className={`fixed bottom-0 right-0 m-4 p-4 rounded-md shadow-md flex items-center space-x-2 z-[9999] space-y-1 ${
+        type === ToastType.SUCCESS
+          ? "bg-background text-foreground border border-border"
+          : "bg-destructive text-destructive-foreground"
       }`}
     >
       {type === ToastType.SUCCESS ? (
-        <CheckCircle className="text-white" />
+        <CheckCircle className="text-primary" />
       ) : (
-        <XCircle className="text-white" />
+        <XCircle className="text-destructive-foreground" />
       )}
-      <span className="text-white">{message}</span>
+      <span>{message}</span>
       <button
         onClick={() => {
           setIsVisible(false);
           onClose();
         }}
-        className="ml-2 text-white hover:text-gray-200 focus:outline-none"
+        className={`ml-2 focus:outline-none ${
+          type === ToastType.SUCCESS
+            ? "text-muted-foreground hover:text-foreground"
+            : "text-destructive-foreground/80 hover:text-destructive-foreground"
+        }`}
         aria-label="Close"
       >
         <X size={18} />
