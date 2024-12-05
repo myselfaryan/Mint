@@ -1,10 +1,9 @@
 "use client";
+
 import { mockProblems, Problem } from "./mockProblems";
 import { useToast } from "@/hooks/use-toast";
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { useEffect, useState } from "react";
-import { ProblemEditor } from "@/components/problem-editor";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const columns: ColumnDef<Problem>[] = [
   { header: "Problem Code", accessorKey: "nameId", sortable: true },
@@ -20,7 +19,7 @@ export default function ProblemsPage({
 }) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  // const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -39,15 +38,15 @@ export default function ProblemsPage({
     fetchProblems();
   }, [params.orgId]);
 
-  const handleAdd = () => {
-    setSelectedProblem(null);
-    setIsEditorOpen(true);
-  };
+  // const handleAdd = () => {
+  //   setSelectedProblem(null);
+  //   setIsEditorOpen(true);
+  // };
 
-  const handleEdit = (problem: Problem) => {
-    setSelectedProblem(problem);
-    setIsEditorOpen(true);
-  };
+  // const handleEdit = (problem: Problem) => {
+  //   setSelectedProblem(problem);
+  //   setIsEditorOpen(true);
+  // };
 
   const handleDelete = async (problem: Problem) => {
     try {
@@ -64,44 +63,44 @@ export default function ProblemsPage({
     }
   };
 
-  const handleSave = async (problem: Problem) => {
-    try {
-      const url = selectedProblem
-        ? `/api/orgs/${params.orgId}/problems/${selectedProblem.id}`
-        : `/api/orgs/${params.orgId}/problems`;
+  // const handleSave = async (problem: Problem) => {
+  //   try {
+  //     const url = selectedProblem
+  //       ? `/api/orgs/${params.orgId}/problems/${selectedProblem.id}`
+  //       : `/api/orgs/${params.orgId}/problems`;
 
-      const response = await fetch(url, {
-        method: selectedProblem ? "PATCH" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...problem, orgId: parseInt(params.orgId) }),
-      });
+  //     const response = await fetch(url, {
+  //       method: selectedProblem ? "PATCH" : "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ ...problem, orgId: parseInt(params.orgId) }),
+  //     });
 
-      if (!response.ok) throw new Error("Failed to save problem");
-      const savedProblem = await response.json();
+  //     if (!response.ok) throw new Error("Failed to save problem");
+  //     const savedProblem = await response.json();
 
-      setProblems((prev) => {
-        if (selectedProblem) {
-          return prev.map((p) =>
-            p.id === selectedProblem.id ? savedProblem : p,
-          );
-        }
-        return [...prev, savedProblem];
-      });
-    } catch (error) {
-      console.error("Error saving problem:", error);
-    }
-  };
+  //     setProblems((prev) => {
+  //       if (selectedProblem) {
+  //         return prev.map((p) =>
+  //           p.id === selectedProblem.id ? savedProblem : p,
+  //         );
+  //       }
+  //       return [...prev, savedProblem];
+  //     });
+  //   } catch (error) {
+  //     console.error("Error saving problem:", error);
+  //   }
+  // };
 
-  const handleSavelocal = (updatedProblem: Problem) => {
-    setProblems(
-      problems.map((p) => (p.id === updatedProblem.id ? updatedProblem : p)),
-    );
-    toast({
-      title: "Success!",
-      description: "Problem updated successfully",
-    });
-    setIsEditorOpen(false);
-  };
+  // const handleSavelocal = (updatedProblem: Problem) => {
+  //   setProblems(
+  //     problems.map((p) => (p.id === updatedProblem.id ? updatedProblem : p)),
+  //   );
+  //   toast({
+  //     title: "Success!",
+  //     description: "Problem updated successfully",
+  //   });
+  //   setIsEditorOpen(false);
+  // };
 
   return (
     <>
@@ -110,7 +109,7 @@ export default function ProblemsPage({
         columns={columns}
         title="Problems"
         searchableFields={["nameId", "title"]}
-        onAdd={handleAdd}
+        // onAdd={handleAdd}
         // onEdit={null}
         onDelete={handleDelete}
         allowDownload={true}

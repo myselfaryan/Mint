@@ -6,6 +6,7 @@ export interface Contest {
   startTime: string;
   endTime: string;
   problems: string;
+  problemCount?: number;
 }
 
 export const mockContests: Contest[] = [

@@ -1,16 +1,12 @@
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Plus, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  mockProblems,
-  Problem as ListProblem,
-} from "@/app/[orgId]/problems/mockProblems";
 
 interface TestCase {
   input: string;
@@ -28,179 +24,78 @@ interface Problem {
 }
 
 interface ProblemEditorProps {
-  problem?: ListProblem | null;
-  onClose?: () => void;
-  onSave?: (problem: ListProblem) => void;
+  problem?: Problem | null;
+  onSave?: (problem: Problem) => void;
 }
 
-export function ProblemEditor({
-  problem,
-  onClose,
-  onSave,
-}: ProblemEditorProps) {
-  const router = useRouter();
+export function ProblemEditor({ problem, onSave }: ProblemEditorProps) {
   const { toast } = useToast();
-  const [problems, setProblems] = useState<Problem[]>([
-    {
-      id: problem?.id?.toString() || "1",
-      code: problem?.nameId || "",
-      title: problem?.title || "",
-      description: problem?.description || "",
-      allowedLanguages: problem?.allowedLanguages || [
-        "python",
-        "javascript",
-        "typescript",
-      ],
-      testCases: problem?.testCases || [
-        { input: "", output: "", kind: "example" },
-      ],
-    },
-  ]);
-  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
 
-  const currentProblem = problems[currentProblemIndex];
+  const [currentProblem, setCurrentProblem] = useState<Problem>({
+    id: problem?.id?.toString() || "1",
+    code: problem?.code || "",
+    title: problem?.title || "",
+    description: problem?.description || "",
+    allowedLanguages: problem?.allowedLanguages || [
+      "python",
+      "javascript",
+      "typescript",
+    ],
+    testCases: problem?.testCases || [
+      { input: "", output: "", kind: "example" },
+    ],
+  });
 
-  const addTestCase = () => {
-    const updatedProblems = [...problems];
-    updatedProblems[currentProblemIndex] = {
-      ...currentProblem,
-      testCases: [
-        ...currentProblem.testCases,
-        { input: "", output: "", kind: "example" },
-      ],
-    };
-    setProblems(updatedProblems);
+  const updateProblemField = <K extends keyof Problem>(
+    field: K,
+    value: Problem[K],
+  ) => {
+    setCurrentProblem((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const removeTestCase = (index: number) => {
-    const updatedProblems = [...problems];
-    updatedProblems[currentProblemIndex] = {
-      ...currentProblem,
-      testCases: currentProblem.testCases.filter((_, i) => i !== index),
-    };
-    setProblems(updatedProblems);
+  const addTestCase = () => {
+    setCurrentProblem((prev) => ({
+      ...prev,
+      testCases: [
+        ...prev.testCases,
+        { input: "", output: "", kind: "example" },
+      ],
+    }));
   };
 
   const updateTestCase = (
     index: number,
-    field: "input" | "output" | "kind",
+    field: keyof TestCase,
     value: string,
   ) => {
-    const updatedProblems = [...problems];
-    const updatedTestCases = currentProblem.testCases.map((testCase, i) =>
-      i === index ? { ...testCase, [field]: value } : testCase,
-    );
-    updatedProblems[currentProblemIndex] = {
-      ...currentProblem,
-      testCases: updatedTestCases,
-    };
-    setProblems(updatedProblems);
+    setCurrentProblem((prev) => ({
+      ...prev,
+      testCases: prev.testCases.map((tc, i) =>
+        i === index ? { ...tc, [field]: value } : tc,
+      ),
+    }));
   };
 
-  const updateProblemField = (
-    field: "code" | "title" | "description" | "allowedLanguages",
-    value: string | string[],
-  ) => {
-    const updatedProblems = [...problems];
-    updatedProblems[currentProblemIndex] = {
-      ...currentProblem,
-      [field]: value,
-    };
-    setProblems(updatedProblems);
-  };
-
-  const addNewProblem = () => {
-    const newProblem: Problem = {
-      id: (problems.length + 1).toString(),
-      code: "",
-      title: "",
-      description: "",
-      allowedLanguages: ["python", "javascript", "typescript"],
-      testCases: [{ input: "", output: "", kind: "example" }],
-    };
-    setProblems([...problems, newProblem]);
-    setCurrentProblemIndex(problems.length);
-  };
-
-  const removeProblem = (index: number) => {
-    if (problems.length === 1) return;
-    const updatedProblems = problems.filter((_, i) => i !== index);
-    setProblems(updatedProblems);
-    setCurrentProblemIndex(
-      Math.min(currentProblemIndex, updatedProblems.length - 1),
-    );
-  };
-
-  const handleCreateContest = () => {
-    // TODO: Add API call to create contest with problems
-    console.log("Creating contest with problems:", problems);
-    toast({
-      title: "Success!",
-      description: "Contest created successfully",
-      duration: 3000,
-    });
-    router.push("/contests");
+  const removeTestCase = (index: number) => {
+    if (currentProblem.testCases.length === 1) return;
+    setCurrentProblem((prev) => ({
+      ...prev,
+      testCases: prev.testCases.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSaveProblem = async () => {
     try {
-      // Validate required fields
-      if (!currentProblem.title || !currentProblem.description) {
-        toast({
-          title: "Error",
-          description: "Please fill in all required fields",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Validate test cases
-      if (currentProblem.testCases.some((tc) => !tc.input || !tc.output)) {
-        toast({
-          title: "Error",
-          description: "Please fill in all test cases",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // If editing an existing problem
-      if (problem) {
-        const updatedProblem: ListProblem = {
-          ...problem,
-          title: currentProblem.title,
-          allowedLanguages: currentProblem.allowedLanguages,
-        };
-        onSave?.(updatedProblem);
-        onClose?.();
-        return;
-      }
-
-      // Creating a new problem
-      const nameId = Math.random().toString(36).substring(2, 7).toUpperCase();
-      const newProblem: ListProblem = {
-        id: mockProblems.length + 1,
-        nameId,
-        title: currentProblem.title,
-        allowedLanguages: currentProblem.allowedLanguages,
-        createdAt: new Date().toISOString().split("T")[0],
-        orgId: 1,
-      };
-
-      mockProblems.push(newProblem);
-
+      if (onSave) await onSave(currentProblem);
       toast({
-        title: "Success!",
+        title: "Success",
         description: "Problem saved successfully",
       });
-
-      // Get orgId from URL
-      const pathSegments = window.location.pathname.split("/");
-      const orgId = pathSegments[1];
-
-      // Redirect to problems page
-      router.push(`/${orgId}/problems`);
     } catch (error) {
+      console.error("Error saving problem:", error);
       toast({
         title: "Error",
         description: "Failed to save problem",
@@ -211,70 +106,26 @@ export function ProblemEditor({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <div className="flex-1 p-6">
-        <div className="flex justify-end mb-4">
-          <Button
-            onClick={handleSaveProblem}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
-            Save Problem
-          </Button>
-        </div>
-        {/* <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-2">
-            {problems.map((problem, index) => (
-              <Button
-                key={problem.id}
-                variant={currentProblemIndex === index ? "default" : "outline"}
-                onClick={() => setCurrentProblemIndex(index)}
-                className="relative"
-              >
-                Problem {index + 1}
-                {problems.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeProblem(index);
-                    }}
-                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center"
-                  >
-                    ×
-                  </button>
-                )}
-              </Button>
-            ))}
-            <Button variant="outline" onClick={addNewProblem}>
-              <Plus className="h-4 w-4 mr-2" /> Add Problem
-            </Button>
-          </div>
-
-          <Button
-            onClick={handleCreateContest}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
-            Create Contest
-          </Button>
-        </div> */}
-
+      <div className="flex-1 px-6 py-2">
         <Tabs defaultValue="problem" className="w-full">
-          <TabsList className="w-full bg-muted p-0 mb-6">
+          <TabsList className="w-full bg-muted p-1 mb-6">
             <TabsTrigger
               value="problem"
-              className="flex-1 bg-muted data-[state=active]:bg-muted-foreground/20"
+              className="flex-1 data-[state=active]:bg-background"
             >
-              Problem Statement
+              Problem
             </TabsTrigger>
             <TabsTrigger
               value="testcases"
-              className="flex-1 bg-muted data-[state=active]:bg-muted-foreground/20"
+              className="flex-1 data-[state=active]:bg-background"
             >
               Test Cases
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="problem">
-            <div className="space-y-4">
-              <div>
+            <div className="space-y-6">
+              <div className="space-y-2">
                 <label
                   htmlFor="code"
                   className="block text-sm font-medium mb-1"
@@ -285,17 +136,17 @@ export function ProblemEditor({
                   id="code"
                   value={currentProblem.code}
                   onChange={(e) => updateProblemField("code", e.target.value)}
-                  placeholder="Enter problem code"
+                  placeholder="Enter problem code (unique identifier for this problem)"
                   className="bg-muted border-border"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="title"
                   className="block text-sm font-medium mb-1"
                 >
-                  Problem Title
+                  Title
                 </label>
                 <Input
                   id="title"
@@ -306,12 +157,12 @@ export function ProblemEditor({
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="description"
                   className="block text-sm font-medium mb-1"
                 >
-                  Problem Description
+                  Description
                 </label>
                 <Textarea
                   id="description"
@@ -320,11 +171,11 @@ export function ProblemEditor({
                     updateProblemField("description", e.target.value)
                   }
                   placeholder="Enter problem description"
-                  className="bg-muted border-border min-h-[200px]"
+                  className="min-h-[200px] bg-muted border-border"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="allowedLanguages"
                   className="block text-sm font-medium mb-1"
@@ -340,7 +191,7 @@ export function ProblemEditor({
                       e.target.value.split(", "),
                     )
                   }
-                  placeholder="Enter allowed languages"
+                  placeholder="Enter allowed languages separated by comma"
                   className="bg-muted border-border"
                 />
               </div>
@@ -350,61 +201,78 @@ export function ProblemEditor({
           <TabsContent value="testcases">
             <div className="space-y-4">
               {currentProblem.testCases.map((testCase, index) => (
-                <div key={index} className="bg-muted p-4 rounded-md space-y-2">
+                <div
+                  key={index}
+                  className="p-4 border border-border rounded-lg space-y-4"
+                >
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">
+                    <h3 className="text-lg font-semibold">
                       Test Case {index + 1}
                     </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTestCase(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {currentProblem.testCases.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeTestCase(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
-                  <div>
-                    <label
-                      htmlFor={`input-${index}`}
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Input
-                    </label>
-                    <Textarea
-                      id={`input-${index}`}
-                      value={testCase.input}
-                      onChange={(e) =>
-                        updateTestCase(index, "input", e.target.value)
-                      }
-                      placeholder="Enter test case input"
-                      className="bg-muted-foreground/20 border-border"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor={`output-${index}`}
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Expected Output
-                    </label>
-                    <Textarea
-                      id={`output-${index}`}
-                      value={testCase.output}
-                      onChange={(e) =>
-                        updateTestCase(index, "output", e.target.value)
-                      }
-                      placeholder="Enter expected output"
-                      className="bg-muted-foreground/20 border-border"
-                    />
+
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor={`input-${index}`}
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Input
+                      </label>
+                      <Textarea
+                        id={`input-${index}`}
+                        value={testCase.input}
+                        onChange={(e) =>
+                          updateTestCase(index, "input", e.target.value)
+                        }
+                        placeholder="Enter test case input"
+                        className="bg-muted border-border"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label
+                        htmlFor={`output-${index}`}
+                        className="block text-sm font-medium mb-1"
+                      >
+                        Output
+                      </label>
+                      <Textarea
+                        id={`output-${index}`}
+                        value={testCase.output}
+                        onChange={(e) =>
+                          updateTestCase(index, "output", e.target.value)
+                        }
+                        placeholder="Enter expected output"
+                        className="bg-muted border-border"
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
-              <Button onClick={addTestCase} className="w-full">
+              <Button onClick={addTestCase} className="mx-1">
                 <Plus className="h-4 w-4 mr-2" /> Add Test Case
               </Button>
             </div>
           </TabsContent>
         </Tabs>
+        <div className="flex justify-end mt-4">
+          <Button
+            onClick={handleSaveProblem}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            Save Problem
+          </Button>
+        </div>
       </div>
     </div>
   );

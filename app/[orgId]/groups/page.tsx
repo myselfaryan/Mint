@@ -37,6 +37,13 @@ const groupSchema = z.object({
     ),
 });
 
+const injectUsersCount = (groups: Group[]) => {
+  return groups.map((group) => ({
+    ...group,
+    usersCount: group.users.split(/\r?\n/).length,
+  }));
+};
+
 const fields: Field[] = [
   { name: "name", label: "Name", type: "text" },
   {
@@ -55,14 +62,7 @@ export default function GroupsPage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   useEffect(() => {
-    // iterate through mockGroups
-    // in each item, set usersCount = no of lines in users field
-    setGroups(
-      mockGroups.map((group) => ({
-        ...group,
-        usersCount: group.users.split(/\r?\n/).length,
-      })),
-    );
+    setGroups(injectUsersCount(mockGroups));
   }, []);
 
   const deleteGroup = async (group: Group) => {
@@ -81,13 +81,17 @@ export default function GroupsPage() {
   const saveGroup = async (group: Group) => {
     if (selectedGroup) {
       // Update existing group
-      setGroups(groups.map((g) => (g.id === group.id ? group : g)));
+      setGroups(
+        injectUsersCount(groups.map((g) => (g.id === group.id ? group : g))),
+      );
     } else {
       // Add new group
-      setGroups([
-        ...groups,
-        { ...group, id: Date.now(), createdAt: new Date().toISOString() },
-      ]);
+      setGroups(
+        injectUsersCount([
+          ...groups,
+          { ...group, id: Date.now(), createdAt: new Date().toISOString() },
+        ]),
+      );
     }
     setIsEditorOpen(false);
   };

@@ -16,6 +16,7 @@ interface InviteUserData {
 const columns: ColumnDef<User>[] = [
   { header: "Name", accessorKey: "name" },
   { header: "Username", accessorKey: "nameId" },
+  { header: "Email", accessorKey: "email" },
   { header: "Role", accessorKey: "role" },
   { header: "Joined", accessorKey: "joinedAt" },
   {
@@ -154,7 +155,7 @@ export default function UsersPage({
       <GenericListing
         data={users}
         columns={columns}
-        title="Organization Users"
+        title="User"
         searchableFields={["name", "nameId", "role", "about"]}
         onAdd={() => {
           setSelectedUser(null);
