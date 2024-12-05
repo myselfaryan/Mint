@@ -30,7 +30,7 @@ export default function SubmissionsPage({
         const response = await fetch(`/api/orgs/${params.orgId}/submissions`);
         if (!response.ok) throw new Error("Failed to fetch submissions");
         const data = await response.json();
-        setSubmissions(data);
+        setSubmissions(data && data.length ? data : mockSubmissions);
       } catch (error) {
         console.error("Error fetching submissions:", error);
         setSubmissions(mockSubmissions);
