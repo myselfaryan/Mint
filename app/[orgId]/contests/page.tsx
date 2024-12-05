@@ -93,6 +93,7 @@ export default function ContestsPage() {
           setIsEditorOpen(true);
         }}
         onDelete={deleteContest}
+        rowClickAttr="nameId"
       />
 
       <GenericEditor

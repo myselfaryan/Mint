@@ -1,5 +1,5 @@
-import { ContestDetailPage } from "@/components/contest-details-table";
+// import { ContestDetailPage } from "@/components/contest-details-table";
 
 export default function ContestDetail() {
-  return <ContestDetailPage />;
+  return <div>Contest Detail</div>;
 }
