@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { groups, orgs, users } from "@/db/schema";
+import { contests, groups, orgs, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export async function getOrgIdFromNameId(nameId: string): Promise<number> {
@@ -45,4 +45,27 @@ export async function getGroupIdFromNameId(
   }
 
   return group[0].id;
+}
+
+export async function getContestIdFromNameId(
+  orgId: number,
+  nameId: string,
+): Promise<number> {
+  const contest = await db
+    .select({ id: contests.id })
+    .from(contests)
+    .where(
+      and(
+        eq(contests.nameId, nameId),
+        eq(contests.organizerId, orgId),
+        eq(contests.organizerKind, "org"),
+      ),
+    )
+    .limit(1);
+
+  if (contest.length === 0) {
+    throw new Error("Contest not found");
+  }
+
+  return contest[0].id;
 }

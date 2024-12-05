@@ -94,6 +94,7 @@ export async function getSubmission(orgId: number, submissionId: number) {
   return submissions[0] || null;
 }
 
+/*
 export async function getSubmissions(
   orgId: number,
   filters?: {
@@ -155,4 +156,47 @@ export async function getSubmissions(
     .where(whereClause)
     .orderBy(problemSubmissions.submittedAt)
     .limit(50);
+}
+*/
+
+export async function getOrgSubmissions(orgId: number) {
+  return await db
+    .select({
+      id: problemSubmissions.id,
+      submittedAt: problemSubmissions.submittedAt,
+      language: problemSubmissions.language,
+      status: problemSubmissions.status,
+      executionTime: problemSubmissions.executionTime,
+      memoryUsage: problemSubmissions.memoryUsage,
+      user: {
+        id: users.id,
+        nameId: users.nameId,
+        name: users.name,
+      },
+      problem: {
+        id: problems.id,
+        title: problems.title,
+      },
+      contest: {
+        id: contests.id,
+        nameId: contests.nameId,
+        name: contests.name,
+      },
+    })
+    .from(problemSubmissions)
+    .innerJoin(users, eq(users.id, problemSubmissions.userId))
+    .innerJoin(
+      contestProblems,
+      eq(contestProblems.id, problemSubmissions.contestProblemId),
+    )
+    .innerJoin(problems, eq(problems.id, contestProblems.problemId))
+    .innerJoin(
+      contests,
+      and(
+        eq(contests.id, contestProblems.contestId),
+        eq(contests.organizerId, orgId),
+        eq(contests.organizerKind, "org"),
+      ),
+    )
+    .orderBy(problemSubmissions.submittedAt);
 }

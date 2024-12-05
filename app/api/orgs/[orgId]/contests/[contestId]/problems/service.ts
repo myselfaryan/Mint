@@ -30,3 +30,19 @@ export async function addProblemToContest(
     return contestProblem;
   });
 }
+
+export async function getContestProblems(contestId: number) {
+  return await db
+    .select({
+      problemId: problems.id,
+      problemNameId: problems.code,
+      title: problems.title,
+      description: problems.description,
+      allowedLanguages: problems.allowedLanguages,
+      order: contestProblems.order,
+    })
+    .from(contestProblems)
+    .innerJoin(problems, eq(problems.id, contestProblems.problemId))
+    .where(eq(contestProblems.contestId, contestId))
+    .orderBy(contestProblems.order);
+}
