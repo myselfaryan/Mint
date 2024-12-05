@@ -111,12 +111,13 @@ export default function ProblemsPage({
         title="Problems"
         searchableFields={["nameId", "title"]}
         onAdd={handleAdd}
-        onEdit={handleEdit}
+        // onEdit={null}
         onDelete={handleDelete}
         allowDownload={true}
         addPage="new"
+        editPathAttr="id"
       />
-
+      {/*
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent className="max-w-4xl">
           <ProblemEditor
@@ -125,7 +126,7 @@ export default function ProblemsPage({
             onSave={handleSavelocal}
           />
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

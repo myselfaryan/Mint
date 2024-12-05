@@ -48,6 +48,7 @@ interface GenericListingProps<T> {
   allowDownload?: boolean;
   addPage?: string;
   rowClickAttr?: keyof T; // attribute to use for navigation when row is clicked
+  editPathAttr?: keyof T; // attribute containing the edit path for navigation
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -62,6 +63,7 @@ export function GenericListing<T extends { id: number | undefined }>({
   allowDownload = true,
   addPage,
   rowClickAttr,
+  editPathAttr,
 }: GenericListingProps<T>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -206,14 +208,19 @@ export function GenericListing<T extends { id: number | undefined }>({
                   )}
                 </TableHead>
               ))}
-              {(onEdit || onDelete) && <TableHead>Actions</TableHead>}
+              {(onEdit || onDelete || editPathAttr) && (
+                <TableHead>Actions</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAndSortedData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+                  colSpan={
+                    columns.length +
+                    (onEdit || onDelete || editPathAttr ? 1 : 0)
+                  }
                   className="h-24 text-center"
                 >
                   No results found.
@@ -239,7 +246,7 @@ export function GenericListing<T extends { id: number | undefined }>({
                       {String(item[column.accessorKey])}
                     </TableCell>
                   ))}
-                  {(onEdit || onDelete) && (
+                  {(onEdit || onDelete || editPathAttr) && (
                     <TableCell>
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
@@ -256,8 +263,18 @@ export function GenericListing<T extends { id: number | undefined }>({
                             <Copy className="mr-2 h-4 w-4" />
                             Copy ID
                           </DropdownMenuItem>
-                          {onEdit && (
-                            <DropdownMenuItem onClick={() => onEdit(item)}>
+                          {(onEdit || editPathAttr) && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (onEdit) {
+                                  onEdit(item);
+                                } else if (editPathAttr && item[editPathAttr]) {
+                                  router.push(
+                                    `${window.location.pathname}/${String(item[editPathAttr])}`,
+                                  );
+                                }
+                              }}
+                            >
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
