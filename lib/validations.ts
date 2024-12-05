@@ -70,6 +70,10 @@ export const createGroupSchema = z.object({
 
 export const updateGroupSchema = createGroupSchema.partial();
 
+export const updateGroupMembersSchema = z.object({
+  emails: z.array(z.string().email()),
+});
+
 // Problem Schemas
 export const createProblemSchema = z.object({
   orgId: z.number().int().positive(),

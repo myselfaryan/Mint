@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "@/db/drizzle";
-import { groups, groupMemberships } from "@/db/schema";
+import { groups, groupMemberships, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createGroupSchema } from "@/lib/validations";
 
@@ -48,7 +48,37 @@ export async function addGroupMember(groupId: number, userId: number) {
 }
 
 export async function getGroups(orgId: number) {
-  return await db.query.groups.findMany({
-    where: eq(groups.orgId, orgId),
-  });
+  return await db
+    .select({
+      id: groups.id,
+      nameId: groups.nameId,
+      name: groups.name,
+      about: groups.about,
+      avatar: groups.avatar,
+      createdAt: groups.createdAt,
+      orgId: groups.orgId,
+      userEmails: users.email,
+    })
+    .from(groups)
+    .leftJoin(groupMemberships, eq(groupMemberships.groupId, groups.id))
+    .leftJoin(users, eq(users.id, groupMemberships.userId))
+    .where(eq(groups.orgId, orgId))
+    .then((rows) => {
+      // Group by group details and collect emails
+      const groupMap = new Map();
+
+      rows.forEach((row) => {
+        const { userEmails, ...groupDetails } = row;
+        if (!groupMap.has(row.id)) {
+          groupMap.set(row.id, {
+            ...groupDetails,
+            userEmails: userEmails ? [userEmails] : [],
+          });
+        } else if (userEmails) {
+          groupMap.get(row.id).userEmails.push(userEmails);
+        }
+      });
+
+      return Array.from(groupMap.values());
+    });
 }
