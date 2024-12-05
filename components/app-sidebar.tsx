@@ -77,17 +77,17 @@ const data = {
     {
       name: "Acme Inc",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      nameId: "Enterprise",
     },
     {
       name: "Acme Corp.",
       logo: AudioWaveform,
-      plan: "Startup",
+      nameId: "Startup",
     },
     {
       name: "Evil Corp.",
       logo: Command,
-      plan: "Free",
+      nameId: "Free",
     },
   ],
   navMain: [
@@ -175,6 +175,14 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  // get user from AuthContext
+  const { user } = useContext(AuthContext);
+  console.log(process.env.NEXT_PUBLIC_DEBUG);
+  console.log(user);
+  if (!user && process.env.NEXT_PUBLIC_DEBUG !== "True") {
+    router.push("/auth");
+  }
+
   // Get the base path (e.g., /[orgId])
   const basePath = pathname.split("/").slice(0, 2).join("/");
 
@@ -211,7 +219,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                           {activeTeam.name}
                         </span>
                         <span className="truncate text-xs">
-                          {activeTeam.plan}
+                          {activeTeam.nameId}
                         </span>
                       </div>
                       <ChevronsUpDown className="ml-auto" />
@@ -294,20 +302,20 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage
-                          src={data.user.avatar}
-                          alt={data.user.name}
-                        />
                         <AvatarFallback className="rounded-lg">
-                          CN
+                          {(user?.name || data.user.name)
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                          {data.user.name}
+                          {user?.name || data.user.name}
                         </span>
                         <span className="truncate text-xs">
-                          {data.user.email}
+                          {user?.email || data.user.email}
                         </span>
                       </div>
                       <ChevronsUpDown className="ml-auto size-4" />
@@ -322,20 +330,20 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuLabel className="p-0 font-normal">
                       <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
-                          <AvatarImage
-                            src={data.user.avatar}
-                            alt={data.user.name}
-                          />
                           <AvatarFallback className="rounded-lg">
-                            CN
+                            {(user?.name || data.user.name)
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            {data.user.name}
+                            {user?.name || data.user.name}
                           </span>
                           <span className="truncate text-xs">
-                            {data.user.email}
+                            {user?.email || data.user.email}
                           </span>
                         </div>
                       </div>

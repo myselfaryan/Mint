@@ -48,8 +48,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await fetchApi<User>("/auth/me");
+        const data = await fetchApi<User>("/me");
         if (data.email) {
+          console.log("User authorized");
           setIsAuthenticated(true);
           setUser(data);
         }
@@ -95,7 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       setUser(data);
       setIsAuthenticated(true);
-      router.push("/admin");
+      router.push("/onboarding");
       return data;
     } catch (error) {
       console.error("Signup failed:", error);
