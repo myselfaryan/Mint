@@ -1,4 +1,4 @@
-import { CalendarIcon, ClockIcon, ListIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -39,9 +39,9 @@ async function getContestData(nameId: string) {
 export default async function ContestDetailsPage({
   params,
 }: {
-  params: { contestId: string };
+  params: { orgId: string; id: string };
 }) {
-  const contestData = await getContestData(params.contestId);
+  const contestData = await getContestData(params.id);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -137,7 +137,7 @@ export default async function ContestDetailsPage({
             <ul className="space-y-2 px-2">
               {contestData.problems.map((problem) => (
                 <li key={problem.id}>
-                  <Link href={`/problems/${problem.id}`}>
+                  <Link href={`/${params.orgId}/problems/${problem.id}`}>
                     <Button
                       variant="link"
                       className="p-0 h-auto text-primary hover:text-primary/80"
