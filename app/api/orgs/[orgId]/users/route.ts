@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as userService from "./service";
-import { IdSchema } from "@/app/api/types";
+import { NameIdSchema } from "@/app/api/types";
 import { inviteUserSchema } from "@/lib/validations";
 import { z } from "zod";
+import { getOrgIdFromNameId } from "@/app/api/service";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
+
     const users = await userService.getOrgUsers(orgId);
     return NextResponse.json(users);
   } catch (error) {
@@ -25,9 +27,9 @@ export async function POST(
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
-    const data = inviteUserSchema.parse(await request.json());
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
 
+    const data = inviteUserSchema.parse(await request.json());
     const membership = await userService.inviteUser(orgId, data);
     return NextResponse.json(membership, { status: 201 });
   } catch (error) {

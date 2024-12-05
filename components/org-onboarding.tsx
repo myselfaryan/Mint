@@ -20,7 +20,7 @@ import { PlusCircle, Users } from "lucide-react";
 import { GenericEditor, Field } from "@/mint/generic-editor";
 import { useState } from "react";
 import { z } from "zod";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 export interface Org {
@@ -38,7 +38,7 @@ const fields: Field[] = [
   },
   {
     name: "nameId",
-    label: "Organization ID(Slug)",
+    label: "Organization ID (Slug)",
     type: "text",
   },
 ];
@@ -47,6 +47,7 @@ export default function OrgOnboarding() {
   const [org, setOrg] = useState<Org | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
+  const router = useRouter();
   // setOrg(null);
   // const { toast } = useToast();
 
@@ -65,7 +66,7 @@ export default function OrgOnboarding() {
       const orgData = await response.json();
       if (response.ok) {
         setOrg(orgData);
-        router.push(`/org/${orgData.nameId}`);
+        router.push(`/${orgData.nameId}`);
       } else {
         // toast({
         //   title: "Error creating organization",

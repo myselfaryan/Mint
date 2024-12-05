@@ -6,6 +6,7 @@ import { inviteUserSchema } from "@/lib/validations";
 import { useEffect, useState } from "react";
 
 import { User, mockUsers } from "./mockUsers";
+import { timeAgo } from "@/lib/utils";
 
 interface InviteUserData {
   email: string;
@@ -38,6 +39,15 @@ const fields: Field[] = [
   },
 ];
 
+function makeJoinedAtReadable(users: User[]) {
+  return users.map((user) => {
+    return {
+      ...user,
+      joinedAt: timeAgo(user.joinedAt),
+    };
+  });
+}
+
 export default function UsersPage({
   params: { orgId },
 }: {
@@ -46,6 +56,7 @@ export default function UsersPage({
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  console.log(`orgId: ${orgId}`);
 
   const fetchUsers = async () => {
     try {
@@ -54,7 +65,8 @@ export default function UsersPage({
         setUsers(mockUsers);
         throw new Error("Failed to fetch users");
       }
-      const data = await response.json();
+
+      let data: User[] = makeJoinedAtReadable(await response.json());
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -89,7 +101,7 @@ export default function UsersPage({
 
   const updateRole = async (user: User) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/users/${user.id}`, {
+      const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: user.role }),
@@ -119,7 +131,7 @@ export default function UsersPage({
 
   const removeUser = async (user: User) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/users/${user.id}`, {
+      const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
         method: "DELETE",
       });
 

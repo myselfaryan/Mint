@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as userService from "./service";
-import { IdSchema } from "@/app/api/types";
+import { NameIdSchema } from "@/app/api/types";
 import { updateUserRoleSchema } from "@/lib/validations";
 import { z } from "zod";
+import { getOrgIdFromNameId, getUserIdFromNameId } from "@/app/api/service";
 
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: { orgId: string; userId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
-    const userId = IdSchema.parse(params.userId);
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
+    const userId = await getUserIdFromNameId(NameIdSchema.parse(params.userId));
 
     const deleted = await userService.removeUserFromOrg(orgId, userId);
     return NextResponse.json(deleted);
@@ -30,8 +31,9 @@ export async function PATCH(
   { params }: { params: { orgId: string; userId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
-    const userId = IdSchema.parse(params.userId);
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
+    const userId = await getUserIdFromNameId(NameIdSchema.parse(params.userId));
+
     const { role } = updateUserRoleSchema.parse(await _req.json());
 
     const updated = await userService.updateUserRole(orgId, userId, role);
