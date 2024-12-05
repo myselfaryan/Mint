@@ -76,12 +76,12 @@ export const updateGroupMembersSchema = z.object({
 
 // Problem Schemas
 export const createProblemSchema = z.object({
-  orgId: z.number().int().positive(),
-  nameId: NameIdSchema,
+  code: NameIdSchema,
   name: z.string().min(2).max(100),
   statement: z.string(),
   timeLimit: z.number().int().positive(),
   memoryLimit: z.number().int().positive(),
+  orgId: z.number().int().positive(),
 });
 
 export const updateProblemSchema = createProblemSchema.partial();
@@ -123,4 +123,26 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export const addProblemSchema = z.object({
   problemId: z.number().int().positive(),
   order: z.number().int().min(0).optional(),
+});
+
+// Define the test case schema
+export const testCaseSchema = z.object({
+  input: z.string(),
+  output: z.string(),
+  kind: z.enum(["example", "test"]).default("test"),
+});
+
+// Define the expected response schema for type safety
+export const problemSchema = z.object({
+  id: z.number(),
+  nameId: z
+    .string()
+    .length(5)
+    .regex(/^[A-Za-z0-9]+$/),
+  title: z.string(),
+  description: z.string().optional(),
+  allowedLanguages: z.array(z.string()),
+  createdAt: z.string(),
+  orgId: z.number(),
+  testCases: z.array(testCaseSchema).optional(),
 });
