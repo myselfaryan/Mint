@@ -15,8 +15,8 @@ const defaultContestData = {
   name: "Default Contest",
   nameId: "default-contest",
   description: "This is a default contest description.",
-  startTime: "2023-07-01T09:00:00Z",
-  endTime: "2023-07-01T17:00:00Z",
+  startTime: "2024-07-01T09:00:00Z",
+  endTime: "2025-07-01T17:00:00Z",
   problems: [
     { id: "default-1", title: "Default Problem 1" },
     { id: "default-2", title: "Default Problem 2" },
