@@ -49,6 +49,7 @@ interface GenericListingProps<T> {
   addPage?: string;
   rowClickAttr?: keyof T; // attribute to use for navigation when row is clicked
   editPathAttr?: keyof T; // attribute containing the edit path for navigation
+  editPathSuffix?: string;
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -64,6 +65,7 @@ export function GenericListing<T extends { id: number | undefined }>({
   addPage,
   rowClickAttr,
   editPathAttr,
+  editPathSuffix,
 }: GenericListingProps<T>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -270,7 +272,7 @@ export function GenericListing<T extends { id: number | undefined }>({
                                   onEdit(item);
                                 } else if (editPathAttr && item[editPathAttr]) {
                                   router.push(
-                                    `${window.location.pathname}/${String(item[editPathAttr])}`,
+                                    `${window.location.pathname}/${String(item[editPathAttr])}/${editPathSuffix}`,
                                   );
                                 }
                               }}

@@ -116,8 +116,9 @@ export default function ProblemsPage({
         onDelete={handleDelete}
         allowDownload={true}
         addPage="new"
-        editPathAttr="id"
+        editPathAttr="nameId"
         rowClickAttr="nameId"
+        editPathSuffix="edit"
       />
       {/*
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
