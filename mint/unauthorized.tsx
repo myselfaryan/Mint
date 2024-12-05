@@ -15,8 +15,10 @@ import { useContext } from "react";
 
 export function UnauthorizedPage() {
   const { logout } = useContext(AuthContext);
-  const handleLogout = async () => {
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
     await logout();
+    window.location.href = "/";
   };
 
   return (
@@ -37,8 +39,8 @@ export function UnauthorizedPage() {
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button asChild onClick={handleLogout}>
-            <Link href="/" className="flex items-center">
+          <Button asChild>
+            <Link href="/" onClick={handleLogout} className="flex items-center">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Logout
             </Link>
