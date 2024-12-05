@@ -19,7 +19,7 @@ export default function ProblemsPage({
 }) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
-  // const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -29,7 +29,7 @@ export default function ProblemsPage({
         const response = await fetch(`/api/orgs/${params.orgId}/problems`);
         if (!response.ok) throw new Error("Failed to fetch problems");
         const data = await response.json();
-        setProblems(data);
+        setProblems(data && data.length ? data : mockProblems);
       } catch (error) {
         console.error("Error fetching problems:", error);
         setProblems(mockProblems);
@@ -38,10 +38,10 @@ export default function ProblemsPage({
     fetchProblems();
   }, [params.orgId]);
 
-  // const handleAdd = () => {
-  //   setSelectedProblem(null);
-  //   setIsEditorOpen(true);
-  // };
+  const handleAdd = () => {
+    setSelectedProblem(null);
+    setIsEditorOpen(true);
+  };
 
   // const handleEdit = (problem: Problem) => {
   //   setSelectedProblem(problem);
@@ -63,33 +63,35 @@ export default function ProblemsPage({
     }
   };
 
-  // const handleSave = async (problem: Problem) => {
-  //   try {
-  //     const url = selectedProblem
-  //       ? `/api/orgs/${params.orgId}/problems/${selectedProblem.id}`
-  //       : `/api/orgs/${params.orgId}/problems`;
+  /*
+  const handleSave = async (problem: Problem) => {
+    try {
+      const url = selectedProblem
+        ? `/api/orgs/${params.orgId}/problems/${selectedProblem.id}`
+        : `/api/orgs/${params.orgId}/problems`;
 
-  //     const response = await fetch(url, {
-  //       method: selectedProblem ? "PATCH" : "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ ...problem, orgId: parseInt(params.orgId) }),
-  //     });
+      const response = await fetch(url, {
+        method: selectedProblem ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...problem, orgId: parseInt(params.orgId) }),
+      });
 
-  //     if (!response.ok) throw new Error("Failed to save problem");
-  //     const savedProblem = await response.json();
+      if (!response.ok) throw new Error("Failed to save problem");
+      const savedProblem = await response.json();
 
-  //     setProblems((prev) => {
-  //       if (selectedProblem) {
-  //         return prev.map((p) =>
-  //           p.id === selectedProblem.id ? savedProblem : p,
-  //         );
-  //       }
-  //       return [...prev, savedProblem];
-  //     });
-  //   } catch (error) {
-  //     console.error("Error saving problem:", error);
-  //   }
-  // };
+      setProblems((prev) => {
+        if (selectedProblem) {
+          return prev.map((p) =>
+            p.id === selectedProblem.id ? savedProblem : p,
+          );
+        }
+        return [...prev, savedProblem];
+      });
+    } catch (error) {
+      console.error("Error saving problem:", error);
+    }
+  };
+  */
 
   // const handleSavelocal = (updatedProblem: Problem) => {
   //   setProblems(
@@ -109,7 +111,7 @@ export default function ProblemsPage({
         columns={columns}
         title="Problems"
         searchableFields={["nameId", "title"]}
-        // onAdd={handleAdd}
+        onAdd={handleAdd}
         // onEdit={null}
         onDelete={handleDelete}
         allowDownload={true}
