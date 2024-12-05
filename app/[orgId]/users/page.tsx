@@ -6,6 +6,7 @@ import { inviteUserSchema } from "@/lib/validations";
 import { useEffect, useState } from "react";
 
 import { User, mockUsers } from "./mockUsers";
+import { timeAgo } from "@/lib/utils";
 
 interface InviteUserData {
   email: string;
@@ -38,6 +39,15 @@ const fields: Field[] = [
   },
 ];
 
+function makeJoinedAtReadable(users: User[]) {
+  return users.map((user) => {
+    return {
+      ...user,
+      joinedAt: timeAgo(user.joinedAt),
+    };
+  });
+}
+
 export default function UsersPage({
   params: { orgId },
 }: {
@@ -55,7 +65,8 @@ export default function UsersPage({
         setUsers(mockUsers);
         throw new Error("Failed to fetch users");
       }
-      const data = await response.json();
+
+      let data: User[] = makeJoinedAtReadable(await response.json());
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
