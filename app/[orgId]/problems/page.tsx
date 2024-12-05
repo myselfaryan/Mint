@@ -117,6 +117,7 @@ export default function ProblemsPage({
         allowDownload={true}
         addPage="new"
         editPathAttr="id"
+        rowClickAttr="nameId"
       />
       {/*
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
