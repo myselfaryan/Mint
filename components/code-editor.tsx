@@ -29,6 +29,7 @@ import {
   ResizablePanelGroup,
   ResizableHandle,
 } from "@/components/ui/resizable";
+import { mockProblems, Problem } from "@/app/[orgId]/problems/mockProblems";
 
 const themes = {
   "VS Code Dark": vscodeDark,
@@ -63,7 +64,14 @@ const extensions = {
   cpp: [cpp()],
 };
 
-export function CodeEditor() {
+export interface CodeEditorProps {
+  problem?: Problem | null;
+}
+
+export function CodeEditor({ problem }: CodeEditorProps) {
+  if (!problem) {
+    problem = mockProblems[0];
+  }
   // Editor state - manages the current code content
   const [code, setCode] = useState<string>(() => defaultCode["cpp"]);
 
@@ -207,11 +215,10 @@ export function CodeEditor() {
             <div className="p-4 overflow-auto">
               <div className="space-y-4">
                 <h1 className="text-xl font-bold text-foreground">
-                  2028. Find Missing Observations
+                  {problem?.title}
                 </h1>
                 <p className="text-sm text-foreground">
-                  You have observations of n + m 6-sided dice rolls with each
-                  face numbered from 1 to 6...
+                  {problem?.description}
                 </p>
               </div>
             </div>
