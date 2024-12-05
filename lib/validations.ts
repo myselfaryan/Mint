@@ -71,7 +71,7 @@ export const createGroupSchema = z.object({
 export const updateGroupSchema = createGroupSchema.partial();
 
 export const updateGroupMembersSchema = z.object({
-  emails: z.array(z.string().email())
+  emails: z.array(z.string().email()),
 });
 
 // Problem Schemas

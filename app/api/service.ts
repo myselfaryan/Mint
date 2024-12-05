@@ -30,18 +30,18 @@ export async function getUserIdFromNameId(nameId: string): Promise<number> {
   return user[0].id;
 }
 
-export async function getGroupIdFromNameId(orgId: number, nameId: string): Promise<number> {
+export async function getGroupIdFromNameId(
+  orgId: number,
+  nameId: string,
+): Promise<number> {
   const group = await db
     .select({ id: groups.id })
     .from(groups)
-    .where(and(
-      eq(groups.nameId, nameId),
-      eq(groups.orgId, orgId)
-    ))
+    .where(and(eq(groups.nameId, nameId), eq(groups.orgId, orgId)))
     .limit(1);
 
   if (group.length === 0) {
-    throw new Error('Group not found');
+    throw new Error("Group not found");
   }
 
   return group[0].id;
