@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 
 const columns: ColumnDef<Contest>[] = [
-  { header: "Name", accessorKey: "name", sortable: true },
+  { header: "Contest ID", accessorKey: "nameId", sortable: true },
+  { header: "Title", accessorKey: "name", sortable: true },
   // { header: "Description", accessorKey: "description" },
   { header: "Start Time", accessorKey: "startTime", sortable: true },
   { header: "End Time", accessorKey: "endTime", sortable: true },
   { header: "Problems", accessorKey: "problems" },
+  { header: "Problem Count", accessorKey: "problemCount" },
 ];
 
 const fields: Field[] = [
@@ -42,13 +44,20 @@ const contestSchema = z.object({
   problems: z.string(),
 });
 
+const injectProblemsCount = (contests: Contest[]) => {
+  return contests.map((contest) => ({
+    ...contest,
+    problemCount: contest.problems.split(",").length,
+  }));
+};
+
 export default function ContestsPage() {
   const [contests, setContests] = useState<Contest[]>([]);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   useEffect(() => {
-    setContests(mockContests);
+    setContests(injectProblemsCount(mockContests));
   }, []);
 
   const deleteContest = async (contest: Contest) => {
