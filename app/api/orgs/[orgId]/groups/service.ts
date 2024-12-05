@@ -57,22 +57,22 @@ export async function getGroups(orgId: number) {
       avatar: groups.avatar,
       createdAt: groups.createdAt,
       orgId: groups.orgId,
-      userEmails: users.email
+      userEmails: users.email,
     })
     .from(groups)
     .leftJoin(groupMemberships, eq(groupMemberships.groupId, groups.id))
     .leftJoin(users, eq(users.id, groupMemberships.userId))
     .where(eq(groups.orgId, orgId))
-    .then(rows => {
+    .then((rows) => {
       // Group by group details and collect emails
       const groupMap = new Map();
 
-      rows.forEach(row => {
+      rows.forEach((row) => {
         const { userEmails, ...groupDetails } = row;
         if (!groupMap.has(row.id)) {
           groupMap.set(row.id, {
             ...groupDetails,
-            userEmails: userEmails ? [userEmails] : []
+            userEmails: userEmails ? [userEmails] : [],
           });
         } else if (userEmails) {
           groupMap.get(row.id).userEmails.push(userEmails);

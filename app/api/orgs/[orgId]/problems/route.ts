@@ -1,15 +1,19 @@
-import { createProblemSchema, createTestCaseSchema } from "@/lib/validations";
+import {
+  createProblemSchema,
+  createTestCaseSchema,
+  NameIdSchema,
+} from "@/lib/validations";
 import * as problemService from "./service";
 import { NextRequest } from "next/server";
-import { IdSchema } from "../../../types";
 import { z } from "zod";
+import { getOrgIdFromNameId } from "@/app/api/service";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     const body = await request.json();
 
     const { testCases, ...problemData } = body;

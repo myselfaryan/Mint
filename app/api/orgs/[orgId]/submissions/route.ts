@@ -3,10 +3,40 @@ import {
   createSubmissionSchema,
   getSubmissionsQuerySchema,
 } from "./validation";
-import * as submissionService from "./service";
 import { IdSchema } from "@/app/api/types";
 import { z } from "zod";
+import * as submissionService from "./service";
+import { getOrgIdFromNameId } from "@/app/api/service";
+import { NameIdSchema } from "@/app/api/types";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { orgId: string } },
+) {
+  try {
+    // Validate orgId format
+    const orgNameId = NameIdSchema.parse(params.orgId);
+
+    // Get numeric orgId
+    const orgId = await getOrgIdFromNameId(orgNameId);
+
+    const submissions = await submissionService.getOrgSubmissions(orgId);
+    return NextResponse.json(submissions);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ errors: error.errors }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "Organization not found") {
+      return NextResponse.json({ message: error.message }, { status: 404 });
+    }
+    return NextResponse.json(
+      { message: "Failed to fetch submissions" },
+      { status: 500 },
+    );
+  }
+}
+
+/*
 export async function GET(
   request: NextRequest,
   { params }: { params: { orgId: string } },
@@ -28,6 +58,7 @@ export async function GET(
     );
   }
 }
+*/
 
 export async function POST(
   request: NextRequest,

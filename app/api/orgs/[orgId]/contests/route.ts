@@ -4,15 +4,15 @@ import { createContest } from "./service";
 import { db } from "@/db/drizzle";
 import { contests } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
-import { createContestSchema } from "@/lib/validations";
-import { IdSchema } from "@/app/api/types";
+import { createContestSchema, NameIdSchema } from "@/lib/validations";
+import { getOrgIdFromNameId } from "@/app/api/service";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     const data = createContestSchema.parse(await request.json());
 
     const contest = await createContest(orgId, data);
