@@ -106,9 +106,9 @@ const defaultUser = {
 const defaultTeams = {
   teams: [
     {
-      name: "Acme Inc",
+      name: "IIIT Sri City",
       logo: GalleryVerticalEnd,
-      nameId: "acme",
+      nameId: "iiits",
       role: "owner",
     },
     {
