@@ -36,6 +36,7 @@ const fields: Field[] = [
 ];
 
 const contestSchema = z.object({
+  id: z.number().optional(),
   name: z.string().min(2).max(100),
   nameId: z.string().min(2).max(50),
   description: z.string(),
