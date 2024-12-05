@@ -1,15 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { useContext, useState } from "react";
 import {
   AudioWaveform,
   ChevronsUpDown,
   Command,
-  Frame,
   GalleryVerticalEnd,
   LogOut,
-  Map,
-  PieChart,
   Plus,
   Users,
   Trophy,
@@ -21,7 +19,7 @@ import {
   Contact,
 } from "lucide-react";
 import { Check } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -64,32 +62,8 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthContext } from "@/contexts/auth-context";
-import { useContext } from "react";
 
-// This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      nameId: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      nameId: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      nameId: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Users",
@@ -121,21 +95,33 @@ const data = {
       items: [],
     },
   ],
-  projects: [
+};
+
+const defaultUser = {
+  name: "shadcn",
+  email: "m@example.com",
+  avatar: "/avatars/shadcn.jpg",
+};
+
+const defaultTeams = {
+  teams: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      name: "Acme Inc",
+      logo: GalleryVerticalEnd,
+      nameId: "acme",
+      role: "owner",
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
+      name: "Acme Corp.",
+      logo: AudioWaveform,
+      nameId: "corp",
+      role: "admin",
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Evil Corp.",
+      logo: Command,
+      nameId: "corp2",
+      role: "member",
     },
   ],
 };
@@ -165,8 +151,11 @@ function ThemeItems() {
 }
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-  const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
+  // const [teams, setTeams] = React.useState(defaultTeams.teams);
+  const [activeTeam, setActiveTeam] = useState(defaultTeams.teams[0]);
+
   const { logout } = useContext(AuthContext);
+  // const [isInitialRender, setIsInitialRender] = useState(true);
 
   const handleLogout = () => {
     logout();
@@ -198,6 +187,43 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  // useEffect(() => {
+  //   if (isInitialRender) {
+  //     setIsInitialRender(false);
+  //     console.log("useEffect");
+  //     console.log(user?.orgs);
+  //     if (user?.orgs)
+  //       setTeams(
+  //         user?.orgs.map((org) => ({
+  //           ...org,
+  //           logo: GalleryVerticalEnd,
+  //         })),
+  //       );
+  //     else setTeams(defaultTeams.teams);
+  //     console.log(teams);
+  //     setActiveTeam(teams[0]);
+  //   }
+  // }, [user, teams, isInitialRender]);
+
+  // setTeams(user?.orgs ? user?.orgs : defaultTeams.teams);
+
+  // if (user?.orgs)
+  //   setTeams(
+  //     user?.orgs.map((org) => ({
+  //       ...org,
+  //       logo: GalleryVerticalEnd,
+  //     })),
+  //   );
+  // else setTeams(defaultTeams.teams);
+  const teams = user?.orgs
+    ? user?.orgs.map((org) => ({
+        ...org,
+        logo: GalleryVerticalEnd,
+      }))
+    : defaultTeams.teams;
+
+  // setActiveTeam(teams[0]);
+
   return (
     <ThemeProvider>
       <SidebarProvider>
@@ -219,7 +245,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                           {activeTeam.name}
                         </span>
                         <span className="truncate text-xs">
-                          {activeTeam.nameId}
+                          {activeTeam.role}
                         </span>
                       </div>
                       <ChevronsUpDown className="ml-auto" />
@@ -234,7 +260,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuLabel className="text-xs text-muted-foreground">
                       Organizations
                     </DropdownMenuLabel>
-                    {data.teams.map((team, index) => (
+                    {teams.map((team, index) => (
                       <DropdownMenuItem
                         key={team.name}
                         onClick={() => setActiveTeam(team)}
@@ -244,9 +270,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                           <team.logo className="size-4 shrink-0" />
                         </div>
                         {team.name}
-                        <DropdownMenuShortcut>
-                          ⌘{index + 1}
-                        </DropdownMenuShortcut>
+                        <DropdownMenuShortcut>{team.role}</DropdownMenuShortcut>
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
@@ -303,7 +327,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarFallback className="rounded-lg">
-                          {(user?.name || data.user.name)
+                          {(user?.name || defaultUser.name)
                             .split(" ")
                             .map((n) => n[0])
                             .join("")
@@ -312,10 +336,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                          {user?.name || data.user.name}
+                          {user?.name || defaultUser.name}
                         </span>
                         <span className="truncate text-xs">
-                          {user?.email || data.user.email}
+                          {user?.email || defaultUser.email}
                         </span>
                       </div>
                       <ChevronsUpDown className="ml-auto size-4" />
@@ -331,7 +355,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarFallback className="rounded-lg">
-                            {(user?.name || data.user.name)
+                            {(user?.name || defaultUser.name)
                               .split(" ")
                               .map((n) => n[0])
                               .join("")
@@ -340,10 +364,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            {user?.name || data.user.name}
+                            {user?.name || defaultUser.name}
                           </span>
                           <span className="truncate text-xs">
-                            {user?.email || data.user.email}
+                            {user?.email || defaultUser.email}
                           </span>
                         </div>
                       </div>
