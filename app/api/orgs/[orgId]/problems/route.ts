@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { orgId: string } },
 ) {
   try {
-    console.log('HERE');
+    console.log("HERE");
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     console.log(`orgId: ${orgId}`);
     const problems = await problemService.getOrgProblems(orgId);
