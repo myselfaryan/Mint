@@ -54,16 +54,66 @@ export default async function ContestDetailsPage({
     });
   };
 
+  const getContestStatus = () => {
+    const now = new Date();
+    const startTime = new Date(contestData.startTime);
+    const endTime = new Date(contestData.endTime);
+    if (now < startTime) {
+      // TODO: add in how many hours/days left
+      return {
+        text: "Upcoming",
+        color: "text-yello-500",
+        dotColor: "bg-yellow-500",
+        animate: false,
+      };
+    } else if (now >= startTime && now <= endTime) {
+      return {
+        text: "Live",
+        color: "text-green-500",
+        dotColor: "bg-green-500",
+        animate: true,
+      };
+    } else {
+      return {
+        text: "Contest is over",
+        color: "text-primary-muted",
+        dotColor: "bg-gray-400",
+        animate: false,
+      };
+    }
+  };
+
+  const status = getContestStatus();
+
   return (
     <div className="container px-8 py-2 w-3xl h-screen">
       <Card className="bg-background">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">
-            {contestData.name}
-          </CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Contest Code: {contestData.nameId}
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-2xl font-bold">
+                {contestData.name}
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Contest Code: {contestData.nameId}
+              </CardDescription>
+            </div>
+            <div
+              className={`font-semibold ${status.color} flex items-center gap-2`}
+            >
+              <div className="relative flex">
+                <div className={`w-3 h-3 rounded-full ${status.dotColor}`} />
+                {status.animate && (
+                  <div className="absolute top-0 left-0 w-2 h-2">
+                    <div
+                      className={`w-3 h-3 rounded-full ${status.dotColor} animate-ping`}
+                    />
+                  </div>
+                )}
+              </div>
+              {status.text}
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-foreground">{contestData.description}</p>
