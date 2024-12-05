@@ -30,7 +30,7 @@ interface ChartData {
   };
 }
 
-export default function Page() {
+export default function GraphicsPage() {
   const chartData: ChartData = {
     submissions: {
       total: 12584,
