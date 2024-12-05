@@ -63,7 +63,7 @@ export function AuthComponent({
         method: "POST",
         body: JSON.stringify(values),
       });
-      router.push("/"); // Redirect to home page after successful login
+      router.push("/iiits"); // Redirect to home page after successful login
     } catch (error) {
       console.error(error);
       toast({
@@ -80,7 +80,7 @@ export function AuthComponent({
         method: "POST",
         body: JSON.stringify(values),
       });
-      router.push("/"); // Redirect to home page after successful registration
+      router.push("/iiits"); // Redirect to home page after successful registration
     } catch (error) {
       console.error(error);
       toast({
