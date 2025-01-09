@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 import {
   AudioWaveform,
   ChevronsUpDown,
@@ -131,17 +131,26 @@ function ThemeItems() {
 
   return (
     <>
-      <DropdownMenuItem onClick={() => setTheme("light")}>
+      <DropdownMenuItem
+        onClick={() => setTheme("light")}
+        className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+      >
         <Sun className="mr-2 h-4 w-4" />
         <span>Light</span>
         {theme === "light" && <Check className="ml-auto h-4 w-4" />}
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => setTheme("dark")}>
+      <DropdownMenuItem
+        onClick={() => setTheme("dark")}
+        className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+      >
         <Moon className="mr-2 h-4 w-4" />
         <span>Dark</span>
         {theme === "dark" && <Check className="ml-auto h-4 w-4" />}
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => setTheme("system")}>
+      <DropdownMenuItem
+        onClick={() => setTheme("system")}
+        className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+      >
         <Monitor className="mr-2 h-4 w-4" />
         <span>System</span>
         {theme === "system" && <Check className="ml-auto h-4 w-4" />}
@@ -151,21 +160,48 @@ function ThemeItems() {
 }
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-  // const [teams, setTeams] = React.useState(defaultTeams.teams);
-  const [activeTeam, setActiveTeam] = useState(defaultTeams.teams[0]);
+  const { logout, user } = useContext(AuthContext);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const { logout } = useContext(AuthContext);
-  // const [isInitialRender, setIsInitialRender] = useState(true);
+  // Transform user orgs into teams format or use default teams
+  const teams = useMemo(() => {
+    if (user?.orgs && user.orgs.length > 0) {
+      return user.orgs.map((org) => ({
+        ...org,
+        logo: GalleryVerticalEnd,
+      }));
+    }
+    return defaultTeams.teams;
+  }, [user?.orgs]);
+
+  // Set active team with proper initialization
+  const [activeTeam, setActiveTeam] = useState(() => teams[0]);
+
+  // Handle team change with URL update
+  const handleTeamChange = (team: typeof teams[0]) => {
+    setActiveTeam(team);
+    // Get the current path segments after the org ID
+    const pathSegments = pathname.split('/').slice(2);
+    // Construct new path with new org ID and maintain the rest of the path
+    const newPath = `/${team.nameId}${pathSegments.length ? '/' + pathSegments.join('/') : ''}`;
+    router.push(newPath);
+  };
+
+  // Update activeTeam when teams change
+  useEffect(() => {
+    if (
+      teams.length > 0 &&
+      (!activeTeam || !teams.find((t) => t.nameId === activeTeam.nameId))
+    ) {
+      setActiveTeam(teams[0]);
+    }
+  }, [teams, activeTeam]);
 
   const handleLogout = () => {
     logout();
   };
 
-  const pathname = usePathname();
-  const router = useRouter();
-
-  // get user from AuthContext
-  const { user } = useContext(AuthContext);
   console.log(process.env.NEXT_PUBLIC_DEBUG);
   console.log(user);
   if (!user && process.env.NEXT_PUBLIC_DEBUG !== "True") {
@@ -187,43 +223,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     }));
   };
 
-  // useEffect(() => {
-  //   if (isInitialRender) {
-  //     setIsInitialRender(false);
-  //     console.log("useEffect");
-  //     console.log(user?.orgs);
-  //     if (user?.orgs)
-  //       setTeams(
-  //         user?.orgs.map((org) => ({
-  //           ...org,
-  //           logo: GalleryVerticalEnd,
-  //         })),
-  //       );
-  //     else setTeams(defaultTeams.teams);
-  //     console.log(teams);
-  //     setActiveTeam(teams[0]);
-  //   }
-  // }, [user, teams, isInitialRender]);
-
-  // setTeams(user?.orgs ? user?.orgs : defaultTeams.teams);
-
-  // if (user?.orgs)
-  //   setTeams(
-  //     user?.orgs.map((org) => ({
-  //       ...org,
-  //       logo: GalleryVerticalEnd,
-  //     })),
-  //   );
-  // else setTeams(defaultTeams.teams);
-  const teams = user?.orgs
-    ? user?.orgs.map((org) => ({
-        ...org,
-        logo: GalleryVerticalEnd,
-      }))
-    : defaultTeams.teams;
-
-  // setActiveTeam(teams[0]);
-
   return (
     <ThemeProvider>
       <SidebarProvider>
@@ -235,7 +234,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton
                       size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                      className="cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                         <activeTeam.logo className="size-4" />
@@ -263,8 +262,8 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     {teams.map((team, index) => (
                       <DropdownMenuItem
                         key={team.name}
-                        onClick={() => setActiveTeam(team)}
-                        className="gap-2 p-2"
+                        onClick={() => handleTeamChange(team)}
+                        className="cursor-pointer gap-2 p-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
                         <div className="flex size-6 items-center justify-center rounded-sm border">
                           <team.logo className="size-4 shrink-0" />
@@ -275,15 +274,14 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="gap-2 p-2"
+                      className="cursor-pointer gap-2 p-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       onClick={() => router.push("/onboarding")}
                     >
-                      <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                        <Plus className="size-4" />
+                      <div className="flex size-6 items-center justify-center rounded-sm border bg-sidebar-primary text-sidebar-primary-foreground">
+                        <Plus className="size-4 shrink-0" />
                       </div>
-                      <div className="font-medium text-muted-foreground">
-                        Create or Join a Org
-                      </div>
+                      <span className="font-medium">Create or Join a Org</span>
+                      <DropdownMenuShortcut>New</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -323,7 +321,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton
                       size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                      className="cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarFallback className="rounded-lg">
@@ -375,7 +373,9 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
+                        <DropdownMenuSubTrigger
+                          className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
                           <Sun className="mr-2 h-4 w-4" />
                           <span>Change Theme</span>
                         </DropdownMenuSubTrigger>
@@ -385,7 +385,9 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </DropdownMenuSub>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
                       <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
                       <span>Log out</span>
                     </DropdownMenuItem>
