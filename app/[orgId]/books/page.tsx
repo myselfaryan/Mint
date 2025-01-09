@@ -6,6 +6,9 @@ import { GenericEditor, Field } from "@/mint/generic-editor";
 import { bookSchema } from "@/mint/books/schema";
 import { Book, mockBooks } from "@/mint/books/mockData";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
+import { marked } from "marked";
 
 const columns: ColumnDef<{ id: string | number } & Book>[] = [
   { header: "Name", accessorKey: "name" as const },
@@ -69,6 +72,21 @@ export default function BooksPage() {
 
   return (
     <>
+      <div className="mt-6 my-4 mx-8">
+        <Alert variant={"destructive"}>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(
+                  "You are viewing **dummy data** in this page, because fetching from backend failed. This is because `ENABLE_MOCKING` is set to _true_ in the `.env` file.",
+                ),
+              }}
+            />
+          </AlertDescription>
+        </Alert>
+      </div>
       <GenericListing
         data={books}
         columns={columns}
