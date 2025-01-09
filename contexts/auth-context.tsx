@@ -89,6 +89,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     fullName: string,
   ): Promise<User> => {
     try {
+      throw new Error("unimplemented!");
+
       const data = await fetchApi<User>("/auth/register", {
         method: "POST",
         body: JSON.stringify({ email, password, fullName }),
