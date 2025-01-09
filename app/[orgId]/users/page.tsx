@@ -128,7 +128,8 @@ export default function UsersPage({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.message || formatValidationErrors(errorData);
+        const errorMessage =
+          errorData.message || formatValidationErrors(errorData);
         throw new Error(errorMessage);
       }
 

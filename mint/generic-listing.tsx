@@ -144,9 +144,12 @@ export function GenericListing<T extends { id: number | undefined }>({
         toast({
           variant: "destructive",
           title: "Error",
-          description: error instanceof Error ? error.message : 
-            (error && typeof error === 'object' && 'message' in error ? 
-              error.message : formatValidationErrors(error)),
+          description:
+            error instanceof Error
+              ? error.message
+              : error && typeof error === "object" && "message" in error
+                ? error.message
+                : formatValidationErrors(error),
         });
         console.error("Delete error:", error);
       }
