@@ -62,6 +62,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthContext } from "@/contexts/auth-context";
+import { notFound } from "next/navigation";
 
 const data = {
   navMain: [
@@ -160,9 +161,14 @@ function ThemeItems() {
 }
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-  const { logout, user } = useContext(AuthContext);
+  const { logout, user, isAuthenticated } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Get orgId from URL
+  const orgId = pathname.split("/")[1];
+
+  console.log("orgId", orgId);
 
   // Transform user orgs into teams format or use default teams
   const teams = useMemo(() => {
@@ -172,31 +178,44 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         logo: GalleryVerticalEnd,
       }));
     }
-    return defaultTeams.teams;
+    return [];
   }, [user?.orgs]);
 
-  // Set active team with proper initialization
-  const [activeTeam, setActiveTeam] = useState(() => teams[0]);
+  console.log("teams in sidebar", teams);
+
+  // Check if the orgId exists in teams, if not return 404
+  useEffect(() => {
+    console.log('404 check - orgId:', orgId, 'type:', typeof orgId);
+    console.log('404 check - teams:', teams);
+    console.log('404 check - teams.length:', teams.length);
+    if (isAuthenticated && orgId && teams.length > 0 && !teams.find((team) => team.nameId === orgId)) {
+      notFound();
+    }
+  }, [orgId, teams, isAuthenticated]);
+
+  // Set active team based on URL orgId
+  const [activeTeam, setActiveTeam] = useState<(typeof teams)[0] | null>(() => {
+    const teamFromUrl = teams.find((team) => team.nameId === orgId);
+    return teamFromUrl || null;
+  });
+
+  // Update activeTeam when URL changes or teams load
+  useEffect(() => {
+    const teamFromUrl = teams.find((team) => team.nameId === orgId);
+    if (teamFromUrl && (!activeTeam || activeTeam.nameId !== teamFromUrl.nameId)) {
+      setActiveTeam(teamFromUrl);
+    }
+  }, [orgId, teams, activeTeam]);
 
   // Handle team change with URL update
-  const handleTeamChange = (team: typeof teams[0]) => {
+  const handleTeamChange = (team: (typeof teams)[0]) => {
     setActiveTeam(team);
     // Get the current path segments after the org ID
-    const pathSegments = pathname.split('/').slice(2);
+    const pathSegments = pathname.split("/").slice(2);
     // Construct new path with new org ID and maintain the rest of the path
-    const newPath = `/${team.nameId}${pathSegments.length ? '/' + pathSegments.join('/') : ''}`;
+    const newPath = `/${team.nameId}${pathSegments.length ? "/" + pathSegments.join("/") : ""}`;
     router.push(newPath);
   };
-
-  // Update activeTeam when teams change
-  useEffect(() => {
-    if (
-      teams.length > 0 &&
-      (!activeTeam || !teams.find((t) => t.nameId === activeTeam.nameId))
-    ) {
-      setActiveTeam(teams[0]);
-    }
-  }, [teams, activeTeam]);
 
   const handleLogout = () => {
     logout();
@@ -223,6 +242,42 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  // If auth is still loading, show skeleton UI
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen">
+        <aside className="flex flex-col w-64 px-4 py-6 border-r">
+          {/* Skeleton for org switcher */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+          </div>
+          
+          {/* Skeleton for navigation items */}
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
+                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+
+          {/* Skeleton for user account */}
+          <div className="mt-auto">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </aside>
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <ThemeProvider>
       <SidebarProvider>
@@ -236,18 +291,21 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       size="lg"
                       className="cursor-pointer hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     >
-                      <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <activeTeam.logo className="size-4" />
-                      </div>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {activeTeam.name}
-                        </span>
-                        <span className="truncate text-xs">
-                          {activeTeam.role}
-                        </span>
-                      </div>
-                      <ChevronsUpDown className="ml-auto" />
+                      {activeTeam && (
+                        <>
+                          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                            <activeTeam.logo className="size-4" />
+                          </div>
+                          <div className="grid flex-1 text-left text-sm leading-tight">
+                            <span className="truncate font-semibold">
+                              {activeTeam.name}
+                            </span>
+                            <span className="truncate text-xs">
+                              {activeTeam.nameId}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -373,9 +431,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger
-                          className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        >
+                        <DropdownMenuSubTrigger className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <Sun className="mr-2 h-4 w-4" />
                           <span>Change Theme</span>
                         </DropdownMenuSubTrigger>
@@ -385,9 +441,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </DropdownMenuSub>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
+                    <DropdownMenuItem className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                       <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
                       <span>Log out</span>
                     </DropdownMenuItem>

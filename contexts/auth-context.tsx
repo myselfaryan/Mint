@@ -53,6 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           console.log("User authorized");
           setIsAuthenticated(true);
           setUser(data);
+          console.log("user orgs fetched in auth context", data?.orgs);
         }
       } catch (error) {
         console.error("User not authorized");
