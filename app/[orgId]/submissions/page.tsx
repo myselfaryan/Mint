@@ -2,7 +2,11 @@
 
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { Submission, mockSubmissions } from "./mockSubmissions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { formatValidationErrors } from "@/utils/error";
+import { MockAlert } from "@/components/mock-alert";
+import { timeAgo } from "@/lib/utils";
 
 const columns: ColumnDef<Submission>[] = [
   { header: "User", accessorKey: "userNameId", sortable: true },
@@ -21,26 +25,32 @@ export default function SubmissionsPage({
   params: { orgId: string };
 }) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  // const [selectedSubmission, setSelectedSubmission] =
-  //   useState<Submission | null>(null);
+  const [showMockAlert, setShowMockAlert] = useState(false);
+
+  const fetchSubmissions = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/orgs/${params.orgId}/submissions`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
+      }
+      const data = await response.json();
+      setSubmissions(data);
+      setShowMockAlert(false);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      setSubmissions(mockSubmissions);
+      setShowMockAlert(true);
+    }
+  }, [params.orgId]);
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const response = await fetch(`/api/orgs/${params.orgId}/submissions`);
-        if (!response.ok) throw new Error("Failed to fetch submissions");
-        const data = await response.json();
-        setSubmissions(data && data.length ? data : mockSubmissions);
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
-        setSubmissions(mockSubmissions);
-      }
-    };
     fetchSubmissions();
-  }, [params.orgId]);
+  }, [params.orgId, fetchSubmissions]);
 
   return (
     <>
+      <MockAlert show={showMockAlert} />
       <GenericListing
         data={submissions}
         columns={columns}
@@ -49,6 +59,8 @@ export default function SubmissionsPage({
           "userNameId",
           "contestNameId",
           "contestProblemNameId",
+          "language",
+          "status",
         ]}
         allowDownload={true}
       />
