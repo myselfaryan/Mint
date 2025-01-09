@@ -79,3 +79,16 @@ export async function getOrgProblems(orgId: number) {
 
   return Object.values(groupedProblems);
 }
+
+export async function getProblemIdFromCode(orgId: number, code: string): Promise<number> {
+  const problem = await db.query.problems.findFirst({
+    where: (problems, { and, eq }) =>
+      and(eq(problems.orgId, orgId), eq(problems.code, code)),
+  });
+
+  if (!problem) {
+    throw new Error("Problem not found");
+  }
+
+  return problem.id;
+}
