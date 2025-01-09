@@ -84,7 +84,8 @@ export default function GroupsPage() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error instanceof Error ? error.message : "Failed to fetch groups",
+          description:
+            error instanceof Error ? error.message : "Failed to fetch groups",
         });
         // Fallback to mock data in case of error
         setGroups(injectUsersCount(mockGroups));
@@ -95,9 +96,12 @@ export default function GroupsPage() {
 
   const deleteGroup = async (group: Group) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/groups/${group.nameId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/orgs/${orgId}/groups/${group.nameId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -115,7 +119,8 @@ export default function GroupsPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete group",
+        description:
+          error instanceof Error ? error.message : "Failed to delete group",
       });
       return Promise.reject(error);
     }
@@ -162,7 +167,8 @@ export default function GroupsPage() {
       toast({
         variant: "destructive",
         title: "Validation Error",
-        description: error instanceof Error ? error.message : "Failed to save group",
+        description:
+          error instanceof Error ? error.message : "Failed to save group",
       });
       throw error;
     }

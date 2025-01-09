@@ -59,7 +59,7 @@ export default function ContestsPage() {
   const params = useParams();
   const orgId = params.orgId as string;
   const { toast } = useToast();
-  
+
   const [contests, setContests] = useState<Contest[]>([]);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -79,7 +79,8 @@ export default function ContestsPage() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error instanceof Error ? error.message : "Failed to fetch contests",
+          description:
+            error instanceof Error ? error.message : "Failed to fetch contests",
         });
         // Fallback to mock data in case of error
         setContests(injectProblemsCount(mockContests));
@@ -90,9 +91,12 @@ export default function ContestsPage() {
 
   const deleteContest = async (contest: Contest) => {
     try {
-      const response = await fetch(`/api/orgs/${orgId}/contests/${contest.nameId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/orgs/${orgId}/contests/${contest.nameId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -112,7 +116,8 @@ export default function ContestsPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete contest",
+        description:
+          error instanceof Error ? error.message : "Failed to delete contest",
       });
       return Promise.reject(error);
     }
@@ -140,7 +145,9 @@ export default function ContestsPage() {
       const savedContest = await response.json();
 
       if (selectedContest) {
-        setContests(contests.map((c) => (c.id === savedContest.id ? savedContest : c)));
+        setContests(
+          contests.map((c) => (c.id === savedContest.id ? savedContest : c)),
+        );
         toast({
           title: "Success",
           description: "Contest updated successfully",
@@ -159,7 +166,8 @@ export default function ContestsPage() {
       toast({
         variant: "destructive",
         title: "Validation Error",
-        description: error instanceof Error ? error.message : "Failed to save contest",
+        description:
+          error instanceof Error ? error.message : "Failed to save contest",
       });
       throw error;
     }
