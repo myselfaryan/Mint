@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { orgs, memberships } from "@/db/schema";
 import { z } from "zod";
-import { createOrgSchema } from "./validation";
+import { createOrgSchema } from "@/lib/validations";
 
 export async function createOrg(
   userId: number,
