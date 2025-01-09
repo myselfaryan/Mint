@@ -66,6 +66,7 @@ export const createGroupSchema = z.object({
   nameId: NameIdSchema,
   name: z.string().min(2).max(100),
   description: z.string().optional(),
+  emails: z.array(z.string().email()).optional(),
 });
 
 export const updateGroupSchema = createGroupSchema.partial();

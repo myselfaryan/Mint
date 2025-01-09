@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
 import { createGroupSchema } from "@/lib/validations";
-import * as groupService from "./service";
+import * as groupsService from "./service";
+import * as groupService from "./[groupId]/service";
 import { NameIdSchema } from "@/app/api/types";
 import { getOrgIdFromNameId } from "@/app/api/service";
 
@@ -12,7 +13,7 @@ export async function GET(
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
 
-    const groups = await groupService.getGroups(orgId);
+    const groups = await groupsService.getGroups(orgId);
     return Response.json(groups);
   } catch (error) {
     return Response.json({ error: "Failed to fetch groups" }, { status: 500 });
@@ -25,9 +26,19 @@ export async function POST(
 ) {
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    const data = createGroupSchema.parse(await request.json());
+    const { emails, ...rest } = createGroupSchema.parse(await request.json());
 
-    const group = await groupService.createGroup(orgId, data);
+    const group = await groupsService.createGroup(orgId, rest);
+
+    if (emails) {
+      const groupWithUserEmails = await groupService.updateGroupMembers(
+        orgId,
+        group.id,
+        emails,
+      );
+      return Response.json(groupWithUserEmails, { status: 201 });
+    }
+
     return Response.json(group, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
