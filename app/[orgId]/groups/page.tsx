@@ -6,7 +6,7 @@ import { Group, mockGroups } from "./mockData";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
-const columns: ColumnDef<{ id: string | number } & Group>[] = [
+const columns: ColumnDef<Group>[] = [
   { header: "Name", accessorKey: "name" as const },
   { header: "Name ID", accessorKey: "nameId" as const },
   { header: "About", accessorKey: "about" as const },
@@ -15,6 +15,7 @@ const columns: ColumnDef<{ id: string | number } & Group>[] = [
 ];
 
 const groupSchema = z.object({
+  id: z.number().optional(),
   name: z.string().min(2).max(100),
   nameId: z
     .string()
