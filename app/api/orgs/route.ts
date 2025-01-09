@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { orgs } from "@/db/schema";
 import { count } from "drizzle-orm";
 import { createOrgSchema } from "@/lib/validations";
-import * as orgService from "./service";
+import * as orgsService from "./service";
 import { z } from "zod";
 import { getCurrentSession } from "@/lib/server/session";
 
@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
 
   const results = await db.select().from(orgs).limit(limit).offset(offset);
   const total = await db.select({ count: count() }).from(orgs);
-  console.log("HERE");
 
   return NextResponse.json({
     data: results,
@@ -32,7 +31,7 @@ export async function POST(request: NextRequest) {
     const userId = user.id;
 
     const data = createOrgSchema.parse(await request.json());
-    const org = await orgService.createOrg(userId, data);
+    const org = await orgsService.createOrg(userId, data);
     return NextResponse.json(org, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
