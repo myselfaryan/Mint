@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { testCases } from "@/db/schema";
 import { z } from "zod";
-import { testCaseSchema } from "./validation";
+import { testCaseSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 
 export async function addTestCase(

@@ -179,12 +179,12 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [activeTeam, setActiveTeam] = useState(() => teams[0]);
 
   // Handle team change with URL update
-  const handleTeamChange = (team: typeof teams[0]) => {
+  const handleTeamChange = (team: (typeof teams)[0]) => {
     setActiveTeam(team);
     // Get the current path segments after the org ID
-    const pathSegments = pathname.split('/').slice(2);
+    const pathSegments = pathname.split("/").slice(2);
     // Construct new path with new org ID and maintain the rest of the path
-    const newPath = `/${team.nameId}${pathSegments.length ? '/' + pathSegments.join('/') : ''}`;
+    const newPath = `/${team.nameId}${pathSegments.length ? "/" + pathSegments.join("/") : ""}`;
     router.push(newPath);
   };
 
@@ -373,9 +373,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger
-                          className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        >
+                        <DropdownMenuSubTrigger className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <Sun className="mr-2 h-4 w-4" />
                           <span>Change Theme</span>
                         </DropdownMenuSubTrigger>
@@ -386,9 +384,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
+                      onClick={handleLogout}
                       className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >
-                      <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
+                      <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

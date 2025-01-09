@@ -2,7 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Flame, Share2, Trophy, Users, BookOpen, GraduationCap, School } from "lucide-react";
+import {
+  Check,
+  Flame,
+  Share2,
+  Trophy,
+  Users,
+  BookOpen,
+  GraduationCap,
+  School,
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 interface OnboardingTask {
@@ -24,7 +33,8 @@ export function UserOnboarding() {
       {
         id: 1,
         title: "Join your first contest",
-        description: "Start your journey by participating in a practice contest. This will help you understand the platform better.",
+        description:
+          "Start your journey by participating in a practice contest. This will help you understand the platform better.",
         buttonText: "View Contests",
         buttonIcon: <Trophy className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -35,7 +45,8 @@ export function UserOnboarding() {
       {
         id: 2,
         title: "Complete your student profile",
-        description: "Add your academic details and interests to get personalized contest recommendations.",
+        description:
+          "Add your academic details and interests to get personalized contest recommendations.",
         buttonText: "Edit Profile",
         buttonIcon: <GraduationCap className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -46,7 +57,8 @@ export function UserOnboarding() {
       {
         id: 3,
         title: "Join your class group",
-        description: "Connect with your classmates and access class-specific contests and materials.",
+        description:
+          "Connect with your classmates and access class-specific contests and materials.",
         buttonText: "View Groups",
         buttonIcon: <Users className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -59,7 +71,8 @@ export function UserOnboarding() {
       {
         id: 1,
         title: "Create your first contest",
-        description: "Start by creating a practice contest for your students. You can set questions, time limits, and scoring rules.",
+        description:
+          "Start by creating a practice contest for your students. You can set questions, time limits, and scoring rules.",
         buttonText: "Create Contest",
         buttonIcon: <Trophy className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -70,7 +83,8 @@ export function UserOnboarding() {
       {
         id: 2,
         title: "Create a student group",
-        description: "Organize your students into groups for better management and targeted assignments.",
+        description:
+          "Organize your students into groups for better management and targeted assignments.",
         buttonText: "Create Group",
         buttonIcon: <Users className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -94,7 +108,8 @@ export function UserOnboarding() {
       {
         id: 1,
         title: "Add faculty members",
-        description: "Invite teachers and staff members to join your organization.",
+        description:
+          "Invite teachers and staff members to join your organization.",
         buttonText: "Add Faculty",
         buttonIcon: <GraduationCap className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -105,7 +120,8 @@ export function UserOnboarding() {
       {
         id: 2,
         title: "Configure organization settings",
-        description: "Set up your organization's profile, branding, and contest rules.",
+        description:
+          "Set up your organization's profile, branding, and contest rules.",
         buttonText: "Organization Settings",
         buttonIcon: <School className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -116,7 +132,8 @@ export function UserOnboarding() {
       {
         id: 3,
         title: "Join the community",
-        description: "Connect with other educational institutions using our platform.",
+        description:
+          "Connect with other educational institutions using our platform.",
         buttonText: "Join Community",
         buttonIcon: <Flame className="h-4 w-4 mr-2" />,
         buttonAction: () => {
@@ -143,20 +160,21 @@ export function UserOnboarding() {
     <div className="max-w-3xl mx-auto p-6">
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-2xl">{titles[role as keyof typeof titles]}</CardTitle>
+          <CardTitle className="text-2xl">
+            {titles[role as keyof typeof titles]}
+          </CardTitle>
           <p className="text-muted-foreground">
             {descriptions[role as keyof typeof descriptions]}
           </p>
         </CardHeader>
         <CardContent className="space-y-6 relative">
           {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-start space-x-4"
-            >
-              <div className={`mt-0 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                task.completed ? 'bg-green-500/20' : 'bg-muted'
-              }`}>
+            <div key={task.id} className="flex items-start space-x-4">
+              <div
+                className={`mt-0 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                  task.completed ? "bg-green-500/20" : "bg-muted"
+                }`}
+              >
                 {task.completed ? (
                   <Check className="h-4 w-4 text-green-500" />
                 ) : (
