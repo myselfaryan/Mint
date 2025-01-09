@@ -3,8 +3,10 @@
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { GenericEditor, Field } from "@/mint/generic-editor";
 import { inviteUserSchema } from "@/lib/validations";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { formatValidationErrors } from "@/utils/error";
+import { MockAlert } from "@/components/mock-alert";
 import { User, mockUsers } from "./mockUsers";
 import { timeAgo } from "@/lib/utils";
 
@@ -22,7 +24,6 @@ const columns: ColumnDef<User>[] = [
   {
     header: "About",
     accessorKey: "about",
-    // cell: ({ getValue }) => getValue() || "No description"
   },
 ];
 
@@ -54,30 +55,38 @@ export default function UsersPage({
 }: {
   params: { orgId: string };
 }) {
+  const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  console.log(`orgId: ${orgId}`);
+  const [showMockAlert, setShowMockAlert] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch(`/api/orgs/${orgId}/users`);
       if (!response.ok) {
-        setUsers(mockUsers);
-        throw new Error("Failed to fetch users");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
       }
-
-      let data: User[] = makeJoinedAtReadable(await response.json());
+      const data: User[] = makeJoinedAtReadable(await response.json());
       setUsers(data);
+      setShowMockAlert(false);
     } catch (error) {
       console.error("Error fetching users:", error);
-      setUsers(mockUsers);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to fetch users",
+      });
+      setUsers(makeJoinedAtReadable(mockUsers));
+      setShowMockAlert(true);
     }
-  };
+  }, [orgId, toast, setUsers, setShowMockAlert]);
 
   useEffect(() => {
     fetchUsers();
-  }, [orgId]);
+  }, [fetchUsers]);
 
   const inviteUser = async (data: InviteUserData) => {
     try {
@@ -88,94 +97,76 @@ export default function UsersPage({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to invite user");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
       }
 
       await fetchUsers();
       setIsEditorOpen(false);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const updateRole = async (user: User) => {
-    try {
-      const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: user.role }),
+      toast({
+        title: "Success",
+        description: "User invited successfully",
       });
-
-      if (!response.ok) {
-        // TODO: remove
-        setUsers(
-          mockUsers.map((u) => {
-            return {
-              ...u,
-              role: user.role,
-            };
-          }),
-        );
-
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update role");
-      }
-
-      await fetchUsers();
       return Promise.resolve();
     } catch (error) {
+      console.error("Error inviting user:", error);
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          error instanceof Error ? error.message : "Failed to invite user",
+      });
       return Promise.reject(error);
     }
   };
 
-  const removeUser = async (user: User) => {
+  const deleteUser = async (user: User) => {
     try {
       const response = await fetch(`/api/orgs/${orgId}/users/${user.nameId}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        // TODO: remove
-        setUsers(users.filter((u) => u.id !== user.id));
-        const error = await response.json();
-        throw new Error(error.message || "Failed to remove user");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || formatValidationErrors(errorData);
+        throw new Error(errorMessage);
       }
 
-      setUsers(users.filter((u) => u.id !== user.id));
+      await fetchUsers();
+      toast({
+        title: "Success",
+        description: "User removed successfully",
+      });
       return Promise.resolve();
     } catch (error) {
+      console.error("Error removing user:", error);
       return Promise.reject(error);
     }
   };
 
   return (
     <>
+      <MockAlert show={showMockAlert} />
       <GenericListing
         data={users}
         columns={columns}
-        title="User"
-        searchableFields={["name", "nameId", "role", "about"]}
+        title="Users"
+        searchableFields={["name", "email", "nameId"]}
         onAdd={() => {
           setSelectedUser(null);
           setIsEditorOpen(true);
         }}
-        onEdit={(user) => {
-          setSelectedUser(user);
-          setIsEditorOpen(true);
-        }}
-        onDelete={removeUser}
+        onDelete={deleteUser}
       />
 
       <GenericEditor
         data={selectedUser}
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
-        onSave={selectedUser ? updateRole : inviteUser}
+        onSave={inviteUser}
         schema={inviteUserSchema}
         fields={fields}
-        title={selectedUser ? "Role" : "User to Organization"}
+        title="Invite User"
       />
     </>
   );
