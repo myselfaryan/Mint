@@ -57,9 +57,39 @@ export const createContestSchema = z.object({
   registrationEndTime: TimestampSchema,
   startTime: TimestampSchema,
   endTime: TimestampSchema,
-  allowList: z.array(z.string()).default([]),
-  disallowList: z.array(z.string()).default([]),
+  allowList: z.array(z.string().email()).default([]),
+  disallowList: z.array(z.string().email()).default([]),
 });
+
+export const updateContestSchema = createContestSchema
+  .omit({ nameId: true })
+  .partial()
+  .refine(
+    (data) => {
+      // If any time field is provided, ensure they are in correct order
+      if (
+        data.registrationStartTime ||
+        data.registrationEndTime ||
+        data.startTime ||
+        data.endTime
+      ) {
+        const regStart = data.registrationStartTime || new Date(0);
+        const regEnd = data.registrationEndTime || new Date(0);
+        const start = data.startTime || new Date(0);
+        const end = data.endTime || new Date(0);
+
+        return (
+          regStart <= regEnd &&
+          regEnd <= start &&
+          start <= end
+        );
+      }
+      return true;
+    },
+    {
+      message: "Invalid time sequence. Registration start ≤ Registration end ≤ Contest start ≤ Contest end",
+    }
+  );
 
 // Group Schemas
 export const createGroupSchema = z.object({
