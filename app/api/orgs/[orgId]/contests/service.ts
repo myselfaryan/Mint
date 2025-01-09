@@ -2,13 +2,25 @@ import { z } from "zod";
 import { db } from "@/db/drizzle";
 import { contests } from "@/db/schema";
 import { createContestSchema } from "@/lib/validations";
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 
 export async function createContest(
   orgId: number,
   data: z.infer<typeof createContestSchema>,
 ) {
   return await db.transaction(async (tx) => {
+    // Check if a contest with the same nameId exists for this org
+    const existingContest = await tx.query.contests.findFirst({
+      where: and(
+        eq(contests.organizerId, orgId),
+        eq(contests.nameId, data.nameId)
+      ),
+    });
+
+    if (existingContest) {
+      throw new Error("Contest with this nameId already exists");
+    }
+
     const [contest] = await tx
       .insert(contests)
       .values({

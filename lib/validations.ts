@@ -57,8 +57,8 @@ export const createContestSchema = z.object({
   registrationEndTime: TimestampSchema,
   startTime: TimestampSchema,
   endTime: TimestampSchema,
-  allowList: z.array(z.string()),
-  disallowList: z.array(z.string()),
+  allowList: z.array(z.string()).default([]),
+  disallowList: z.array(z.string()).default([]),
 });
 
 // Group Schemas
