@@ -11,23 +11,19 @@ export async function GET(
   { params }: { params: { orgId: string } },
 ) {
   try {
-    console.log("HERE");
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    console.log(`orgId: ${orgId}`);
     const problems = await problemService.getOrgProblems(orgId);
-    console.log(`problems: ${problems}`);
-
     const validatedProblems = z.array(problemSchema).parse(problems);
     return NextResponse.json(validatedProblems);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+      return NextResponse.json({ error: error.errors }, { status: 400 });
     }
     if (error instanceof Error && error.message === "Organization not found") {
-      return NextResponse.json({ message: error.message }, { status: 404 });
+      return NextResponse.json({ error: error.message }, { status: 404 });
     }
     return NextResponse.json(
-      { message: "Failed to fetch problems" },
+      { error: "Failed to fetch problems" },
       { status: 500 },
     );
   }
@@ -54,12 +50,12 @@ export async function POST(
       validatedTestCases,
     );
 
-    return Response.json(problem, { status: 201 });
+    return NextResponse.json(problem, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return Response.json({ error: error.errors }, { status: 400 });
+      return NextResponse.json({ error: error.errors }, { status: 400 });
     }
-    return Response.json(
+    return NextResponse.json(
       { error: "Failed to create problem" },
       { status: 500 },
     );
