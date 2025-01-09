@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/db/drizzle";
 import { contests } from "@/db/schema";
-import { createContestSchema } from "@/lib/validations";
+import { createContestSchema, updateContestSchema } from "@/lib/validations";
 import { and, count, eq } from "drizzle-orm";
 
 export async function createContest(
@@ -52,4 +52,69 @@ export async function getOrgContests(orgId: number, limit: number, offset: numbe
     limit,
     offset,
   };
+}
+
+export async function getContestByNameId(orgId: number, nameId: string) {
+  const contest = await db.query.contests.findFirst({
+    where: and(
+      eq(contests.organizerId, orgId),
+      eq(contests.nameId, nameId)
+    ),
+  });
+
+  if (!contest) {
+    throw new Error("Contest not found");
+  }
+
+  return contest;
+}
+
+export async function updateContest(
+  orgId: number,
+  nameId: string,
+  data: z.infer<typeof updateContestSchema>
+) {
+  return await db.transaction(async (tx) => {
+    // Check if contest exists and belongs to the org
+    const contest = await tx.query.contests.findFirst({
+      where: and(
+        eq(contests.organizerId, orgId),
+        eq(contests.nameId, nameId)
+      ),
+    });
+
+    if (!contest) {
+      throw new Error("Contest not found");
+    }
+
+    const [updatedContest] = await tx
+      .update(contests)
+      .set(data)
+      .where(eq(contests.id, contest.id))
+      .returning();
+
+    return updatedContest;
+  });
+}
+
+export async function deleteContest(orgId: number, nameId: string) {
+  return await db.transaction(async (tx) => {
+    // Check if contest exists and belongs to the org
+    const contest = await tx.query.contests.findFirst({
+      where: and(
+        eq(contests.organizerId, orgId),
+        eq(contests.nameId, nameId)
+      ),
+    });
+
+    if (!contest) {
+      throw new Error("Contest not found");
+    }
+
+    await tx
+      .delete(contests)
+      .where(eq(contests.id, contest.id));
+
+    return contest;
+  });
 }
