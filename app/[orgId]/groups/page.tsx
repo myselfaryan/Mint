@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { formatValidationErrors } from "@/utils/error";
+import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
 
 const columns: ColumnDef<Group>[] = [
@@ -68,6 +69,7 @@ export default function GroupsPage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [showMockAlert, setShowMockAlert] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -79,6 +81,7 @@ export default function GroupsPage() {
         }
         const data = await response.json();
         setGroups(injectUsersCount(data));
+        setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching groups:", error);
         toast({
@@ -89,6 +92,7 @@ export default function GroupsPage() {
         });
         // Fallback to mock data in case of error
         setGroups(injectUsersCount(mockGroups));
+        setShowMockAlert(true);
       }
     };
     fetchGroups();
@@ -176,6 +180,7 @@ export default function GroupsPage() {
 
   return (
     <>
+      <MockAlert show={showMockAlert} />
       <GenericListing
         data={groups}
         columns={columns}

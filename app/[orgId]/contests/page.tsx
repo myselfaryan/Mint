@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { formatValidationErrors } from "@/utils/error";
+import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
 
 const columns: ColumnDef<Contest>[] = [
@@ -63,6 +64,7 @@ export default function ContestsPage() {
   const [contests, setContests] = useState<Contest[]>([]);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [showMockAlert, setShowMockAlert] = useState(false);
 
   useEffect(() => {
     const fetchContests = async () => {
@@ -74,6 +76,7 @@ export default function ContestsPage() {
         }
         const data = await response.json();
         setContests(injectProblemsCount(data));
+        setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching contests:", error);
         toast({
@@ -84,6 +87,7 @@ export default function ContestsPage() {
         });
         // Fallback to mock data in case of error
         setContests(injectProblemsCount(mockContests));
+        setShowMockAlert(true);
       }
     };
     fetchContests();
@@ -175,6 +179,7 @@ export default function ContestsPage() {
 
   return (
     <>
+      <MockAlert show={showMockAlert} />
       <GenericListing
         data={contests}
         columns={columns}
