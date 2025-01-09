@@ -4,6 +4,10 @@ import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { GenericEditor, Field } from "@/mint/generic-editor";
 import { Contest, mockContests } from "./mockData";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { formatValidationErrors } from "@/utils/error";
+import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
 
 const columns: ColumnDef<Contest>[] = [
@@ -53,42 +57,129 @@ const injectProblemsCount = (contests: Contest[]) => {
 };
 
 export default function ContestsPage() {
+  const params = useParams();
+  const orgId = params.orgId as string;
+  const { toast } = useToast();
+
   const [contests, setContests] = useState<Contest[]>([]);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [showMockAlert, setShowMockAlert] = useState(false);
 
   useEffect(() => {
-    setContests(injectProblemsCount(mockContests));
-  }, []);
+    const fetchContests = async () => {
+      try {
+        const response = await fetch(`/api/orgs/${orgId}/contests`);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(formatValidationErrors(errorData));
+        }
+        const data = await response.json();
+        setContests(injectProblemsCount(data));
+        setShowMockAlert(false);
+      } catch (error) {
+        console.error("Error fetching contests:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description:
+            error instanceof Error ? error.message : "Failed to fetch contests",
+        });
+        // Fallback to mock data in case of error
+        setContests(injectProblemsCount(mockContests));
+        setShowMockAlert(true);
+      }
+    };
+    fetchContests();
+  }, [orgId, toast]);
 
   const deleteContest = async (contest: Contest) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await fetch(
+        `/api/orgs/${orgId}/contests/${contest.nameId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
-      // Update the state after successful API call
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
+      }
+
       setContests((prevContests) =>
         prevContests.filter((c) => c.id !== contest.id),
       );
+      toast({
+        title: "Success",
+        description: "Contest deleted successfully",
+      });
       return Promise.resolve();
     } catch (error) {
+      console.error("Error deleting contest:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to delete contest",
+      });
       return Promise.reject(error);
     }
   };
 
   const saveContest = async (contest: Contest) => {
-    if (selectedContest) {
-      // Update existing contest
-      setContests(contests.map((c) => (c.id === contest.id ? contest : c)));
-    } else {
-      // Add new contest
-      setContests([...contests, { ...contest, id: Date.now() }]);
+    try {
+      const url = selectedContest
+        ? `/api/orgs/${orgId}/contests/${contest.nameId}`
+        : `/api/orgs/${orgId}/contests`;
+
+      const response = await fetch(url, {
+        method: selectedContest ? "PATCH" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(contest),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
+      }
+
+      const savedContest = await response.json();
+
+      if (selectedContest) {
+        setContests(
+          contests.map((c) => (c.id === savedContest.id ? savedContest : c)),
+        );
+        toast({
+          title: "Success",
+          description: "Contest updated successfully",
+        });
+      } else {
+        setContests([...contests, savedContest]);
+        toast({
+          title: "Success",
+          description: "Contest created successfully",
+        });
+      }
+
+      setIsEditorOpen(false);
+    } catch (error) {
+      console.error("Error saving contest:", error);
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          error instanceof Error ? error.message : "Failed to save contest",
+      });
+      throw error;
     }
-    setIsEditorOpen(false);
   };
 
   return (
     <>
+      <MockAlert show={showMockAlert} />
       <GenericListing
         data={contests}
         columns={columns}

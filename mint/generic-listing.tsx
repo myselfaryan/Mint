@@ -30,6 +30,7 @@ import {
 import { DeleteConfirmationModal } from "@/mint/delete-confirm";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { formatValidationErrors } from "@/utils/error";
 
 export interface ColumnDef<T> {
   header: string;
@@ -141,10 +142,16 @@ export function GenericListing<T extends { id: number | undefined }>({
       } catch (error) {
         // Show error toast
         toast({
-          title: "Failed to delete item",
-          description: `Error happened ${error instanceof Error ? error.message : "Unknown error"}`,
+          variant: "destructive",
+          title: "Error",
+          description:
+            error instanceof Error
+              ? error.message
+              : error && typeof error === "object" && "message" in error
+                ? error.message
+                : formatValidationErrors(error),
         });
-        console.log(error);
+        console.error("Delete error:", error);
       }
     }
   };
