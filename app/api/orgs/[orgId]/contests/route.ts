@@ -18,8 +18,13 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
-    if (error instanceof Error && error.message === "Organization not found") {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+    if (error instanceof Error) {
+      if (error.message === "Organization not found") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+      if (error.message === "Contest with this nameId already exists") {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
     }
     return NextResponse.json(
       { error: "Failed to create contest" },
