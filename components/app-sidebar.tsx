@@ -185,10 +185,15 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
 
   // Check if the orgId exists in teams, if not return 404
   useEffect(() => {
-    console.log('404 check - orgId:', orgId, 'type:', typeof orgId);
-    console.log('404 check - teams:', teams);
-    console.log('404 check - teams.length:', teams.length);
-    if (isAuthenticated && orgId && teams.length > 0 && !teams.find((team) => team.nameId === orgId)) {
+    console.log("404 check - orgId:", orgId, "type:", typeof orgId);
+    console.log("404 check - teams:", teams);
+    console.log("404 check - teams.length:", teams.length);
+    if (
+      isAuthenticated &&
+      orgId &&
+      teams.length > 0 &&
+      !teams.find((team) => team.nameId === orgId)
+    ) {
       notFound();
     }
   }, [orgId, teams, isAuthenticated]);
@@ -202,7 +207,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   // Update activeTeam when URL changes or teams load
   useEffect(() => {
     const teamFromUrl = teams.find((team) => team.nameId === orgId);
-    if (teamFromUrl && (!activeTeam || activeTeam.nameId !== teamFromUrl.nameId)) {
+    if (
+      teamFromUrl &&
+      (!activeTeam || activeTeam.nameId !== teamFromUrl.nameId)
+    ) {
       setActiveTeam(teamFromUrl);
     }
   }, [orgId, teams, activeTeam]);
@@ -252,7 +260,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
             <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
           </div>
-          
+
           {/* Skeleton for navigation items */}
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -271,9 +279,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </aside>
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     );
   }
