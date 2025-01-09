@@ -103,7 +103,10 @@ export function OrgProfileForm() {
                     <FormItem>
                       <FormLabel>Organization Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter organization name" {...field} />
+                        <Input
+                          placeholder="Enter organization name"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         This is your organization&apos;s display name
@@ -119,7 +122,10 @@ export function OrgProfileForm() {
                     <FormItem>
                       <FormLabel>Logo URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com/logo.png" {...field} />
+                        <Input
+                          placeholder="https://example.com/logo.png"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         Enter the URL of your organization&apos;s logo
@@ -159,7 +165,10 @@ export function OrgProfileForm() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="contact@organization.com" {...field} />
+                      <Input
+                        placeholder="contact@organization.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>Official contact email</FormDescription>
                     <FormMessage />
@@ -191,10 +200,15 @@ export function OrgProfileForm() {
                     <FormControl>
                       <div className="flex items-center space-x-2">
                         <Link2 className="h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="https://www.organization.com" {...field} />
+                        <Input
+                          placeholder="https://www.organization.com"
+                          {...field}
+                        />
                       </div>
                     </FormControl>
-                    <FormDescription>Your organization&apos;s website</FormDescription>
+                    <FormDescription>
+                      Your organization&apos;s website
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

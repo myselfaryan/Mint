@@ -33,10 +33,12 @@ export async function createSession(
   userId: number,
 ): Promise<Session> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+  const expiryDays = 3;
+  const expiresAt = new Date(Date.now() + expiryDays * 60 * 60 * 24 * 1000);
   const session: Session = {
     id: sessionId,
     userId,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    expiresAt,
   };
   await db.insert(sessionTable).values(session);
   return session;

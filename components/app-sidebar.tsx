@@ -441,8 +441,11 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                       </DropdownMenuSub>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                      <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
