@@ -77,21 +77,35 @@ export const updateGroupMembersSchema = z.object({
 
 // Problem Schemas
 export const createProblemSchema = z.object({
-  code: NameIdSchema,
-  name: z.string().min(2).max(100),
-  statement: z.string(),
-  timeLimit: z.number().int().positive(),
-  memoryLimit: z.number().int().positive(),
-  orgId: z.number().int().positive(),
+  code: z.string()
+    .regex(/^[a-z0-9-]+$/, "Code must contain only lowercase letters, numbers, and hyphens")
+    .min(2)
+    .max(50),
+  title: z.string().min(2).max(100),
+  description: z.string(),
+  allowedLanguages: z.array(z.string()),
 });
 
-export const updateProblemSchema = createProblemSchema.partial();
+export const problemSchema = z.object({
+  id: z.number().int().positive(),
+  code: z.string(),
+  title: z.string(),
+  description: z.string(),
+  allowedLanguages: z.array(z.string()),
+  createdAt: z.string().datetime(),
+  orgId: z.number().int().positive(),
+  testCases: z.array(z.object({
+    input: z.string(),
+    output: z.string(),
+    kind: z.enum(["example", "test"]).default("test"),
+  })),
+});
 
 // Test Case Schema
 export const createTestCaseSchema = z.object({
   input: z.string(),
   output: z.string(),
-  isExample: z.boolean().optional(),
+  kind: z.enum(["example", "test"]).default("test"),
 });
 
 // Participant Schema
