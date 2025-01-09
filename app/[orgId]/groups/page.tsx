@@ -5,6 +5,8 @@ import { GenericEditor, Field } from "@/mint/generic-editor";
 import { Group, mockGroups } from "./mockData";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { formatValidationErrors } from "@/utils/error";
 import { z } from "zod";
 
 const columns: ColumnDef<Group>[] = [
@@ -61,6 +63,7 @@ const fields: Field[] = [
 export default function GroupsPage() {
   const params = useParams();
   const orgId = params.orgId as string;
+  const { toast } = useToast();
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -71,18 +74,24 @@ export default function GroupsPage() {
       try {
         const response = await fetch(`/api/orgs/${orgId}/groups`);
         if (!response.ok) {
-          throw new Error("Failed to fetch groups");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
         setGroups(injectUsersCount(data));
       } catch (error) {
         console.error("Error fetching groups:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to fetch groups",
+        });
         // Fallback to mock data in case of error
         setGroups(injectUsersCount(mockGroups));
       }
     };
     fetchGroups();
-  }, [orgId]);
+  }, [orgId, toast]);
 
   const deleteGroup = async (group: Group) => {
     try {
@@ -91,13 +100,23 @@ export default function GroupsPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete group");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
       }
 
       setGroups((prevGroups) => prevGroups.filter((g) => g.id !== group.id));
+      toast({
+        title: "Success",
+        description: "Group deleted successfully",
+      });
       return Promise.resolve();
     } catch (error) {
       console.error("Error deleting group:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete group",
+      });
       return Promise.reject(error);
     }
   };
@@ -117,22 +136,34 @@ export default function GroupsPage() {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to ${selectedGroup ? "update" : "create"} group`,
-        );
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
       }
 
       const savedGroup = await response.json();
 
       if (selectedGroup) {
         setGroups(groups.map((g) => (g.id === savedGroup.id ? savedGroup : g)));
+        toast({
+          title: "Success",
+          description: "Group updated successfully",
+        });
       } else {
         setGroups([...groups, savedGroup]);
+        toast({
+          title: "Success",
+          description: "Group created successfully",
+        });
       }
 
       setIsEditorOpen(false);
     } catch (error) {
       console.error("Error saving group:", error);
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: error instanceof Error ? error.message : "Failed to save group",
+      });
       throw error;
     }
   };
