@@ -37,9 +37,9 @@ export function RegisterComponent() {
   async function onSubmit(values: RegisterInput) {
     try {
       await register(
+        values.name,
         values.email,
         values.password,
-        values.name,
         values.confirmPassword,
       );
       router.push("/onboarding");
