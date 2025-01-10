@@ -232,7 +232,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   console.log(process.env.NEXT_PUBLIC_DEBUG);
   console.log(user);
   if (!user && process.env.NEXT_PUBLIC_DEBUG !== "True") {
-    router.push("/auth");
+    router.push("/auth/login");
   }
 
   // Get the base path (e.g., /[orgId])
