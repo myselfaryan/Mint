@@ -180,21 +180,6 @@ export const testCaseSchema = z.object({
   kind: z.enum(["example", "test"]).default("test"),
 });
 
-// Define the expected response schema for type safety
-export const problemSchema = z.object({
-  id: z.number(),
-  nameId: z
-    .string()
-    .length(5)
-    .regex(/^[A-Za-z0-9]+$/),
-  title: z.string(),
-  description: z.string().optional(),
-  allowedLanguages: z.array(z.string()),
-  createdAt: z.string(),
-  orgId: z.number(),
-  testCases: z.array(testCaseSchema).optional(),
-});
-
 // Frontend Form Schemas
 export const registerFormSchema = z
   .object({
