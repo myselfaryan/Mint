@@ -12,7 +12,7 @@ interface Org {
 }
 
 interface User {
-  _id: number;
+  id: number;
   email: string;
   name: string;
   orgs: Org[];
@@ -21,7 +21,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<User>;
-  signup: (email: string, password: string, fullName: string) => Promise<User>;
+  signup: (email: string, password: string, name: string) => Promise<User>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   setIsAuthenticated: (status: boolean) => void;
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = async (email: string, password: string): Promise<User> => {
     try {
-      const data = await fetchApi<User>("/auth/login", {
+      const data = await fetchApi<User>("auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
@@ -76,40 +76,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       setUser(data);
       setIsAuthenticated(true);
-      router.push("/admin");
       return data;
     } catch (error) {
       console.error("Login failed:", error);
-      throw new Error("Invalid credentials");
+      // Re-throw the error to be handled by the component
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
     }
   };
 
   const register = async (
     email: string,
     password: string,
-    fullName: string,
+    name: string,
+    nameId: string,
   ): Promise<User> => {
     try {
-      throw new Error("unimplemented!");
-
-      const data = await fetchApi<User>("/auth/register", {
+      const data = await fetchApi<User>("auth/register", {
         method: "POST",
-        body: JSON.stringify({ email, password, fullName }),
+        body: JSON.stringify({ email, password, name, nameId }),
       });
+
+      if (!data.email) {
+        throw new Error("Registration failed: Invalid response");
+      }
 
       setUser(data);
       setIsAuthenticated(true);
-      router.push("/onboarding");
       return data;
     } catch (error) {
-      console.error("Signup failed:", error);
-      throw new Error("Registration failed");
+      console.error("Registration failed:", error);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("Registration failed. Please try again.");
+      }
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
-      await fetchApi("/auth/logout", { method: "DELETE" });
+      await fetchApi("auth/logout", { method: "DELETE" });
       setUser(null);
       setIsAuthenticated(false);
       router.push("/auth?mode=login");
