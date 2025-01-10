@@ -3,6 +3,7 @@ import { z } from "zod";
 import * as problemService from "./service";
 import { getOrgIdFromNameId, getContestIdFromNameId } from "@/app/api/service";
 import { addProblemSchema, NameIdSchema } from "@/lib/validations";
+import { getProblemIdFromCode } from "../../../problems/service";
 
 export async function POST(
   request: NextRequest,
@@ -17,11 +18,11 @@ export async function POST(
     const orgId = await getOrgIdFromNameId(orgNameId);
     const contestId = await getContestIdFromNameId(orgId, contestNameId);
     const data = addProblemSchema.parse(await request.json());
+    const problemId = await getProblemIdFromCode(orgId, data.problemCode);
 
     const problem = await problemService.addProblemToContest(
-      orgId,
       contestId,
-      data.problemCode,
+      problemId,
       data.order ?? 0,
     );
 
@@ -64,7 +65,7 @@ export async function GET(
     const orgId = await getOrgIdFromNameId(orgNameId);
     const contestId = await getContestIdFromNameId(orgId, contestNameId);
 
-    const problems = await problemService.getContestProblems(orgId, contestId);
+    const problems = await problemService.getContestProblems(contestId);
     return NextResponse.json(problems);
   } catch (error) {
     if (error instanceof z.ZodError) {
