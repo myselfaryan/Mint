@@ -21,7 +21,12 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<User>;
-  signup: (email: string, password: string, name: string) => Promise<User>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ) => Promise<User>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   setIsAuthenticated: (status: boolean) => void;
@@ -30,7 +35,7 @@ interface AuthContextType {
 const defaultContext: AuthContextType = {
   user: null,
   login: async () => Promise.reject("Not implemented"),
-  signup: async () => Promise.reject("Not implemented"),
+  register: async () => Promise.reject("Not implemented"),
   logout: async () => Promise.reject("Not implemented"),
   isAuthenticated: false,
   setIsAuthenticated: () => {},
@@ -89,19 +94,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const register = async (
+    name: string,
     email: string,
     password: string,
-    name: string,
-    nameId: string,
+    confirmPassword: string,
   ): Promise<User> => {
     try {
       const data = await fetchApi<User>("auth/register", {
         method: "POST",
-        body: JSON.stringify({ email, password, name, nameId }),
+        body: JSON.stringify({ name, email, password, confirmPassword }),
       });
 
       if (!data.email) {
-        throw new Error("Registration failed: Invalid response");
+        throw new Error("Registration failed: Email not provided!");
       }
 
       setUser(data);
@@ -134,7 +139,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         user,
         login,
-        signup: register,
+        register,
         logout,
         isAuthenticated,
         setIsAuthenticated,

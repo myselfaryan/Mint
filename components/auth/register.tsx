@@ -1,6 +1,6 @@
 "use client";
 
-import { RegisterFormInput, registerFormSchema } from "@/lib/validations";
+import { RegisterInput, registerSchema } from "@/lib/validations";
 import { useToast } from "@/hooks/use-toast";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
@@ -19,22 +19,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { AuthCard } from "./auth-card";
 
-// Helper function to generate nameId from name
-function generateNameId(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-") // Replace non-alphanumeric chars with dash
-    .replace(/-+/g, "-") // Replace multiple dashes with single dash
-    .replace(/^-|-$/g, ""); // Remove leading/trailing dashes
-}
-
 export function RegisterComponent() {
   const { toast } = useToast();
-  const { signup } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const router = useRouter();
 
-  const form = useForm<RegisterFormInput>({
-    resolver: zodResolver(registerFormSchema),
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -43,17 +34,23 @@ export function RegisterComponent() {
     },
   });
 
-  async function onSubmit(values: RegisterFormInput) {
+  async function onSubmit(values: RegisterInput) {
     try {
-      // Generate nameId from name and include it in the API request
-      const nameId = generateNameId(values.name);
-      await signup(values.email, values.password, values.name, nameId);
+      await register(
+        values.email,
+        values.password,
+        values.name,
+        values.confirmPassword,
+      );
       router.push("/onboarding");
     } catch (error) {
       console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
       });
     }

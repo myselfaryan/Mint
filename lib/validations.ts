@@ -148,7 +148,7 @@ export const createParticipantSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(8),
 });
 
 export const registerSchema = loginSchema
@@ -179,25 +179,3 @@ export const testCaseSchema = z.object({
   output: z.string(),
   kind: z.enum(["example", "test"]).default("test"),
 });
-
-// Frontend Form Schemas
-export const registerFormSchema = z
-  .object({
-    name: z.string().min(2).max(100),
-    email: EmailSchema,
-    password: z.string().min(8).max(100),
-    confirmPassword: z.string().min(8).max(100),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-export type RegisterFormInput = z.infer<typeof registerFormSchema>;
-
-export const loginFormSchema = z.object({
-  email: EmailSchema,
-  password: z.string().min(8).max(100),
-});
-
-export type LoginFormInput = z.infer<typeof loginFormSchema>;
