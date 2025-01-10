@@ -5,7 +5,9 @@ import { Organization } from "./mockData";
 import StatCard from "@/components/stat-card";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/client/fetch";
-import { UnauthorizedPage } from "@/mint/unauthorized";
+
+import { notFound } from "next/navigation";
+import { PageSkeleton } from "@/components/ui/page-skeleton";
 
 interface AdminData {
   platformStats: {
@@ -33,8 +35,8 @@ const columns: ColumnDef<Organization>[] = [
 
 export default function AdminPage() {
   const [data, setData] = useState<AdminData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,23 +58,11 @@ export default function AdminPage() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
-    );
-  }
-
-  if (error === "unauthorized") {
-    return <UnauthorizedPage />;
+    return <PageSkeleton />;
   }
 
   if (error || !data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Error: {error}
-      </div>
-    );
+    return notFound();
   }
 
   return (
