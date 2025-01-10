@@ -15,6 +15,13 @@
       "when": 1733372203239,
       "tag": "0001_next_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736482279838,
+      "tag": "0002_omniscient_domino",
+      "breakpoints": true
     }
   ]
 }
