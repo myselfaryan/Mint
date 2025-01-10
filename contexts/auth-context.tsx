@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await fetchApi("auth/logout", { method: "DELETE" });
       setUser(null);
       setIsAuthenticated(false);
-      router.push("/auth?mode=login");
+      router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
       throw error;
