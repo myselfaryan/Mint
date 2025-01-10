@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     "A modern online judge. Platform for organizations to host programming contests",
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' },
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: "/favicon.ico" },
+      { url: "/favicon.ico", sizes: "16x16", type: "image/x-icon" },
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
     ],
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 

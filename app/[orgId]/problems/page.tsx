@@ -52,7 +52,7 @@ export default function ProblemsPage({
         `/api/orgs/${params.orgId}/problems/${problem.nameId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (!response.ok) {

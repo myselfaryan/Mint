@@ -24,7 +24,10 @@ const problemSchema = z.object({
     .string()
     .min(1, "Problem code is required")
     .max(10, "Problem code must be at most 10 characters")
-    .regex(/^[A-Z0-9]+$/, "Problem code must contain only uppercase letters and numbers"),
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Problem code must contain only uppercase letters and numbers",
+    ),
   name: z
     .string()
     .min(1, "Problem name is required")
@@ -42,11 +45,11 @@ const problemSchema = z.object({
     .min(1, "At least one test case is required")
     .refine(
       (testCases) => testCases.some((tc) => tc.kind === "example"),
-      "At least one example test case is required"
+      "At least one example test case is required",
     )
     .refine(
       (testCases) => testCases.some((tc) => tc.kind === "test"),
-      "At least one hidden test case is required"
+      "At least one hidden test case is required",
     ),
 });
 
@@ -123,7 +126,10 @@ export function ProblemEditor() {
 
   const addTestCase = async (kind: "example" | "test") => {
     const currentTestCases = getValues("testCases");
-    setValue("testCases", [...currentTestCases, { input: "", output: "", kind }]);
+    setValue("testCases", [
+      ...currentTestCases,
+      { input: "", output: "", kind },
+    ]);
     await trigger("testCases");
   };
 
@@ -140,14 +146,16 @@ export function ProblemEditor() {
     index: number,
     field: keyof TestCase,
     value: string,
-    kind: "example" | "test"
+    kind: "example" | "test",
   ) => {
     const currentTestCases = [...testCases];
     // Find the actual index in the full array
     const fullIndex = currentTestCases.findIndex(
-      (tc, i) => tc.kind === kind && currentTestCases.filter(t => t.kind === kind).indexOf(tc) === index
+      (tc, i) =>
+        tc.kind === kind &&
+        currentTestCases.filter((t) => t.kind === kind).indexOf(tc) === index,
     );
-    
+
     if (fullIndex !== -1) {
       currentTestCases[fullIndex] = {
         ...currentTestCases[fullIndex],
@@ -221,18 +229,19 @@ export function ProblemEditor() {
             placeholder="Enter problem code (uppercase letters and numbers only)"
           />
           {errors.code && (
-            <p className="text-sm text-destructive mt-1">{errors.code.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.code.message}
+            </p>
           )}
         </div>
 
         <div>
           <label className="text-sm font-medium">Problem Name</label>
-          <Input
-            {...register("name")}
-            placeholder="Enter problem name"
-          />
+          <Input {...register("name")} placeholder="Enter problem name" />
           {errors.name && (
-            <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.name.message}
+            </p>
           )}
         </div>
 
@@ -244,7 +253,9 @@ export function ProblemEditor() {
             className="h-32"
           />
           {errors.statement && (
-            <p className="text-sm text-destructive mt-1">{errors.statement.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.statement.message}
+            </p>
           )}
         </div>
 
@@ -252,10 +263,15 @@ export function ProblemEditor() {
           <label className="text-sm font-medium">Allowed Languages</label>
           <Input
             {...register("allowedLanguages")}
-            value={Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""}
+            value={
+              Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""
+            }
             onChange={(e) => {
               const languages = e.target.value
-                ? e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
+                ? e.target.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean)
                 : [];
               setValue("allowedLanguages", languages);
               trigger("allowedLanguages");
@@ -276,7 +292,9 @@ export function ProblemEditor() {
           </TabsList>
 
           {errors.testCases && (
-            <p className="text-sm text-destructive mt-1">{errors.testCases.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.testCases.message}
+            </p>
           )}
 
           <TabsContent value="example" className="space-y-4">
@@ -289,7 +307,12 @@ export function ProblemEditor() {
                     <Textarea
                       value={testCase.input}
                       onChange={(e) =>
-                        updateTestCase(index, "input", e.target.value, "example")
+                        updateTestCase(
+                          index,
+                          "input",
+                          e.target.value,
+                          "example",
+                        )
                       }
                       placeholder="Test case input"
                     />
@@ -299,7 +322,12 @@ export function ProblemEditor() {
                     <Textarea
                       value={testCase.output}
                       onChange={(e) =>
-                        updateTestCase(index, "output", e.target.value, "example")
+                        updateTestCase(
+                          index,
+                          "output",
+                          e.target.value,
+                          "example",
+                        )
                       }
                       placeholder="Expected output"
                     />
