@@ -47,10 +47,7 @@ export function RegisterComponent() {
       console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
-        description:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
+        description: error?.message || "Registration failed. Please try again.",
         variant: "destructive",
       });
     }

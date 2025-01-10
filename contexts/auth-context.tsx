@@ -100,25 +100,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     confirmPassword: string,
   ): Promise<User> => {
     try {
-      const data = await fetchApi<User>("auth/register", {
+      const response = await fetchApi<User>("auth/register", {
         method: "POST",
         body: JSON.stringify({ name, email, password, confirmPassword }),
       });
+      console.log("response from backend", response);
 
-      if (!data.email) {
-        throw new Error("Registration failed: Email not provided!");
-      }
-
-      setUser(data);
+      setUser(response);
       setIsAuthenticated(true);
-      return data;
+      return response;
     } catch (error) {
       console.error("Registration failed:", error);
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("Registration failed. Please try again.");
-      }
+      throw error;
     }
   };
 
