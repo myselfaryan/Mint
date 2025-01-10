@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createContest } from "./service";
-import { db } from "@/db/drizzle";
-import { contests } from "@/db/schema";
-import { count, eq } from "drizzle-orm";
+import { createContest, getOrgContests } from "./service";
 import { createContestSchema, NameIdSchema } from "@/lib/validations";
 import { getOrgIdFromNameId } from "@/app/api/service";
 
@@ -19,10 +16,18 @@ export async function POST(
     return NextResponse.json(contest, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    if (error instanceof Error) {
+      if (error.message === "Organization not found") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+      if (error.message === "Contest with this nameId already exists") {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
     }
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: "Failed to create contest" },
       { status: 500 },
     );
   }
@@ -32,25 +37,24 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { orgId: string } },
 ) {
-  const { searchParams } = req.nextUrl;
-  const limit = Number(searchParams.get("limit") || 10);
-  const offset = Number(searchParams.get("offset") || 0);
+  try {
+    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
+    const { searchParams } = req.nextUrl;
+    const limit = Math.min(Number(searchParams.get("limit") || 10), 100);
+    const offset = Math.max(Number(searchParams.get("offset") || 0), 0);
 
-  const results = await db.query.contests.findMany({
-    where: eq(contests.organizerId, Number(params.orgId)),
-    limit,
-    offset,
-  });
-
-  const total = await db
-    .select({ count: count() })
-    .from(contests)
-    .where(eq(contests.organizerId, Number(params.orgId)));
-
-  return NextResponse.json({
-    data: results,
-    total: total[0].count,
-    limit,
-    offset,
-  });
+    const result = await getOrgContests(orgId, limit, offset);
+    return NextResponse.json(result);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "Organization not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    return NextResponse.json(
+      { error: "Failed to fetch contests" },
+      { status: 500 },
+    );
+  }
 }

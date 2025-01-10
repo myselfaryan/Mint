@@ -57,15 +57,43 @@ export const createContestSchema = z.object({
   registrationEndTime: TimestampSchema,
   startTime: TimestampSchema,
   endTime: TimestampSchema,
-  allowList: z.array(z.string()),
-  disallowList: z.array(z.string()),
+  allowList: z.array(z.string().email()).default([]),
+  disallowList: z.array(z.string().email()).default([]),
 });
+
+export const updateContestSchema = createContestSchema
+  .omit({ nameId: true })
+  .partial()
+  .refine(
+    (data) => {
+      // If any time field is provided, ensure they are in correct order
+      if (
+        data.registrationStartTime ||
+        data.registrationEndTime ||
+        data.startTime ||
+        data.endTime
+      ) {
+        const regStart = data.registrationStartTime || new Date(0);
+        const regEnd = data.registrationEndTime || new Date(0);
+        const start = data.startTime || new Date(0);
+        const end = data.endTime || new Date(0);
+
+        return regStart <= regEnd && regEnd <= start && start <= end;
+      }
+      return true;
+    },
+    {
+      message:
+        "Invalid time sequence. Registration start ≤ Registration end ≤ Contest start ≤ Contest end",
+    },
+  );
 
 // Group Schemas
 export const createGroupSchema = z.object({
   nameId: NameIdSchema,
   name: z.string().min(2).max(100),
   description: z.string().optional(),
+  emails: z.array(z.string().email()).optional(),
 });
 
 export const updateGroupSchema = createGroupSchema.partial();
@@ -76,26 +104,46 @@ export const updateGroupMembersSchema = z.object({
 
 // Problem Schemas
 export const createProblemSchema = z.object({
-  code: NameIdSchema,
-  name: z.string().min(2).max(100),
-  statement: z.string(),
-  timeLimit: z.number().int().positive(),
-  memoryLimit: z.number().int().positive(),
-  orgId: z.number().int().positive(),
+  code: z
+    .string()
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Code must contain only lowercase letters, numbers, and hyphens",
+    )
+    .min(2)
+    .max(50),
+  title: z.string().min(2).max(100),
+  description: z.string(),
+  allowedLanguages: z.array(z.string()),
 });
 
-export const updateProblemSchema = createProblemSchema.partial();
+export const problemSchema = z.object({
+  id: z.number().int().positive(),
+  code: z.string(),
+  title: z.string(),
+  description: z.string(),
+  allowedLanguages: z.array(z.string()),
+  createdAt: z.string().datetime(),
+  orgId: z.number().int().positive(),
+  testCases: z.array(
+    z.object({
+      input: z.string(),
+      output: z.string(),
+      kind: z.enum(["example", "test"]).default("test"),
+    }),
+  ),
+});
 
 // Test Case Schema
 export const createTestCaseSchema = z.object({
   input: z.string(),
   output: z.string(),
-  isExample: z.boolean().optional(),
+  kind: z.enum(["example", "test"]).default("test"),
 });
 
 // Participant Schema
 export const createParticipantSchema = z.object({
-  userId: z.number().int().positive(),
+  email: EmailSchema,
 });
 
 export const loginSchema = z.object({
@@ -121,7 +169,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const addProblemSchema = z.object({
-  problemId: z.number().int().positive(),
+  problemCode: NameIdSchema,
   order: z.number().int().min(0).optional(),
 });
 
@@ -130,19 +178,4 @@ export const testCaseSchema = z.object({
   input: z.string(),
   output: z.string(),
   kind: z.enum(["example", "test"]).default("test"),
-});
-
-// Define the expected response schema for type safety
-export const problemSchema = z.object({
-  id: z.number(),
-  nameId: z
-    .string()
-    .length(5)
-    .regex(/^[A-Za-z0-9]+$/),
-  title: z.string(),
-  description: z.string().optional(),
-  allowedLanguages: z.array(z.string()),
-  createdAt: z.string(),
-  orgId: z.number(),
-  testCases: z.array(testCaseSchema).optional(),
 });

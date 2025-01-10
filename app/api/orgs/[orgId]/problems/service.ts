@@ -13,7 +13,10 @@ export async function createProblem(
     const [problem] = await tx
       .insert(problems)
       .values({
-        ...data,
+        code: data.code,
+        title: data.title,
+        description: data.description,
+        allowedLanguages: data.allowedLanguages,
         orgId,
       })
       .returning();
@@ -21,7 +24,9 @@ export async function createProblem(
     if (testCasesData.length > 0) {
       await tx.insert(testCases).values(
         testCasesData.map((tc) => ({
-          ...tc,
+          input: tc.input,
+          output: tc.output,
+          kind: tc.kind,
           problemId: problem.id,
         })),
       );
@@ -34,15 +39,7 @@ export async function createProblem(
 export async function getOrgProblems(orgId: number) {
   const problemsWithTestCases = await db
     .select({
-      problem: {
-        id: problems.id,
-        nameId: problems.code, // using the new 'code' field as nameId
-        title: problems.title,
-        description: problems.description,
-        allowedLanguages: problems.allowedLanguages,
-        createdAt: problems.createdAt,
-        orgId: problems.orgId,
-      },
+      problem: problems,
       testCase: {
         input: testCases.input,
         output: testCases.output,
@@ -62,17 +59,16 @@ export async function getOrgProblems(orgId: number) {
       if (!acc[problemId]) {
         acc[problemId] = {
           ...problem,
-          createdAt: problem.createdAt.toISOString(), // Convert Date to string
+          createdAt: problem.createdAt.toISOString(),
           testCases: [],
         };
       }
 
       if (testCase !== null && testCase.input !== null) {
-        // Check if testCase exists (due to left join)
-        acc[problemId].testCases?.push({
+        acc[problemId].testCases.push({
           input: testCase.input,
           output: testCase.output,
-          kind: testCase.kind ?? "test", // Use default 'test' if kind is null
+          kind: testCase.kind ?? "test",
         });
       }
 
@@ -82,4 +78,20 @@ export async function getOrgProblems(orgId: number) {
   );
 
   return Object.values(groupedProblems);
+}
+
+export async function getProblemIdFromCode(
+  orgId: number,
+  code: string,
+): Promise<number> {
+  const problem = await db.query.problems.findFirst({
+    where: (problems, { and, eq }) =>
+      and(eq(problems.orgId, orgId), eq(problems.code, code)),
+  });
+
+  if (!problem) {
+    throw new Error("Problem not found");
+  }
+
+  return problem.id;
 }

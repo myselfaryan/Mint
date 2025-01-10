@@ -38,7 +38,7 @@ export async function updateGroupMembers(
   groupId: number,
   emails: string[],
 ) {
-  return await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     // Verify group belongs to org
     const group = await tx
       .select()
@@ -78,9 +78,8 @@ export async function updateGroupMembers(
         })
         .onConflictDoNothing();
     }
-
-    return getGroup(orgId, groupId);
   });
+  return await getGroup(orgId, groupId);
 }
 
 export async function deleteGroup(orgId: number, groupId: number) {

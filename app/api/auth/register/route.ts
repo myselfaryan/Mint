@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { generateSessionToken, createSession } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
 import { hashPassword } from "@/lib/password";
+import { generateUsername } from "@/lib/username";
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,15 +26,14 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await hashPassword(validatedData.password);
 
+    const nameId = await generateUsername(validatedData.email);
     const [user] = await db
       .insert(users)
       .values({
         email: validatedData.email,
         hashedPassword: hashedPassword,
         name: validatedData.name,
-
-        // TODO: Use a proper readable slug for nameId
-        nameId: validatedData.email,
+        nameId,
       })
       .returning();
 
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       _id: user.id,
       email: user.email,
       name: user.name,
+      nameId: user.nameId,
       //   role: user.role,
     });
   } catch (error) {
