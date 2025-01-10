@@ -160,8 +160,41 @@ function ThemeItems() {
   );
 }
 
+function SidebarSkeleton({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen">
+      <aside className="flex flex-col w-64 px-4 py-6 border-r">
+        {/* Skeleton for org switcher */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+
+        {/* Skeleton for navigation items */}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+
+        {/* Skeleton for user account */}
+        <div className="mt-auto">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+      </aside>
+      <main className="flex-1">{children}</main>
+    </div>
+  );
+}
+
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-  const { logout, user, isAuthenticated } = useContext(AuthContext);
+  const { logout, user, isAuthenticated, isLoading } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -191,11 +224,12 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     if (
       isAuthenticated &&
       orgId &&
-      teams.length > 0 &&
+      teams.length >= 0 &&
       !teams.find((team) => team.nameId === orgId)
     ) {
       notFound();
     }
+    console.log("WTF");
   }, [orgId, teams, isAuthenticated]);
 
   // Set active team based on URL orgId
@@ -229,8 +263,14 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     logout();
   };
 
-  console.log(process.env.NEXT_PUBLIC_DEBUG);
-  console.log(user);
+  console.log("NEXT_PUBLIC_DEBUG", process.env.NEXT_PUBLIC_DEBUG);
+  console.log("user", user);
+  console.log("isLoading", isLoading);
+
+  if (isLoading || !isAuthenticated) {
+    return <SidebarSkeleton>{children}</SidebarSkeleton>;
+  }
+
   if (!user && process.env.NEXT_PUBLIC_DEBUG !== "True") {
     router.push("/auth/login");
   }
@@ -249,40 +289,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         .join(" "),
     }));
   };
-
-  // If auth is still loading, show skeleton UI
-  if (!isAuthenticated) {
-    return (
-      <div className="flex h-screen">
-        <aside className="flex flex-col w-64 px-4 py-6 border-r">
-          {/* Skeleton for org switcher */}
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-          </div>
-
-          {/* Skeleton for navigation items */}
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-gray-200 animate-pulse" />
-                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-
-          {/* Skeleton for user account */}
-          <div className="mt-auto">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-            </div>
-          </div>
-        </aside>
-        <main className="flex-1">{children}</main>
-      </div>
-    );
-  }
 
   return (
     <ThemeProvider>

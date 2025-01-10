@@ -30,6 +30,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   setIsAuthenticated: (status: boolean) => void;
+  isLoading: boolean;
 }
 
 const defaultContext: AuthContextType = {
@@ -39,6 +40,7 @@ const defaultContext: AuthContextType = {
   logout: async () => Promise.reject("Not implemented"),
   isAuthenticated: false,
   setIsAuthenticated: () => {},
+  isLoading: true,
 };
 
 export const AuthContext = createContext<AuthContextType>(defaultContext);
@@ -48,6 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -62,6 +65,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
       } catch (error) {
         console.error("User not authorized");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -136,6 +141,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         logout,
         isAuthenticated,
         setIsAuthenticated,
+        isLoading,
       }}
     >
       {children}
