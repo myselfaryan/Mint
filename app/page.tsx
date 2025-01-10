@@ -52,13 +52,13 @@ export default function Home() {
               <Button
                 variant="ghost"
                 className="text-gray-300 hover:text-white hover:bg-gray-800"
-                onClick={() => router.push("/auth")}
+                onClick={() => router.push("/auth/login")}
               >
                 Sign In
               </Button>
               <Button
                 className="bg-blue-600 hover:bg-blue-700"
-                onClick={() => router.push("/auth?mode=register")}
+                onClick={() => router.push("/auth/register")}
               >
                 Get Started
               </Button>
