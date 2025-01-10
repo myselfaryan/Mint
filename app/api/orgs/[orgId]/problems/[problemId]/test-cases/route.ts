@@ -38,7 +38,11 @@ export async function POST(
     const problemCode = NameIdSchema.parse(params.problemId);
     const data = createTestCaseSchema.parse(await request.json());
 
-    const testCase = await testCaseService.addTestCase(orgId, problemCode, data);
+    const testCase = await testCaseService.addTestCase(
+      orgId,
+      problemCode,
+      data,
+    );
     return Response.json(testCase, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

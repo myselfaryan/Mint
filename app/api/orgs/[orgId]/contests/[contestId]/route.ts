@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { NameIdSchema, updateContestSchema } from "@/lib/validations";
 import { getOrgIdFromNameId } from "@/app/api/service";
-import {
-  deleteContest,
-  getContestByNameId,
-  updateContest,
-} from "../service";
+import { deleteContest, getContestByNameId, updateContest } from "../service";
 
 export async function GET(
   _request: NextRequest,
