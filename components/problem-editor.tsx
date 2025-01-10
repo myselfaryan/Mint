@@ -1,12 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter, useParams } from "next/navigation";
+import { formatValidationErrors } from "@/utils/error";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const testCaseSchema = z.object({
+  input: z.string().min(1, "Input is required"),
+  output: z.string().min(1, "Output is required"),
+  kind: z.enum(["example", "test"]),
+});
+
+const problemSchema = z.object({
+  code: z
+    .string()
+    .min(1, "Problem code is required")
+    .max(10, "Problem code must be at most 10 characters")
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Problem code must contain only uppercase letters and numbers",
+    ),
+  name: z
+    .string()
+    .min(1, "Problem name is required")
+    .max(100, "Problem name must be at most 100 characters"),
+  statement: z
+    .string()
+    .min(1, "Problem statement is required")
+    .max(10000, "Problem statement must be at most 10000 characters"),
+  allowedLanguages: z
+    .array(z.string())
+    .min(1, "At least one language must be allowed")
+    .max(10, "Too many languages specified"),
+  testCases: z
+    .array(testCaseSchema)
+    .min(1, "At least one test case is required")
+    .refine(
+      (testCases) => testCases.some((tc) => tc.kind === "example"),
+      "At least one example test case is required",
+    )
+    .refine(
+      (testCases) => testCases.some((tc) => tc.kind === "test"),
+      "At least one hidden test case is required",
+    ),
+});
+
+type Problem = z.infer<typeof problemSchema>;
 
 interface TestCase {
   input: string;
@@ -14,266 +61,345 @@ interface TestCase {
   kind: "example" | "test";
 }
 
-interface Problem {
-  id?: string;
-  code: string;
-  title: string;
-  description: string;
-  allowedLanguages: string[];
-  testCases: TestCase[];
-}
-
-interface ProblemEditorProps {
-  problem?: Problem | null;
-  onSave?: (problem: Problem) => void;
-}
-
-export function ProblemEditor({ problem, onSave }: ProblemEditorProps) {
+export function ProblemEditor() {
   const { toast } = useToast();
+  const router = useRouter();
+  const params = useParams();
+  const orgId = params.orgId as string;
+  const problemId = params.id as string;
+  const isEdit = !!problemId;
 
-  const [currentProblem, setCurrentProblem] = useState<Problem>({
-    id: problem?.id?.toString() || "1",
-    code: problem?.code || "",
-    title: problem?.title || "",
-    description: problem?.description || "",
-    allowedLanguages: problem?.allowedLanguages || [
-      "python",
-      "javascript",
-      "typescript",
-    ],
-    testCases: problem?.testCases || [
-      { input: "", output: "", kind: "example" },
-    ],
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    getValues,
+    trigger,
+  } = useForm<Problem>({
+    resolver: zodResolver(problemSchema),
+    defaultValues: {
+      code: "",
+      name: "",
+      statement: "",
+      allowedLanguages: ["python", "javascript", "typescript"],
+      testCases: [{ input: "", output: "", kind: "example" }],
+    },
   });
 
-  const updateProblemField = <K extends keyof Problem>(
-    field: K,
-    value: Problem[K],
-  ) => {
-    setCurrentProblem((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const allowedLanguages = watch("allowedLanguages") || [];
+  const testCases = watch("testCases") || [];
+
+  useEffect(() => {
+    if (isEdit) {
+      const fetchProblem = async () => {
+        try {
+          const response = await fetch(
+            `/api/orgs/${orgId}/problems/${problemId}`,
+          );
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(formatValidationErrors(errorData));
+          }
+          const data = await response.json();
+          // Update form with fetched data
+          Object.entries(data).forEach(([key, value]) => {
+            setValue(key as keyof Problem, value);
+          });
+        } catch (error) {
+          console.error("Error fetching problem:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description:
+              error instanceof Error
+                ? error.message
+                : "Failed to fetch problem",
+          });
+          router.push(`/${orgId}/problems`);
+        }
+      };
+      fetchProblem();
+    }
+  }, [isEdit, orgId, problemId, router, toast, setValue]);
+
+  const addTestCase = async (kind: "example" | "test") => {
+    const currentTestCases = getValues("testCases");
+    setValue("testCases", [
+      ...currentTestCases,
+      { input: "", output: "", kind },
+    ]);
+    await trigger("testCases");
   };
 
-  const addTestCase = () => {
-    setCurrentProblem((prev) => ({
-      ...prev,
-      testCases: [
-        ...prev.testCases,
-        { input: "", output: "", kind: "example" },
-      ],
-    }));
+  const removeTestCase = async (index: number) => {
+    const currentTestCases = getValues("testCases");
+    setValue(
+      "testCases",
+      currentTestCases.filter((_, i) => i !== index),
+    );
+    await trigger("testCases");
   };
 
-  const updateTestCase = (
+  const updateTestCase = async (
     index: number,
     field: keyof TestCase,
     value: string,
+    kind: "example" | "test",
   ) => {
-    setCurrentProblem((prev) => ({
-      ...prev,
-      testCases: prev.testCases.map((tc, i) =>
-        i === index ? { ...tc, [field]: value } : tc,
-      ),
-    }));
+    const currentTestCases = [...testCases];
+    // Find the actual index in the full array
+    const fullIndex = currentTestCases.findIndex(
+      (tc, i) =>
+        tc.kind === kind &&
+        currentTestCases.filter((t) => t.kind === kind).indexOf(tc) === index,
+    );
+
+    if (fullIndex !== -1) {
+      currentTestCases[fullIndex] = {
+        ...currentTestCases[fullIndex],
+        [field]: value,
+      };
+      setValue("testCases", currentTestCases);
+      await trigger("testCases");
+    }
   };
 
-  const removeTestCase = (index: number) => {
-    if (currentProblem.testCases.length === 1) return;
-    setCurrentProblem((prev) => ({
-      ...prev,
-      testCases: prev.testCases.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleSaveProblem = async () => {
+  const onSubmit = async (data: Problem) => {
     try {
-      if (onSave) await onSave(currentProblem);
+      const url = isEdit
+        ? `/api/orgs/${orgId}/problems/${problemId}`
+        : `/api/orgs/${orgId}/problems`;
+
+      const response = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          orgId: parseInt(orgId),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message || formatValidationErrors(errorData);
+        throw new Error(errorMessage);
+      }
+
       toast({
         title: "Success",
-        description: "Problem saved successfully",
+        description: `Problem ${isEdit ? "updated" : "created"} successfully`,
       });
+      router.push(`/${orgId}/problems`);
     } catch (error) {
       console.error("Error saving problem:", error);
       toast({
-        title: "Error",
-        description: "Failed to save problem",
         variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to save problem",
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <div className="flex-1 px-6 py-2">
-        <Tabs defaultValue="problem" className="w-full">
-          <TabsList className="w-full bg-muted p-1 mb-6">
-            <TabsTrigger
-              value="problem"
-              className="flex-1 data-[state=active]:bg-background"
-            >
-              Problem
-            </TabsTrigger>
-            <TabsTrigger
-              value="testcases"
-              className="flex-1 data-[state=active]:bg-background"
-            >
-              Test Cases
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="problem">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label
-                  htmlFor="code"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Problem Code
-                </label>
-                <Input
-                  id="code"
-                  value={currentProblem.code}
-                  onChange={(e) => updateProblemField("code", e.target.value)}
-                  placeholder="Enter problem code (unique identifier for this problem)"
-                  className="bg-muted border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Title
-                </label>
-                <Input
-                  id="title"
-                  value={currentProblem.title}
-                  onChange={(e) => updateProblemField("title", e.target.value)}
-                  placeholder="Enter problem title"
-                  className="bg-muted border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Description
-                </label>
-                <Textarea
-                  id="description"
-                  value={currentProblem.description}
-                  onChange={(e) =>
-                    updateProblemField("description", e.target.value)
-                  }
-                  placeholder="Enter problem description"
-                  className="min-h-[200px] bg-muted border-border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="allowedLanguages"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Allowed Languages
-                </label>
-                <Input
-                  id="allowedLanguages"
-                  value={currentProblem.allowedLanguages.join(", ")}
-                  onChange={(e) =>
-                    updateProblemField(
-                      "allowedLanguages",
-                      e.target.value.split(", "),
-                    )
-                  }
-                  placeholder="Enter allowed languages separated by comma"
-                  className="bg-muted border-border"
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="testcases">
-            <div className="space-y-4">
-              {currentProblem.testCases.map((testCase, index) => (
-                <div
-                  key={index}
-                  className="p-4 border border-border rounded-lg space-y-4"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">
-                      Test Case {index + 1}
-                    </h3>
-                    {currentProblem.testCases.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeTestCase(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor={`input-${index}`}
-                        className="block text-sm font-medium mb-1"
-                      >
-                        Input
-                      </label>
-                      <Textarea
-                        id={`input-${index}`}
-                        value={testCase.input}
-                        onChange={(e) =>
-                          updateTestCase(index, "input", e.target.value)
-                        }
-                        placeholder="Enter test case input"
-                        className="bg-muted border-border"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label
-                        htmlFor={`output-${index}`}
-                        className="block text-sm font-medium mb-1"
-                      >
-                        Output
-                      </label>
-                      <Textarea
-                        id={`output-${index}`}
-                        value={testCase.output}
-                        onChange={(e) =>
-                          updateTestCase(index, "output", e.target.value)
-                        }
-                        placeholder="Enter expected output"
-                        className="bg-muted border-border"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <Button onClick={addTestCase} className="mx-1">
-                <Plus className="h-4 w-4 mr-2" /> Add Test Case
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-        <div className="flex justify-end mt-4">
+    <div className="container mx-auto p-4 space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">
+          {isEdit ? "Edit Problem" : "Create New Problem"}
+        </h1>
+        <div className="space-x-2">
           <Button
-            onClick={handleSaveProblem}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            variant="outline"
+            onClick={() => router.push(`/${orgId}/problems`)}
           >
-            Save Problem
+            Cancel
           </Button>
+          <Button onClick={handleSubmit(onSubmit)}>Save</Button>
         </div>
       </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="text-sm font-medium">Problem Code</label>
+          <Input
+            {...register("code")}
+            placeholder="Enter problem code (uppercase letters and numbers only)"
+          />
+          {errors.code && (
+            <p className="text-sm text-destructive mt-1">
+              {errors.code.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Problem Name</label>
+          <Input {...register("name")} placeholder="Enter problem name" />
+          {errors.name && (
+            <p className="text-sm text-destructive mt-1">
+              {errors.name.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Problem Statement</label>
+          <Textarea
+            {...register("statement")}
+            placeholder="Enter problem statement"
+            className="h-32"
+          />
+          {errors.statement && (
+            <p className="text-sm text-destructive mt-1">
+              {errors.statement.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Allowed Languages</label>
+          <Input
+            {...register("allowedLanguages")}
+            value={
+              Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""
+            }
+            onChange={(e) => {
+              const languages = e.target.value
+                ? e.target.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                : [];
+              setValue("allowedLanguages", languages);
+              trigger("allowedLanguages");
+            }}
+            placeholder="Enter comma-separated languages"
+          />
+          {errors.allowedLanguages && (
+            <p className="text-sm text-destructive mt-1">
+              {errors.allowedLanguages.message}
+            </p>
+          )}
+        </div>
+
+        <Tabs defaultValue="example" className="w-full">
+          <TabsList>
+            <TabsTrigger value="example">Example Test Cases</TabsTrigger>
+            <TabsTrigger value="test">Hidden Test Cases</TabsTrigger>
+          </TabsList>
+
+          {errors.testCases && (
+            <p className="text-sm text-destructive mt-1">
+              {errors.testCases.message}
+            </p>
+          )}
+
+          <TabsContent value="example" className="space-y-4">
+            {testCases
+              .filter((tc) => tc.kind === "example")
+              .map((testCase, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Input</label>
+                    <Textarea
+                      value={testCase.input}
+                      onChange={(e) =>
+                        updateTestCase(
+                          index,
+                          "input",
+                          e.target.value,
+                          "example",
+                        )
+                      }
+                      placeholder="Test case input"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Output</label>
+                    <Textarea
+                      value={testCase.output}
+                      onChange={(e) =>
+                        updateTestCase(
+                          index,
+                          "output",
+                          e.target.value,
+                          "example",
+                        )
+                      }
+                      placeholder="Expected output"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeTestCase(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => addTestCase("example")}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Example Test Case
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="test" className="space-y-4">
+            {testCases
+              .filter((tc) => tc.kind === "test")
+              .map((testCase, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Input</label>
+                    <Textarea
+                      value={testCase.input}
+                      onChange={(e) =>
+                        updateTestCase(index, "input", e.target.value, "test")
+                      }
+                      placeholder="Test case input"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Output</label>
+                    <Textarea
+                      value={testCase.output}
+                      onChange={(e) =>
+                        updateTestCase(index, "output", e.target.value, "test")
+                      }
+                      placeholder="Expected output"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeTestCase(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => addTestCase("test")}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Hidden Test Case
+            </Button>
+          </TabsContent>
+        </Tabs>
+      </form>
     </div>
   );
 }
