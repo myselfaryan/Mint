@@ -14,6 +14,7 @@ interface User {
   email: string;
   name: string;
   orgs: Org[];
+  isSuperuser: boolean;
 }
 
 export async function getUserWithOrgs(userId: number): Promise<User | null> {
@@ -22,6 +23,7 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
       userId: users.id,
       email: users.email,
       name: users.name,
+      isSuperuser: users.isSuperuser,
       orgId: orgs.id,
       orgName: orgs.name,
       orgNameId: orgs.nameId,
@@ -43,6 +45,7 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
     _id: userData.userId,
     email: userData.email,
     name: userData.name,
+    isSuperuser: userData.isSuperuser,
     orgs: result
       .filter((row) => row.orgId !== null) // Filter out null orgs from left join
       .map((row) => ({
