@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center">
-      <h2 className="text-4xl font-bold">404 - Link Not Found</h2>
+      <h2 className="text-4xl font-bold">Link Not Found</h2>
       <p className="mt-4 text-lg text-muted-foreground">
         The link you&apos;re looking for doesn&apos;t exist or you don&apos;t
         have access to the organization.
