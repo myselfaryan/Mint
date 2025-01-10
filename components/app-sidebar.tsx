@@ -197,6 +197,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const { logout, user, isAuthenticated, isLoading } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
+  const pathName = usePathname();
 
   // Get orgId from URL
   const orgId = pathname.split("/")[1];
@@ -474,24 +475,22 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               <Separator orientation="vertical" className="mr-2 h-4" />
               <Breadcrumb>
                 <BreadcrumbList>
-                  {generateBreadcrumbs(usePathname()).map(
-                    (crumb, index, array) => (
-                      <React.Fragment key={crumb.href}>
-                        <BreadcrumbItem className="hidden md:block">
-                          {index === array.length - 1 ? (
-                            <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                          ) : (
-                            <BreadcrumbLink href={crumb.href}>
-                              {crumb.label}
-                            </BreadcrumbLink>
-                          )}
-                        </BreadcrumbItem>
-                        {index < array.length - 1 && (
-                          <BreadcrumbSeparator className="hidden md:block" />
+                  {generateBreadcrumbs(pathName).map((crumb, index, array) => (
+                    <React.Fragment key={crumb.href}>
+                      <BreadcrumbItem className="hidden md:block">
+                        {index === array.length - 1 ? (
+                          <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={crumb.href}>
+                            {crumb.label}
+                          </BreadcrumbLink>
                         )}
-                      </React.Fragment>
-                    ),
-                  )}
+                      </BreadcrumbItem>
+                      {index < array.length - 1 && (
+                        <BreadcrumbSeparator className="hidden md:block" />
+                      )}
+                    </React.Fragment>
+                  ))}
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
