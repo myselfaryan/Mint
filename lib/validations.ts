@@ -78,17 +78,14 @@ export const updateContestSchema = createContestSchema
         const start = data.startTime || new Date(0);
         const end = data.endTime || new Date(0);
 
-        return (
-          regStart <= regEnd &&
-          regEnd <= start &&
-          start <= end
-        );
+        return regStart <= regEnd && regEnd <= start && start <= end;
       }
       return true;
     },
     {
-      message: "Invalid time sequence. Registration start ≤ Registration end ≤ Contest start ≤ Contest end",
-    }
+      message:
+        "Invalid time sequence. Registration start ≤ Registration end ≤ Contest start ≤ Contest end",
+    },
   );
 
 // Group Schemas
@@ -107,8 +104,12 @@ export const updateGroupMembersSchema = z.object({
 
 // Problem Schemas
 export const createProblemSchema = z.object({
-  code: z.string()
-    .regex(/^[a-z0-9-]+$/, "Code must contain only lowercase letters, numbers, and hyphens")
+  code: z
+    .string()
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Code must contain only lowercase letters, numbers, and hyphens",
+    )
     .min(2)
     .max(50),
   title: z.string().min(2).max(100),
@@ -124,11 +125,13 @@ export const problemSchema = z.object({
   allowedLanguages: z.array(z.string()),
   createdAt: z.string().datetime(),
   orgId: z.number().int().positive(),
-  testCases: z.array(z.object({
-    input: z.string(),
-    output: z.string(),
-    kind: z.enum(["example", "test"]).default("test"),
-  })),
+  testCases: z.array(
+    z.object({
+      input: z.string(),
+      output: z.string(),
+      kind: z.enum(["example", "test"]).default("test"),
+    }),
+  ),
 });
 
 // Test Case Schema
@@ -140,7 +143,7 @@ export const createTestCaseSchema = z.object({
 
 // Participant Schema
 export const createParticipantSchema = z.object({
-  userId: z.number().int().positive(),
+  email: EmailSchema,
 });
 
 export const loginSchema = z.object({
@@ -166,7 +169,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const addProblemSchema = z.object({
-  problemId: z.number().int().positive(),
+  problemCode: NameIdSchema,
   order: z.number().int().min(0).optional(),
 });
 

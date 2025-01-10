@@ -13,7 +13,7 @@ export async function createContest(
     const existingContest = await tx.query.contests.findFirst({
       where: and(
         eq(contests.organizerId, orgId),
-        eq(contests.nameId, data.nameId)
+        eq(contests.nameId, data.nameId),
       ),
     });
 
@@ -34,7 +34,11 @@ export async function createContest(
   });
 }
 
-export async function getOrgContests(orgId: number, limit: number, offset: number) {
+export async function getOrgContests(
+  orgId: number,
+  limit: number,
+  offset: number,
+) {
   const results = await db.query.contests.findMany({
     where: eq(contests.organizerId, orgId),
     limit,
@@ -56,10 +60,7 @@ export async function getOrgContests(orgId: number, limit: number, offset: numbe
 
 export async function getContestByNameId(orgId: number, nameId: string) {
   const contest = await db.query.contests.findFirst({
-    where: and(
-      eq(contests.organizerId, orgId),
-      eq(contests.nameId, nameId)
-    ),
+    where: and(eq(contests.organizerId, orgId), eq(contests.nameId, nameId)),
   });
 
   if (!contest) {
@@ -72,15 +73,12 @@ export async function getContestByNameId(orgId: number, nameId: string) {
 export async function updateContest(
   orgId: number,
   nameId: string,
-  data: z.infer<typeof updateContestSchema>
+  data: z.infer<typeof updateContestSchema>,
 ) {
   return await db.transaction(async (tx) => {
     // Check if contest exists and belongs to the org
     const contest = await tx.query.contests.findFirst({
-      where: and(
-        eq(contests.organizerId, orgId),
-        eq(contests.nameId, nameId)
-      ),
+      where: and(eq(contests.organizerId, orgId), eq(contests.nameId, nameId)),
     });
 
     if (!contest) {
@@ -101,19 +99,14 @@ export async function deleteContest(orgId: number, nameId: string) {
   return await db.transaction(async (tx) => {
     // Check if contest exists and belongs to the org
     const contest = await tx.query.contests.findFirst({
-      where: and(
-        eq(contests.organizerId, orgId),
-        eq(contests.nameId, nameId)
-      ),
+      where: and(eq(contests.organizerId, orgId), eq(contests.nameId, nameId)),
     });
 
     if (!contest) {
       throw new Error("Contest not found");
     }
 
-    await tx
-      .delete(contests)
-      .where(eq(contests.id, contest.id));
+    await tx.delete(contests).where(eq(contests.id, contest.id));
 
     return contest;
   });
