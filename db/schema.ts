@@ -8,6 +8,7 @@ import {
   varchar,
   index,
   uniqueIndex,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -19,7 +20,7 @@ export const users = pgTable("users", {
 
   hashedPassword: text("hashed_password").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-
+  isSuperuser: boolean("is_superuser").default(false).notNull(),
   about: text("about"),
   avatar: text("avatar"),
 });
