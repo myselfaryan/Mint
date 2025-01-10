@@ -163,7 +163,7 @@ export function GenericListing<T extends { id: number | undefined }>({
           <div className="relative w-full">
             <Search className="absolute left-2 top-1/2 h-8 w-5 -translate-y-1/2 text-muted-foreground " />
             <Input
-              placeholder={`Search ${title} by ${searchableFields.join(", ")} `}
+              placeholder={`Search ${title} `}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-9 pl-8 md:w-[300px] lg:w-[400px]"
