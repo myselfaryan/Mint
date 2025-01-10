@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginFormInput, loginFormSchema } from "@/lib/validations";
+import { LoginInput, loginSchema } from "@/lib/validations";
 import { useToast } from "@/hooks/use-toast";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
@@ -24,15 +24,15 @@ export function LoginComponent() {
   const { login } = useContext(AuthContext);
   const router = useRouter();
 
-  const form = useForm<LoginFormInput>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: LoginFormInput) {
+  async function onSubmit(values: LoginInput) {
     try {
       const userData = await login(values.email, values.password);
       if (userData.orgs && userData.orgs.length > 0) {
