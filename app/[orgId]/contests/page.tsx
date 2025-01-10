@@ -50,9 +50,12 @@ const contestSchema = z.object({
 });
 
 const injectProblemsCount = (contests: Contest[]) => {
+  if (!contests || !Array.isArray(contests)) {
+    return [];
+  }
   return contests.map((contest) => ({
     ...contest,
-    problemCount: contest.problems.split(",").length,
+    problemCount: contest.problems?.split(",").length || 0,
   }));
 };
 
