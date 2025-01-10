@@ -4,8 +4,9 @@ import { registerSchema } from "@/lib/validations";
 import { LoginInput } from "@/lib/validations";
 import { loginSchema } from "@/lib/validations";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/contexts/auth-context";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +28,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { fetchApi } from "@/lib/client/fetch";
 
 export function AuthComponent({
   initialMode = "login",
@@ -36,6 +36,8 @@ export function AuthComponent({
 }) {
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(initialMode === "login");
+  const { login, signup, user } = useContext(AuthContext);
+  console.log(user);
 
   const router = useRouter();
 
@@ -59,16 +61,17 @@ export function AuthComponent({
 
   async function onLoginSubmit(values: LoginInput) {
     try {
-      await fetchApi("auth/login", {
-        method: "POST",
-        body: JSON.stringify(values),
-      });
-      router.push("/iiits"); // Redirect to home page after successful login
+      const userData = await login(values.email, values.password);
+      if (userData.orgs && userData.orgs.length > 0) {
+        router.push(`/${userData.orgs[0].nameId}`);
+      } else {
+        router.push("/onboarding");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
       toast({
-        title: "Error in login",
-        description: `${error}`,
+        title: "Login Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     }
@@ -76,16 +79,13 @@ export function AuthComponent({
 
   async function onRegisterSubmit(values: RegisterInput) {
     try {
-      await fetchApi("auth/register", {
-        method: "POST",
-        body: JSON.stringify(values),
-      });
-      router.push("/iiits"); // Redirect to home page after successful registration
+      await signup(values.email, values.password, values.name);
+      router.push("/onboarding");
     } catch (error) {
-      console.error(error);
+      console.error("Registration error:", error);
       toast({
-        title: "Error in registering",
-        description: `${error}`,
+        title: "Registration Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       });
     }
