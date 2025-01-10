@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db/drizzle";
-import { users, orgs, contests, memberships, problems, testCases, contestProblems, contestParticipants, problemSubmissions } from "@/db/schema";
+import {
+  users,
+  orgs,
+  contests,
+  memberships,
+  problems,
+  testCases,
+  contestProblems,
+  contestParticipants,
+  problemSubmissions,
+} from "@/db/schema";
 import { getCurrentSession } from "@/lib/server/session";
 import { count, eq, sql } from "drizzle-orm";
 
@@ -49,16 +59,19 @@ export async function GET() {
         organizerUsers: sql<number>`count(distinct case when ${memberships.role} = 'organizer' then ${memberships.userId} end)::integer`,
         memberUsers: sql<number>`count(distinct case when ${memberships.role} = 'member' then ${memberships.userId} end)::integer`,
         problemsCount: sql<number>`count(distinct ${contestProblems.problemId})::integer`,
-        submissionsCount: sql<number>`count(distinct ${problemSubmissions.id})::integer`
+        submissionsCount: sql<number>`count(distinct ${problemSubmissions.id})::integer`,
       })
       .from(orgs)
       .leftJoin(
         contests,
-        sql`${contests.organizerId} = ${orgs.id} AND ${contests.organizerKind} = 'org'`
+        sql`${contests.organizerId} = ${orgs.id} AND ${contests.organizerKind} = 'org'`,
       )
       .leftJoin(memberships, eq(memberships.orgId, orgs.id))
       .leftJoin(contestProblems, eq(contestProblems.contestId, contests.id))
-      .leftJoin(problemSubmissions, eq(problemSubmissions.contestProblemId, contestProblems.id))
+      .leftJoin(
+        problemSubmissions,
+        eq(problemSubmissions.contestProblemId, contestProblems.id),
+      )
       .groupBy(orgs.id, orgs.nameId, orgs.name, orgs.about, orgs.createdAt);
 
     const platformStats = {
