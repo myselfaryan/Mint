@@ -61,7 +61,7 @@ export function RegisterComponent() {
       title="Register"
       description="Create a new account"
       footerLinkText="Already have an account? Login"
-      footerLink="/login"
+      footerLink="/auth/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -44,7 +44,10 @@ export function LoginComponent() {
       console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
       });
     }
@@ -55,7 +58,7 @@ export function LoginComponent() {
       title="Login"
       description="Enter your credentials to login"
       footerLinkText="Don't have an account? Register"
-      footerLink="/register"
+      footerLink="/auth/register"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
