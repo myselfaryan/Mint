@@ -29,8 +29,8 @@ const fields: Field[] = [
     placeholder: "Unique contest ID",
   },
   { name: "description", label: "Description", type: "textarea" },
-  { name: "startTime", label: "Start Time", type: "date" },
-  { name: "endTime", label: "End Time", type: "date" },
+  { name: "startTime", label: "Start Time", type: "datetime" },
+  { name: "endTime", label: "End Time", type: "datetime" },
   {
     name: "problems",
     label: "Problems",

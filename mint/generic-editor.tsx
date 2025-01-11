@@ -26,7 +26,7 @@ import { z } from "zod";
 export interface Field {
   name: string;
   label: string;
-  type: "text" | "number" | "date" | "select" | "textarea";
+  type: "text" | "number" | "date" | "datetime" | "select" | "textarea";
   options?: { value: string; label: string }[];
   placeholder?: string;
 }
@@ -62,24 +62,37 @@ export function GenericEditor<T>({
 
   useEffect(() => {
     if (data) {
-      reset(data);
+      // Convert datetime strings to local datetime-local format for input
+      const formattedData = { ...data };
+      fields.forEach((field) => {
+        if (field.type === "datetime" && formattedData[field.name as keyof typeof formattedData]) {
+          const date = new Date(formattedData[field.name as keyof typeof formattedData] as string);
+          formattedData[field.name as keyof typeof formattedData] = date
+            .toISOString()
+            .slice(0, 16) as any;
+        }
+      });
+      reset(formattedData);
     } else {
       reset({} as T);
     }
-  }, [data, reset]);
+  }, [data, reset, fields]);
 
   const onSubmit = (formData: T) => {
-    // If this is a new entry, add an id
-    console.log("onSubmit in GenericEditor");
-    console.log("formData", formData);
+    // Convert datetime-local values to ISO strings
+    const processedData = { ...formData };
+    fields.forEach((field) => {
+      if (field.type === "datetime" && processedData[field.name as keyof typeof processedData]) {
+        const date = new Date(processedData[field.name as keyof typeof processedData] as string);
+        processedData[field.name as keyof typeof processedData] = date.toISOString() as any;
+      }
+    });
 
+    // If this is a new entry, add an id
     if (!data) {
-      formData = {
-        ...formData,
-        id: Date.now(),
-      } as T;
+      processedData.id = Date.now() as any;
     }
-    onSave(formData);
+    onSave(processedData as T);
     onClose();
   };
 
@@ -130,6 +143,18 @@ export function GenericEditor<T>({
                 ) : field.type === "textarea" ? (
                   <Textarea
                     id={field.name}
+                    placeholder={field.placeholder || ""}
+                    {...register(field.name as any)}
+                    className={
+                      errors[field.name as keyof typeof errors]
+                        ? "border-red-500"
+                        : ""
+                    }
+                  />
+                ) : field.type === "datetime" ? (
+                  <Input
+                    id={field.name}
+                    type="datetime-local"
                     placeholder={field.placeholder || ""}
                     {...register(field.name as any)}
                     className={
