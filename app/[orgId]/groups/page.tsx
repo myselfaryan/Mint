@@ -45,7 +45,7 @@ const groupSchema = z.object({
 const injectUsersCount = (groups: Group[]) => {
   return groups.map((group) => ({
     ...group,
-    usersCount: group.users.split(/\r?\n/).length,
+    usersCount: group.users?.split(/\r?\n/).length ?? 0,
   }));
 };
 
