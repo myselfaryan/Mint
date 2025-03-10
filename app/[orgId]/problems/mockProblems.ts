@@ -6,7 +6,7 @@ export interface TestCase {
 
 export interface Problem {
   id: number;
-  nameId: string; // 5 character alphanumeric code
+  code: string; // 5 character alphanumeric code
   title: string;
   description?: string;
   allowedLanguages: string[];
@@ -18,7 +18,7 @@ export interface Problem {
 export const mockProblems: Problem[] = [
   {
     id: 1,
-    nameId: "2SUM1",
+    code: "2SUM1",
     title:
       "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
     description: `
@@ -48,7 +48,7 @@ export const mockProblems: Problem[] = [
   },
   {
     id: 2,
-    nameId: "REVST",
+    code: "REVST",
     title:
       "Write a function that reverses a string. The input string is given as an array of characters.",
     allowedLanguages: ["python", "cpp", "javascript"],
@@ -57,7 +57,7 @@ export const mockProblems: Problem[] = [
   },
   {
     id: 3,
-    nameId: "BSRCH",
+    code: "BSRCH",
     title:
       "Implement a binary search algorithm to find a target value in a sorted array.",
     allowedLanguages: ["python", "typescript", "java", "cpp"],
