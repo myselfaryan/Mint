@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircle, Users } from "lucide-react";
 import { GenericEditor, Field } from "@/mint/generic-editor";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { AuthContext } from "@/contexts/auth-context";
 
 export interface Org {
   id?: number;
@@ -48,6 +49,7 @@ export default function OrgOnboarding() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const router = useRouter();
+  const { refreshUser } = useContext(AuthContext);
   // setOrg(null);
   // const { toast } = useToast();
 
@@ -66,6 +68,7 @@ export default function OrgOnboarding() {
       const orgData = await response.json();
       if (response.ok) {
         setOrg(orgData);
+        await refreshUser();
         router.push(`/${orgData.nameId}`);
       } else {
         // toast({

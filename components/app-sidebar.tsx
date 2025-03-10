@@ -268,8 +268,12 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   console.log("user", user);
   console.log("isLoading", isLoading);
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading) {
     return <SidebarSkeleton>{children}</SidebarSkeleton>;
+  }
+
+  if (!isAuthenticated) {
+    router.push("/auth/login");
   }
 
   if (!user && process.env.NEXT_PUBLIC_DEBUG !== "True") {

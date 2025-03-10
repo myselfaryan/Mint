@@ -9,7 +9,9 @@ interface ThemeTogglerFrameProps {
   children: ReactNode;
 }
 
-export default function ThemeTogglerFrame({ children }: ThemeTogglerFrameProps) {
+export default function ThemeTogglerFrame({
+  children,
+}: ThemeTogglerFrameProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
