@@ -26,27 +26,27 @@ export interface AdminData {
 }
 
 export const mockData: AdminData = {
-  "platformStats": {
-    "totalOrgs": 21,
-    "totalContests": 2,
-    "totalUsers": 40,
-    "totalProblems": 1,
-    "totalSubmissions": 3
+  platformStats: {
+    totalOrgs: 21,
+    totalContests: 2,
+    totalUsers: 40,
+    totalProblems: 1,
+    totalSubmissions: 3,
   },
-  "organizations": [
+  organizations: [
     {
-      "id": 1,
-      "nameId": "openai_org",
-      "name": "OpenAI Organization",
-      "about": "An organization focused on artificial intelligence research.",
-      "createdAt": "2024-12-04T20:43:39.366Z",
-      "contestsCount": 0,
-      "ownerUsers": 1,
-      "organizerUsers": 0,
-      "memberUsers": 0,
-      "problemsCount": 0,
-      "submissionsCount": 0
+      id: 1,
+      nameId: "openai_org",
+      name: "OpenAI Organization",
+      about: "An organization focused on artificial intelligence research.",
+      createdAt: "2024-12-04T20:43:39.366Z",
+      contestsCount: 0,
+      ownerUsers: 1,
+      organizerUsers: 0,
+      memberUsers: 0,
+      problemsCount: 0,
+      submissionsCount: 0,
     },
     // ... rest of the organizations data
-  ]
-}
+  ],
+};

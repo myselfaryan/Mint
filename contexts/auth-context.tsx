@@ -31,6 +31,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   setIsAuthenticated: (status: boolean) => void;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const defaultContext: AuthContextType = {
@@ -41,6 +42,7 @@ const defaultContext: AuthContextType = {
   isAuthenticated: false,
   setIsAuthenticated: () => {},
   isLoading: true,
+  refreshUser: async () => Promise.reject("Not implemented"),
 };
 
 export const AuthContext = createContext<AuthContextType>(defaultContext);
@@ -132,6 +134,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const data = await fetchApi<User>("/me");
+      if (data.email) {
+        setUser(data);
+      }
+    } catch (error) {
+      console.error("Failed to refresh user:", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -142,6 +155,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         isAuthenticated,
         setIsAuthenticated,
         isLoading,
+        refreshUser,
       }}
     >
       {children}
