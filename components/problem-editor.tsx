@@ -22,11 +22,11 @@ const testCaseSchema = z.object({
 const problemSchema = z.object({
   code: z
     .string()
-    .min(1, "Problem code is required")
-    .max(10, "Problem code must be at most 10 characters")
+    .min(2, "Problem code must be at least 2 characters")
+    .max(50, "Problem code must be at most 50 characters")
     .regex(
-      /^[A-Z0-9]+$/,
-      "Problem code must contain only uppercase letters and numbers",
+      /^[a-z0-9-]+$/,
+      "Problem code must contain only lowercase letters, numbers, and hyphens"
     ),
   name: z
     .string()
@@ -105,7 +105,16 @@ export function ProblemEditor() {
           const data = await response.json();
           // Update form with fetched data
           Object.entries(data).forEach(([key, value]) => {
-            setValue(key as keyof Problem, value);
+            if (key === "allowedLanguages" && Array.isArray(value)) {
+              setValue("allowedLanguages", value as string[]);
+            } else if (key === "testCases" && Array.isArray(value)) {
+              setValue("testCases", value as TestCase[]);
+            } else if (
+              ["code", "name", "statement"].includes(key) && 
+              typeof value === "string"
+            ) {
+              setValue(key as "code" | "name" | "statement", value);
+            }
           });
         } catch (error) {
           console.error("Error fetching problem:", error);
@@ -172,13 +181,24 @@ export function ProblemEditor() {
         ? `/api/orgs/${orgId}/problems/${problemId}`
         : `/api/orgs/${orgId}/problems`;
 
+      // Transform the data to match the API's expected format
+      const apiData = {
+        code: data.code,
+        title: data.name,         // Map 'name' to 'title'
+        description: data.statement, // Map 'statement' to 'description'
+        allowedLanguages: Array.isArray(data.allowedLanguages) 
+          ? data.allowedLanguages 
+          : typeof data.allowedLanguages === 'string'
+            ? data.allowedLanguages.split(',').map(s => s.trim()).filter(Boolean)
+            : [],
+        testCases: data.testCases,
+        orgId: parseInt(orgId),
+      };
+
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          orgId: parseInt(orgId),
-        }),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -226,7 +246,7 @@ export function ProblemEditor() {
           <label className="text-sm font-medium">Problem Code</label>
           <Input
             {...register("code")}
-            placeholder="Enter problem code (uppercase letters and numbers only)"
+            placeholder="Enter problem code (lowercase letters, numbers, and hyphens only)"
           />
           {errors.code && (
             <p className="text-sm text-destructive mt-1">
@@ -262,11 +282,17 @@ export function ProblemEditor() {
         <div>
           <label className="text-sm font-medium">Allowed Languages</label>
           <Input
-            {...register("allowedLanguages")}
-            value={
-              Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""
-            }
+            {...register("allowedLanguages", {
+              setValueAs: (value) => 
+                typeof value === 'string' 
+                  ? value.split(',').map(s => s.trim()).filter(Boolean) 
+                  : value
+            })}
+            defaultValue={Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""}
             onChange={(e) => {
+              setValue("allowedLanguages", e.target.value);
+            }}
+            onBlur={(e) => {
               const languages = e.target.value
                 ? e.target.value
                     .split(",")
@@ -276,7 +302,7 @@ export function ProblemEditor() {
               setValue("allowedLanguages", languages);
               trigger("allowedLanguages");
             }}
-            placeholder="Enter comma-separated languages"
+            placeholder="Enter comma-separated languages (e.g. python, javascript, typescript)"
           />
           {errors.allowedLanguages && (
             <p className="text-sm text-destructive mt-1">

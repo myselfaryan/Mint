@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { MockAlert } from "@/components/mock-alert";
 
 const columns: ColumnDef<Problem>[] = [
-  { header: "Problem Code", accessorKey: "nameId", sortable: true },
+  { header: "Problem Code", accessorKey: "code", sortable: true },
   { header: "Title", accessorKey: "title", sortable: true },
   { header: "Allowed Languages", accessorKey: "allowedLanguages" },
   { header: "Created At", accessorKey: "createdAt", sortable: true },
