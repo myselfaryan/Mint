@@ -242,7 +242,9 @@ export function GenericListing<T extends { id: number | undefined }>({
                     <TableCell
                       key={String(column.accessorKey)}
                       className={
-                        index === 0 && rowClickAttr ? "hover:bg-muted/50" : ""
+                        index === 0 && rowClickAttr
+                          ? "hover:bg-muted/50 cursor-pointer hover:underline decoration-dotted"
+                          : ""
                       }
                       onClick={() => {
                         if (index === 0 && rowClickAttr && item[rowClickAttr]) {

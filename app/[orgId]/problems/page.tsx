@@ -79,12 +79,13 @@ export default function ProblemsPage({
         data={problems}
         columns={columns}
         title="Problems"
-        searchableFields={["nameId", "title"]}
+        searchableFields={["code", "title"]}
         onAdd={() => router.push(`/${params.orgId}/problems/new`)}
         onEdit={(problem: Problem) =>
-          router.push(`/${params.orgId}/problems/${problem.nameId}/edit`)
+          router.push(`/${params.orgId}/problems/${problem.code}/edit`)
         }
         onDelete={handleDelete}
+        rowClickAttr="code"
       />
     </>
   );
