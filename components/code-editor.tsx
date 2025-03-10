@@ -70,7 +70,7 @@ export interface CodeEditorProps {
 
 export function CodeEditor({ problem }: CodeEditorProps) {
   if (!problem) {
-    problem = mockProblems[0];
+    return <div className="p-4">Loading problem...</div>;
   }
   // Editor state - manages the current code content
   const [code, setCode] = useState<string>(() => defaultCode["cpp"]);
