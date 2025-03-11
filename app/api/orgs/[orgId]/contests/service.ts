@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { db } from "@/db/drizzle";
-import { contests } from "@/db/schema";
+import { contests, problems, contestProblems } from "@/db/schema";
 import { createContestSchema, updateContestSchema } from "@/lib/validations";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, asc } from "drizzle-orm";
+import { getProblemIdFromCode } from "../problems/service";
 
 export async function createContest(
   orgId: number,
@@ -21,16 +22,60 @@ export async function createContest(
       throw new Error("Contest with this nameId already exists");
     }
 
+    // Extract problems from data if present
+    const problemsList = data.problems
+      ? data.problems
+          .split(",")
+          .map((p) => p.trim())
+          .filter((p) => p)
+      : [];
+
+    // Remove problems from data before inserting into contests table
+    const { problems, ...contestData } = data;
+
     const [contest] = await tx
       .insert(contests)
       .values({
-        ...data,
+        ...contestData,
         organizerId: orgId,
         organizerKind: "org",
       })
       .returning();
 
-    return contest;
+    // If there are problems, add them to the contest
+    if (problemsList.length > 0) {
+      // Get problem IDs from problem codes
+      const problemEntries = await Promise.all(
+        problemsList.map(async (problemCode, index) => {
+          try {
+            const problemId = await getProblemIdFromCode(orgId, problemCode);
+            return {
+              contestId: contest.id,
+              problemId,
+              order: index,
+            };
+          } catch (error) {
+            console.error(`Problem not found: ${problemCode}`);
+            return null;
+          }
+        }),
+      );
+
+      // Filter out any null entries (problems that weren't found)
+      const validProblemEntries = problemEntries.filter(
+        (entry) => entry !== null,
+      );
+
+      if (validProblemEntries.length > 0) {
+        await tx.insert(contestProblems).values(validProblemEntries);
+        console.log(validProblemEntries);
+      }
+    }
+
+    return {
+      ...contest,
+      problems: problemsList.join(","),
+    };
   });
 }
 
@@ -39,11 +84,43 @@ export async function getOrgContests(
   limit: number,
   offset: number,
 ) {
-  const results = await db.query.contests.findMany({
+  const contestsData = await db.query.contests.findMany({
     where: eq(contests.organizerId, orgId),
     limit,
     offset,
   });
+
+  // Fetch problems for each contest
+  const contestsWithProblems = await Promise.all(
+    contestsData.map(async (contest) => {
+      const problemsData = await db.query.contestProblems.findMany({
+        where: eq(contestProblems.contestId, contest.id),
+        orderBy: (contestProblems, { asc }) => [asc(contestProblems.order)],
+      });
+
+      // For each problem ID, get the problem code
+      const problemCodes = await Promise.all(
+        problemsData.map(async (p) => {
+          try {
+            const problem = await db.query.problems.findFirst({
+              where: eq(problems.id, p.problemId),
+              columns: { code: true },
+            });
+            return problem?.code || "";
+          } catch (error) {
+            return "";
+          }
+        }),
+      );
+
+      const problemsList = problemCodes.filter((code) => code).join(",");
+
+      return {
+        ...contest,
+        problems: problemsList,
+      };
+    }),
+  );
 
   const [{ value: total }] = await db
     .select({ value: count() })
@@ -51,7 +128,7 @@ export async function getOrgContests(
     .where(eq(contests.organizerId, orgId));
 
   return {
-    data: results,
+    data: contestsWithProblems,
     total,
     limit,
     offset,
@@ -67,7 +144,33 @@ export async function getContestByNameId(orgId: number, nameId: string) {
     throw new Error("Contest not found");
   }
 
-  return contest;
+  // Fetch problems for the contest
+  const problemsData = await db.query.contestProblems.findMany({
+    where: eq(contestProblems.contestId, contest.id),
+    orderBy: (contestProblems, { asc }) => [asc(contestProblems.order)],
+  });
+
+  // For each problem ID, get the problem code
+  const problemCodes = await Promise.all(
+    problemsData.map(async (p) => {
+      try {
+        const problem = await db.query.problems.findFirst({
+          where: eq(problems.id, p.problemId),
+          columns: { code: true },
+        });
+        return problem?.code || "";
+      } catch (error) {
+        return "";
+      }
+    }),
+  );
+
+  const problemsList = problemCodes.filter((code) => code).join(",");
+
+  return {
+    ...contest,
+    problems: problemsList,
+  };
 }
 
 export async function updateContest(
@@ -85,13 +188,87 @@ export async function updateContest(
       throw new Error("Contest not found");
     }
 
+    // Extract problems from data if present
+    const problemsList = data.problems
+      ? data.problems
+          .split(",")
+          .map((p) => p.trim())
+          .filter((p) => p)
+      : null;
+
+    // Remove problems from data before updating contests table
+    const { problems, ...contestData } = data;
+
     const [updatedContest] = await tx
       .update(contests)
-      .set(data)
+      .set(contestData)
       .where(eq(contests.id, contest.id))
       .returning();
 
-    return updatedContest;
+    // If problems field was provided, update the contest problems
+    if (problemsList !== null) {
+      // Delete existing problem associations
+      await tx
+        .delete(contestProblems)
+        .where(eq(contestProblems.contestId, contest.id));
+
+      // If there are problems to add
+      if (problemsList.length > 0) {
+        // Get problem IDs from problem codes
+        const problemEntries = await Promise.all(
+          problemsList.map(async (problemCode, index) => {
+            try {
+              const problemId = await getProblemIdFromCode(orgId, problemCode);
+              return {
+                contestId: contest.id,
+                problemId,
+                order: index,
+              };
+            } catch (error) {
+              console.error(`Problem not found: ${problemCode}`);
+              return null;
+            }
+          }),
+        );
+
+        // Filter out any null entries (problems that weren't found)
+        const validProblemEntries = problemEntries.filter(
+          (entry) => entry !== null,
+        );
+
+        if (validProblemEntries.length > 0) {
+          await tx.insert(contestProblems).values(validProblemEntries);
+        }
+      }
+    }
+
+    // Fetch updated problems for the contest
+    const problemsData = await tx.query.contestProblems.findMany({
+      where: eq(contestProblems.contestId, contest.id),
+      orderBy: (contestProblems, { asc }) => [asc(contestProblems.order)],
+    });
+
+    // For each problem ID, get the problem code
+    const problemCodes = await Promise.all(
+      problemsData.map(async (p) => {
+        try {
+          const problem = await db.query.problems.findFirst({
+            where: eq(problems.id, p.problemId),
+            columns: { code: true },
+          });
+          return problem?.code || "";
+        } catch (error) {
+          return "";
+        }
+      }),
+    );
+
+    const updatedProblemsList = problemCodes.filter((code) => code).join(",");
+
+    return {
+      ...updatedContest,
+      problems: updatedProblemsList,
+    };
   });
 }
 

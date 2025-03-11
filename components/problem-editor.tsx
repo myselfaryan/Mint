@@ -26,7 +26,7 @@ const problemSchema = z.object({
     .max(50, "Problem code must be at most 50 characters")
     .regex(
       /^[a-z0-9-]+$/,
-      "Problem code must contain only lowercase letters, numbers, and hyphens"
+      "Problem code must contain only lowercase letters, numbers, and hyphens",
     ),
   name: z
     .string()
@@ -110,7 +110,7 @@ export function ProblemEditor() {
             } else if (key === "testCases" && Array.isArray(value)) {
               setValue("testCases", value as TestCase[]);
             } else if (
-              ["code", "name", "statement"].includes(key) && 
+              ["code", "name", "statement"].includes(key) &&
               typeof value === "string"
             ) {
               setValue(key as "code" | "name" | "statement", value);
@@ -184,12 +184,15 @@ export function ProblemEditor() {
       // Transform the data to match the API's expected format
       const apiData = {
         code: data.code,
-        title: data.name,         // Map 'name' to 'title'
+        title: data.name, // Map 'name' to 'title'
         description: data.statement, // Map 'statement' to 'description'
-        allowedLanguages: Array.isArray(data.allowedLanguages) 
-          ? data.allowedLanguages 
-          : typeof data.allowedLanguages === 'string'
-            ? data.allowedLanguages.split(',').map(s => s.trim()).filter(Boolean)
+        allowedLanguages: Array.isArray(data.allowedLanguages)
+          ? data.allowedLanguages
+          : typeof data.allowedLanguages === "string"
+            ? data.allowedLanguages
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)
             : [],
         testCases: data.testCases,
         orgId: parseInt(orgId),
@@ -283,12 +286,17 @@ export function ProblemEditor() {
           <label className="text-sm font-medium">Allowed Languages</label>
           <Input
             {...register("allowedLanguages", {
-              setValueAs: (value) => 
-                typeof value === 'string' 
-                  ? value.split(',').map(s => s.trim()).filter(Boolean) 
-                  : value
+              setValueAs: (value) =>
+                typeof value === "string"
+                  ? value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                  : value,
             })}
-            defaultValue={Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""}
+            defaultValue={
+              Array.isArray(allowedLanguages) ? allowedLanguages.join(", ") : ""
+            }
             onChange={(e) => {
               setValue("allowedLanguages", e.target.value);
             }}

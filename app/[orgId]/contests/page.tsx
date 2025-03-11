@@ -37,6 +37,13 @@ const fields: Field[] = [
     type: "text",
     placeholder: "Comma-separated problem IDs",
   },
+  { name: "rules", label: "Rules", type: "textarea" },
+  {
+    name: "registrationStartTime",
+    label: "Registration Start",
+    type: "datetime",
+  },
+  { name: "registrationEndTime", label: "Registration End", type: "datetime" },
 ];
 
 const contestSchema = z.object({
@@ -47,7 +54,10 @@ const contestSchema = z.object({
   startTime: z.string(),
   endTime: z.string(),
   problems: z.string(),
-});
+  rules: z.string().default(""),
+  registrationStartTime: z.string().default(new Date().toISOString()),
+  registrationEndTime: z.string().default(new Date().toISOString()),
+}) as z.ZodType<Contest, z.ZodTypeDef, Contest>;
 
 const injectProblemsCount = (contests: Contest[]) => {
   if (!contests || !Array.isArray(contests)) {
@@ -78,7 +88,7 @@ export default function ContestsPage() {
           throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
-        setContests(injectProblemsCount(data));
+        setContests(injectProblemsCount(data.data || []));
         setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching contests:", error);
@@ -132,8 +142,16 @@ export default function ContestsPage() {
 
   const saveContest = async (contest: Contest) => {
     try {
+      const contestWithDefaults = {
+        ...contest,
+        rules: contest.rules || "",
+        registrationStartTime:
+          contest.registrationStartTime || contest.startTime,
+        registrationEndTime: contest.registrationEndTime || contest.startTime,
+      };
+
       const url = selectedContest
-        ? `/api/orgs/${orgId}/contests/${contest.nameId}`
+        ? `/api/orgs/${orgId}/contests/${selectedContest.nameId}`
         : `/api/orgs/${orgId}/contests`;
 
       const response = await fetch(url, {
@@ -141,7 +159,7 @@ export default function ContestsPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(contest),
+        body: JSON.stringify(contestWithDefaults),
       });
 
       if (!response.ok) {
@@ -152,15 +170,24 @@ export default function ContestsPage() {
       const savedContest = await response.json();
 
       if (selectedContest) {
-        setContests(
-          contests.map((c) => (c.id === savedContest.id ? savedContest : c)),
+        setContests((prevContests) =>
+          prevContests.map((c) =>
+            c.id === savedContest.id ? savedContest : c,
+          ),
         );
         toast({
           title: "Success",
           description: "Contest updated successfully",
         });
       } else {
-        setContests([...contests, savedContest]);
+        const contestWithProblemCount = {
+          ...savedContest,
+          problemCount: savedContest.problems?.split(",").length || 0,
+        };
+        setContests((prevContests) => [
+          ...prevContests,
+          contestWithProblemCount,
+        ]);
         toast({
           title: "Success",
           description: "Contest created successfully",
@@ -205,7 +232,7 @@ export default function ContestsPage() {
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
         onSave={saveContest}
-        schema={contestSchema}
+        schema={contestSchema as any}
         fields={fields}
         title="Contest"
       />
