@@ -31,7 +31,7 @@ export default function ContestDetailsPage() {
   const params = useParams();
   const orgId = params.orgId as string;
   const contestId = params.id as string;
-  
+
   const [contestData, setContestData] = useState(defaultContestData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,14 +42,16 @@ export default function ContestDetailsPage() {
         setIsLoading(true);
         const url = `/api/orgs/${orgId}/contests/${contestId}`;
         console.log(`Fetching contest data from: ${url}`);
-        
+
         const res = await fetch(url);
-        
+
         if (!res.ok) {
-          console.error(`Failed to fetch contest data: ${res.status} ${res.statusText}`);
+          console.error(
+            `Failed to fetch contest data: ${res.status} ${res.statusText}`,
+          );
           throw new Error(`Failed to fetch contest data: ${res.status}`);
         }
-        
+
         const data = await res.json();
         console.log("Successfully fetched contest data:", data);
 
@@ -66,7 +68,9 @@ export default function ContestDetailsPage() {
         setError(null);
       } catch (err) {
         console.error("Error fetching contest data:", err);
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -120,11 +124,15 @@ export default function ContestDetailsPage() {
   const status = getContestStatus();
 
   if (isLoading) {
-    return <div className="container px-8 py-2">Loading contest details...</div>;
+    return (
+      <div className="container px-8 py-2">Loading contest details...</div>
+    );
   }
 
   if (error) {
-    return <div className="container px-8 py-2 text-red-500">Error: {error}</div>;
+    return (
+      <div className="container px-8 py-2 text-red-500">Error: {error}</div>
+    );
   }
 
   return (
