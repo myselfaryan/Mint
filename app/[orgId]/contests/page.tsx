@@ -38,7 +38,11 @@ const fields: Field[] = [
     placeholder: "Comma-separated problem IDs",
   },
   { name: "rules", label: "Rules", type: "textarea" },
-  { name: "registrationStartTime", label: "Registration Start", type: "datetime" },
+  {
+    name: "registrationStartTime",
+    label: "Registration Start",
+    type: "datetime",
+  },
   { name: "registrationEndTime", label: "Registration End", type: "datetime" },
 ];
 
@@ -141,7 +145,8 @@ export default function ContestsPage() {
       const contestWithDefaults = {
         ...contest,
         rules: contest.rules || "",
-        registrationStartTime: contest.registrationStartTime || contest.startTime,
+        registrationStartTime:
+          contest.registrationStartTime || contest.startTime,
         registrationEndTime: contest.registrationEndTime || contest.startTime,
       };
 
@@ -166,7 +171,9 @@ export default function ContestsPage() {
 
       if (selectedContest) {
         setContests((prevContests) =>
-          prevContests.map((c) => (c.id === savedContest.id ? savedContest : c)),
+          prevContests.map((c) =>
+            c.id === savedContest.id ? savedContest : c,
+          ),
         );
         toast({
           title: "Success",
@@ -177,7 +184,10 @@ export default function ContestsPage() {
           ...savedContest,
           problemCount: savedContest.problems?.split(",").length || 0,
         };
-        setContests((prevContests) => [...prevContests, contestWithProblemCount]);
+        setContests((prevContests) => [
+          ...prevContests,
+          contestWithProblemCount,
+        ]);
         toast({
           title: "Success",
           description: "Contest created successfully",

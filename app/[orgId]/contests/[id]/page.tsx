@@ -30,16 +30,16 @@ async function getContestData(orgId: string, nameId: string) {
     });
     if (!res.ok) throw new Error("Failed to fetch contest data");
     const data = await res.json();
-    
+
     // Convert comma-separated problem IDs to the expected format
-    const problemsArray = data.problems.split(',').map((id: string) => ({
+    const problemsArray = data.problems.split(",").map((id: string) => ({
       id: id.trim(),
-      title: `Problem ${id.trim()}`
+      title: `Problem ${id.trim()}`,
     }));
-    
+
     return {
       ...data,
-      problems: problemsArray
+      problems: problemsArray,
     };
   } catch (error) {
     console.error("Error fetching contest data:", error);
@@ -146,18 +146,20 @@ export default async function ContestDetailsPage({
               Problems
             </h3>
             <ul className="space-y-2 px-2">
-              {contestData.problems.map((problem: { id: string; title: string }) => (
-                <li key={problem.id}>
-                  <Link href={`/${params.orgId}/problems/${problem.id}`}>
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto text-primary hover:text-primary/80"
-                    >
-                      {problem.title}
-                    </Button>
-                  </Link>
-                </li>
-              ))}
+              {contestData.problems.map(
+                (problem: { id: string; title: string }) => (
+                  <li key={problem.id}>
+                    <Link href={`/${params.orgId}/problems/${problem.id}`}>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-primary hover:text-primary/80"
+                      >
+                        {problem.title}
+                      </Button>
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </div>
         </CardContent>
