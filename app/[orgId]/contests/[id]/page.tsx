@@ -1,5 +1,9 @@
+"use client";
+
 import { CalendarIcon, ClockIcon } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 import {
   Card,
@@ -23,36 +27,59 @@ const defaultContestData = {
   ],
 };
 
-async function getContestData(orgId: string, nameId: string) {
-  try {
-    const res = await fetch(`/api/orgs/${orgId}/contests/${nameId}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) throw new Error("Failed to fetch contest data");
-    const data = await res.json();
+export default function ContestDetailsPage() {
+  const params = useParams();
+  const orgId = params.orgId as string;
+  const contestId = params.id as string;
 
-    // Convert comma-separated problem IDs to the expected format
-    const problemsArray = data.problems.split(",").map((id: string) => ({
-      id: id.trim(),
-      title: `Problem ${id.trim()}`,
-    }));
+  const [contestData, setContestData] = useState(defaultContestData);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    return {
-      ...data,
-      problems: problemsArray,
+  useEffect(() => {
+    const fetchContestData = async () => {
+      try {
+        setIsLoading(true);
+        const url = `/api/orgs/${orgId}/contests/${contestId}`;
+        console.log(`Fetching contest data from: ${url}`);
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          console.error(
+            `Failed to fetch contest data: ${res.status} ${res.statusText}`,
+          );
+          throw new Error(`Failed to fetch contest data: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("Successfully fetched contest data:", data);
+
+        // Convert comma-separated problem IDs to the expected format
+        const problemsArray = data.problems.split(",").map((id: string) => ({
+          id: id.trim(),
+          title: `Problem ${id.trim()}`,
+        }));
+
+        setContestData({
+          ...data,
+          problems: problemsArray,
+        });
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching contest data:", err);
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred",
+        );
+      } finally {
+        setIsLoading(false);
+      }
     };
-  } catch (error) {
-    console.error("Error fetching contest data:", error);
-    return defaultContestData;
-  }
-}
 
-export default async function ContestDetailsPage({
-  params,
-}: {
-  params: { orgId: string; id: string };
-}) {
-  const contestData = await getContestData(params.orgId, params.id);
+    if (orgId && contestId) {
+      fetchContestData();
+    }
+  }, [orgId, contestId]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -95,6 +122,18 @@ export default async function ContestDetailsPage({
   };
 
   const status = getContestStatus();
+
+  if (isLoading) {
+    return (
+      <div className="container px-8 py-2">Loading contest details...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container px-8 py-2 text-red-500">Error: {error}</div>
+    );
+  }
 
   return (
     <div className="container px-8 py-2 w-3xl h-screen">
@@ -149,7 +188,7 @@ export default async function ContestDetailsPage({
               {contestData.problems.map(
                 (problem: { id: string; title: string }) => (
                   <li key={problem.id}>
-                    <Link href={`/${params.orgId}/problems/${problem.id}`}>
+                    <Link href={`/${orgId}/problems/${problem.id}`}>
                       <Button
                         variant="link"
                         className="p-0 h-auto text-primary hover:text-primary/80"
