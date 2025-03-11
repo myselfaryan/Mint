@@ -59,6 +59,7 @@ export const createContestSchema = z.object({
   endTime: TimestampSchema,
   allowList: z.array(z.string().email()).default([]),
   disallowList: z.array(z.string().email()).default([]),
+  problems: z.string().optional(),
 });
 
 export const updateContestSchema = createContestSchema

@@ -23,13 +23,24 @@ const defaultContestData = {
   ],
 };
 
-async function getContestData(nameId: string) {
+async function getContestData(orgId: string, nameId: string) {
   try {
-    const res = await fetch(`api/contests/${nameId}`, {
+    const res = await fetch(`/api/orgs/${orgId}/contests/${nameId}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch contest data");
-    return res.json();
+    const data = await res.json();
+    
+    // Convert comma-separated problem IDs to the expected format
+    const problemsArray = data.problems.split(',').map((id: string) => ({
+      id: id.trim(),
+      title: `Problem ${id.trim()}`
+    }));
+    
+    return {
+      ...data,
+      problems: problemsArray
+    };
   } catch (error) {
     console.error("Error fetching contest data:", error);
     return defaultContestData;
@@ -41,7 +52,7 @@ export default async function ContestDetailsPage({
 }: {
   params: { orgId: string; id: string };
 }) {
-  const contestData = await getContestData(params.id);
+  const contestData = await getContestData(params.orgId, params.id);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -135,7 +146,7 @@ export default async function ContestDetailsPage({
               Problems
             </h3>
             <ul className="space-y-2 px-2">
-              {contestData.problems.map((problem) => (
+              {contestData.problems.map((problem: { id: string; title: string }) => (
                 <li key={problem.id}>
                   <Link href={`/${params.orgId}/problems/${problem.id}`}>
                     <Button
