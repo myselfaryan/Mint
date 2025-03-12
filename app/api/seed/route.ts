@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     if (!isEmpty) {
       return NextResponse.json(
         { error: "Database is not empty" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     console.error("Error in seed route:", error);
     return NextResponse.json(
       { error: "Failed to seed database" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
