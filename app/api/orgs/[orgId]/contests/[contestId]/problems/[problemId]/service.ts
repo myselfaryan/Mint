@@ -3,7 +3,10 @@ import { problems, contestProblems } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { getProblemIdFromCode } from "../../../../problems/service";
 
-export async function getContestProblem(contestId: number, problemCode: string) {
+export async function getContestProblem(
+  contestId: number,
+  problemCode: string,
+) {
   const problem = await db
     .select({
       id: problems.id,
@@ -18,8 +21,8 @@ export async function getContestProblem(contestId: number, problemCode: string) 
     .where(
       and(
         eq(contestProblems.contestId, contestId),
-        eq(problems.code, problemCode)
-      )
+        eq(problems.code, problemCode),
+      ),
     )
     .limit(1);
 
@@ -33,7 +36,7 @@ export async function getContestProblem(contestId: number, problemCode: string) 
 export async function updateContestProblem(
   contestId: number,
   problemCode: string,
-  order: number
+  order: number,
 ) {
   return await db.transaction(async (tx) => {
     // Get the problem ID from the code
@@ -46,8 +49,8 @@ export async function updateContestProblem(
       .where(
         and(
           eq(contestProblems.contestId, contestId),
-          eq(contestProblems.problemId, problemId)
-        )
+          eq(contestProblems.problemId, problemId),
+        ),
       )
       .returning();
 
@@ -60,7 +63,10 @@ export async function updateContestProblem(
   });
 }
 
-export async function removeContestProblem(contestId: number, problemCode: string) {
+export async function removeContestProblem(
+  contestId: number,
+  problemCode: string,
+) {
   return await db.transaction(async (tx) => {
     // Get the problem ID from the code
     const problemId = await getProblemIdFromCode(contestId, problemCode);
@@ -71,8 +77,8 @@ export async function removeContestProblem(contestId: number, problemCode: strin
       .where(
         and(
           eq(contestProblems.contestId, contestId),
-          eq(contestProblems.problemId, problemId)
-        )
+          eq(contestProblems.problemId, problemId),
+        ),
       )
       .returning();
 
@@ -82,4 +88,4 @@ export async function removeContestProblem(contestId: number, problemCode: strin
 
     return deleted;
   });
-} 
+}

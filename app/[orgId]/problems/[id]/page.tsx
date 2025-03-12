@@ -8,7 +8,6 @@ async function getProblem(orgId: string, problemId: string) {
   try {
     // const problemIdNumber = await getProblemIdFromCode(orgId, problemId);
 
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/orgs/${orgId}/problems/${problemId}`,
       {

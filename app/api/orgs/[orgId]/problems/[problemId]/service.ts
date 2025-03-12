@@ -19,7 +19,7 @@ export async function getProblem(orgId: number, code: string) {
 export async function updateProblem(
   orgId: number,
   code: string,
-  data: z.infer<typeof updateProblemSchema>
+  data: z.infer<typeof updateProblemSchema>,
 ) {
   return await db.transaction(async (tx) => {
     // Check if problem exists and belongs to org
@@ -70,4 +70,4 @@ export async function deleteProblem(orgId: number, code: string) {
 
     return deleted;
   });
-} 
+}

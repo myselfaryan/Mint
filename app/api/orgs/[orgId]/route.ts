@@ -18,7 +18,10 @@ export async function GET(
   // Get numeric ID from nameId
   const orgId = await getOrgIdFromNameId(params.orgId);
   if (!orgId) {
-    return NextResponse.json({ message: "Organization not found" }, { status: 404 });
+    return NextResponse.json(
+      { message: "Organization not found" },
+      { status: 404 },
+    );
   }
 
   const org = await db.query.orgs.findFirst({
@@ -37,7 +40,10 @@ export async function PATCH(
   // Get numeric ID from nameId
   const orgId = await getOrgIdFromNameId(params.orgId);
   if (!orgId) {
-    return NextResponse.json({ message: "Organization not found" }, { status: 404 });
+    return NextResponse.json(
+      { message: "Organization not found" },
+      { status: 404 },
+    );
   }
 
   const body = await req.json();

@@ -42,7 +42,11 @@ export async function PATCH(
     const problemCode = NameIdSchema.parse(params.problemId);
     const data = updateProblemSchema.parse(await request.json());
 
-    const problem = await problemService.updateProblem(orgId, problemCode, data);
+    const problem = await problemService.updateProblem(
+      orgId,
+      problemCode,
+      data,
+    );
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -93,4 +97,4 @@ export async function DELETE(
       { status: 500 },
     );
   }
-} 
+}

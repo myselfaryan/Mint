@@ -6,14 +6,22 @@ import * as problemService from "./service";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { orgId: string; contestId: string; problemId: string } },
+  {
+    params,
+  }: { params: { orgId: string; contestId: string; problemId: string } },
 ) {
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    const contestId = await getContestIdFromNameId(orgId, NameIdSchema.parse(params.contestId));
+    const contestId = await getContestIdFromNameId(
+      orgId,
+      NameIdSchema.parse(params.contestId),
+    );
     const problemCode = NameIdSchema.parse(params.problemId);
 
-    const problem = await problemService.getContestProblem(contestId, problemCode);
+    const problem = await problemService.getContestProblem(
+      contestId,
+      problemCode,
+    );
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -37,17 +45,26 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { orgId: string; contestId: string; problemId: string } },
+  {
+    params,
+  }: { params: { orgId: string; contestId: string; problemId: string } },
 ) {
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    const contestId = await getContestIdFromNameId(orgId, NameIdSchema.parse(params.contestId));
+    const contestId = await getContestIdFromNameId(
+      orgId,
+      NameIdSchema.parse(params.contestId),
+    );
     const problemCode = NameIdSchema.parse(params.problemId);
-    
+
     const data = await request.json();
     const order = z.number().int().min(0).parse(data.order);
 
-    const problem = await problemService.updateContestProblem(contestId, problemCode, order);
+    const problem = await problemService.updateContestProblem(
+      contestId,
+      problemCode,
+      order,
+    );
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -71,11 +88,16 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { orgId: string; contestId: string; problemId: string } },
+  {
+    params,
+  }: { params: { orgId: string; contestId: string; problemId: string } },
 ) {
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    const contestId = await getContestIdFromNameId(orgId, NameIdSchema.parse(params.contestId));
+    const contestId = await getContestIdFromNameId(
+      orgId,
+      NameIdSchema.parse(params.contestId),
+    );
     const problemCode = NameIdSchema.parse(params.problemId);
 
     await problemService.removeContestProblem(contestId, problemCode);
@@ -98,4 +120,4 @@ export async function DELETE(
       { status: 500 },
     );
   }
-} 
+}
