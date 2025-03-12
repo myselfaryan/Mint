@@ -203,6 +203,25 @@ const getNavItems = (role?: string) => {
   return allItems.filter((item) => item.allowedRoles.includes(role));
 };
 
+// Add this new component near the top of the file
+function RoleBadge({ role }: { role: string }) {
+  const colors = {
+    owner: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
+    admin:
+      "bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground",
+    member:
+      "bg-muted text-muted-foreground dark:bg-muted/50 dark:text-muted-foreground",
+  };
+
+  return (
+    <span
+      className={`text-xs px-2 py-0.5 rounded-full ${colors[role as keyof typeof colors]}`}
+    >
+      {role}
+    </span>
+  );
+}
+
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const { logout, user, isAuthenticated, isLoading } = useContext(AuthContext);
   const pathname = usePathname();
@@ -317,11 +336,14 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                             <activeTeam.logo className="size-4" />
                           </div>
-                          <div className="grid flex-1 text-left text-sm leading-tight">
-                            <span className="truncate font-semibold">
-                              {activeTeam.name}
-                            </span>
-                            <span className="truncate text-xs">
+                          <div className="grid flex-1 text-left text-sm leading-tight gap-1">
+                            <div className="flex items-center gap-2">
+                              <span className="truncate font-semibold">
+                                {activeTeam.name}
+                              </span>
+                              <RoleBadge role={activeTeam.role} />
+                            </div>
+                            <span className="truncate text-xs text-muted-foreground">
                               {activeTeam.nameId}
                             </span>
                           </div>
@@ -347,8 +369,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                         <div className="flex size-6 items-center justify-center rounded-sm border">
                           <team.logo className="size-4 shrink-0" />
                         </div>
-                        {team.name}
-                        <DropdownMenuShortcut>{team.role}</DropdownMenuShortcut>
+                        <div className="flex-1 flex items-center justify-between">
+                          <span>{team.name}</span>
+                          <RoleBadge role={team.role} />
+                        </div>
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
