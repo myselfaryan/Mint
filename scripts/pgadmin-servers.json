@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Mint Local",
+      "Group": "Servers",
+      "Host": "mint-postgres",
+      "Port": 5432,
+      "MaintenanceDB": "mint",
+      "Username": "postgres",
+      "Password": "postgres",
+      "SSLMode": "prefer"
+    }
+  }
+}

@@ -9,7 +9,15 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx}\"",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:clear": "tsx scripts/clear-db.ts",
+    "db:superuser": "tsx scripts/create-superuser.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "pg": "tsx scripts/pg.ts",
+    "pg:stop": "tsx scripts/pg-stop.ts",
+    "pg-admin": "tsx scripts/pg-admin.ts",
+    "pg-admin:stop": "tsx scripts/pg-admin-stop.ts"
   },
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.2",

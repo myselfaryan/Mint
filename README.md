@@ -1,50 +1,171 @@
-# pariksa
+# Mint
 
-## Migrations
+A modern platform for conducting programming contests and managing coding problems.
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 22.2.0+ and npm
+- Docker
+- [Bun](https://bun.sh) (recommended package manager)
+
+### Quick Start
+
+1. Clone the repository
+
+2. Install dependencies
 
 ```bash
-npx drizzle-kit generate  # generate SQL migration files based on your Drizzle schema
-npx drizzle-kit migrate  # apply generated SQL migration files to your database
+bun install
 ```
 
-> [!NOTE]
-> Use `bun` instead of `npx` if you are using `bun`.
-
----
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+3. Set up environment variables
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+cp .env.example .env
+```
+
+4. Start the database
+
+```bash
+bun pg
+```
+
+5. Run migrations and seed data
+
+```bash
+bun db:migrate
+bun db:superuser  # Create an admin user
+bun db:seed      # Add test data (optional)
+```
+
+6. Start the development server
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Development
 
-## Learn More
+```bash
+bun dev          # Start development server
+bun build        # Build for production
+bun start        # Start production server
+bun lint         # Run ESLint
+bun format       # Format code with Prettier
+bun format:check # Check code formatting
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Database Management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### PostgreSQL Control
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bun pg           # Start PostgreSQL container
+bun pg:stop      # Stop and remove PostgreSQL container
+```
 
-## Deploy on Vercel
+Connection Details:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Host: `localhost` (from host) or `mint-postgres` (from containers)
+- Port: `5432`
+- Database: `mint`
+- Username: `postgres`
+- Password: `postgres`
+- URL: `postgres://postgres:postgres@localhost:5432/mint`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### pgAdmin (Database UI)
+
+```bash
+bun pg-admin     # Start pgAdmin web interface
+bun pg-admin:stop # Stop and remove pgAdmin container
+```
+
+Access Details:
+
+- URL: http://localhost:5050
+- Email: `admin@admin.com`
+- Password: `admin`
+
+#### Database Operations
+
+```bash
+bun db:migrate   # Generate and apply database migrations
+bun db:seed     # Add test data to database
+bun db:clear    # Clear all data from database
+bun db:superuser # Create an admin user interactively
+```
+
+### Test Data
+
+The seeding process creates:
+
+- Admin users (2)
+- Organizer users (3)
+- Regular users (5)
+- Organizations (3)
+- Problems per organization (2)
+- Contests per organization (2)
+- Groups per organization (2)
+
+All test users are created with password: `password123`
+
+## Project Structure
+
+```bash
+mint/
+├── app/            # Next.js app router pages
+├── components/     # React components
+├── db/            # Database schema and migrations
+├── lib/           # Utility functions and shared logic
+├── public/        # Static assets
+└── scripts/       # CLI scripts for development
+```
+
+## Troubleshooting
+
+### Database Issues
+
+1. If containers are already running:
+
+```bash
+docker stop mint-postgres mint-pgadmin
+docker rm mint-postgres mint-pgadmin
+```
+
+1. If ports are in use:
+
+- Check if PostgreSQL is running locally: `sudo lsof -i :5432`
+- Check if something is using pgAdmin port: `sudo lsof -i :5050`
+
+2. To completely reset:
+
+```bash
+bun pg:stop
+bun pg-admin:stop
+bun pg
+bun pg-admin
+bun db:clear
+bun db:migrate
+bun db:seed
+```
+
+> [!NOTE]
+> While Bun is recommended, you can still use npm by replacing `bun` with `npm run` in all commands.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
