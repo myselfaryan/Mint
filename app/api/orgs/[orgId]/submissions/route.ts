@@ -19,8 +19,12 @@ export async function GET(
 
     // Get numeric orgId
     const orgId = await getOrgIdFromNameId(orgNameId);
-
+    console.log("orgid=",orgId);
+    
     const submissions = await submissionService.getOrgSubmissions(orgId);
+    console.log('sub',submissions);
+    
+    
     return NextResponse.json(submissions);
   } catch (error) {
     if (error instanceof z.ZodError) {

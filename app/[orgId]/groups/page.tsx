@@ -61,6 +61,7 @@ const fields: Field[] = [
   { name: "users", label: "Users (one email per line)", type: "textarea" },
 ];
 
+
 export default function GroupsPage() {
   const params = useParams();
   const orgId = params.orgId as string;
@@ -132,25 +133,40 @@ export default function GroupsPage() {
 
   const saveGroup = async (group: Group) => {
     try {
+      // Create a copy of the group object to avoid mutating the original
+      const groupToSave = { ...group };
+      
+      // Convert users from string to array of strings (splitting at newlines)
+      if (typeof groupToSave.users === 'string') {
+        groupToSave.users = groupToSave.users
+          .split('\n')
+          .map(user => user.trim())
+          .filter(user => user.length > 0); // Remove empty lines
+      }
+      
+      console.log("groups", groupToSave);
+      
       const url = selectedGroup
         ? `/api/orgs/${orgId}/groups/${group.nameId}`
         : `/api/orgs/${orgId}/groups`;
-
+      
       const response = await fetch(url, {
         method: selectedGroup ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(group),
+        body: JSON.stringify(groupToSave),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(formatValidationErrors(errorData));
       }
-
+  
       const savedGroup = await response.json();
-
+      // console.log('saved groups',savedGroup);
+      
+  
       if (selectedGroup) {
         setGroups(groups.map((g) => (g.id === savedGroup.id ? savedGroup : g)));
         toast({
@@ -158,13 +174,15 @@ export default function GroupsPage() {
           description: "Group updated successfully",
         });
       } else {
+        console.log("savedgroups",savedGroup);
+        
         setGroups([...groups, savedGroup]);
         toast({
           title: "Success",
           description: "Group created successfully",
         });
       }
-
+  
       setIsEditorOpen(false);
     } catch (error) {
       console.error("Error saving group:", error);
