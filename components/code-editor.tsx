@@ -50,12 +50,12 @@ const defaultCode = {
   python: `def solution(nums, target):
     # Your code here
     return []`,
-  cpp: `class Solution {
-public:
-    vector<int> missingRolls(vector<int>& rolls, int mean, int n) {
-        // Your code here
-    }
-};`,
+  cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  
+}`,
 };
 
 const extensions = {
@@ -307,32 +307,36 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                           </h2>
                         </div>
                         <div className="p-2 space-y-2 overflow-auto flex-1">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 px-2 py-1">
-                              <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                              <span className="text-sm text-foreground">
-                                Case 1
-                              </span>
-                            </div>
-                            <div className="bg-muted rounded p-2">
-                              <div className="text-sm font-mono">
-                                <span className="text-foreground">121</span>
+                          {problem.testCases && problem.testCases.length > 0 ? (
+                            problem.testCases.map((testCase, index) => (
+                              <div key={index} className="space-y-2">
+                                <div className="flex items-center gap-2 px-2 py-1">
+                                  <div className="h-2 w-2 rounded-full bg-muted"></div>
+                                  <span className="text-sm text-foreground">
+                                    Case {index + 1}
+                                  </span>
+                                </div>
+                                <div className="space-y-1">
+                                  <div className="bg-muted rounded p-2">
+                                    <div className="text-xs text-muted-foreground mb-1">Input:</div>
+                                    <div className="text-sm font-mono">
+                                      <span className="text-foreground">{testCase.input}</span>
+                                    </div>
+                                  </div>
+                                  <div className="bg-muted rounded p-2">
+                                    <div className="text-xs text-muted-foreground mb-1">Expected Output:</div>
+                                    <div className="text-sm font-mono">
+                                      <span className="text-foreground">{testCase.output}</span>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
+                            ))
+                          ) : (
+                            <div className="p-4 text-sm text-muted-foreground">
+                              No test cases available
                             </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 px-2 py-1">
-                              <div className="h-2 w-2 rounded-full bg-muted"></div>
-                              <span className="text-sm text-foreground">
-                                Case 2
-                              </span>
-                            </div>
-                            <div className="bg-muted rounded p-2">
-                              <div className="text-sm font-mono">
-                                <span className="text-foreground">-121</span>
-                              </div>
-                            </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     </ResizablePanel>
