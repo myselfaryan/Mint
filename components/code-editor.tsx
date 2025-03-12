@@ -102,7 +102,9 @@ export function CodeEditor({ problem }: CodeEditorProps) {
   const [executionError, setExecutionError] = useState<string | null>(null);
 
   // Add this state to track test case results
-  const [testCaseResults, setTestCaseResults] = useState<Record<number, TestCaseResult>>({});
+  const [testCaseResults, setTestCaseResults] = useState<
+    Record<number, TestCaseResult>
+  >({});
 
   const languageVersions = {
     javascript: "18.15.0",
@@ -140,7 +142,9 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     }
   };
 
-  const runCode = async (testCaseInput: string): Promise<{success: boolean, output: string}> => {
+  const runCode = async (
+    testCaseInput: string,
+  ): Promise<{ success: boolean; output: string }> => {
     console.log("Starting code execution...");
     setIsRunning(true);
     setOutput("");
@@ -201,56 +205,61 @@ export function CodeEditor({ problem }: CodeEditorProps) {
   // Add this function to run a specific test case
   const runTestCase = async (testCase: TestCase, index: number) => {
     if (isRunning) return;
-    
+
     const result = await runCode(testCase.input);
-    
+
     // Update the results for this specific test case
-    setTestCaseResults(prev => ({
+    setTestCaseResults((prev) => ({
       ...prev,
       [index]: {
         output: result.output,
-        success: result.output.trim() === testCase.output.trim()
-      }
+        success: result.output.trim() === testCase.output.trim(),
+      },
     }));
-    
+
     // Update the overall output summary
     const updatedResults = {
       ...testCaseResults,
       [index]: {
         output: result.output,
-        success: result.output.trim() === testCase.output.trim()
-      }
+        success: result.output.trim() === testCase.output.trim(),
+      },
     };
-    
+
     const totalCases = problem.testCases?.length || 0;
-    const passedCases = Object.values(updatedResults).filter(r => r.success).length;
-    
+    const passedCases = Object.values(updatedResults).filter(
+      (r) => r.success,
+    ).length;
+
     setOutput(`Passed ${passedCases} of ${totalCases} test cases`);
   };
 
   // Add a function to run all test cases
   const runAllTestCases = async () => {
-    if (isRunning || !problem.testCases || problem.testCases.length === 0) return;
-    
+    if (isRunning || !problem.testCases || problem.testCases.length === 0)
+      return;
+
     setIsRunning(true);
     const newResults: Record<number, TestCaseResult> = {};
     let passedCount = 0;
-    
+
     for (let i = 0; i < problem.testCases.length; i++) {
       const testCase = problem.testCases[i];
       const result = await runCode(testCase.input);
       const isSuccess = result.output.trim() === testCase.output.trim();
-      
+
       newResults[i] = {
         output: result.output,
-        success: isSuccess
+        success: isSuccess,
       };
-      
+
       if (isSuccess) passedCount++;
     }
-    
+
     setTestCaseResults(newResults);
-    setOutput(`Passed ${passedCount} of ${problem.testCases.length} test cases`);
+    setOutput(
+      `Passed ${passedCount} of ${problem.testCases.length} test cases`,
+    );
     setIsRunning(false);
   };
 
@@ -380,13 +389,15 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                               <div key={index} className="space-y-2">
                                 <div className="flex items-center justify-between gap-2 px-2 py-1">
                                   <div className="flex items-center gap-2">
-                                    <div className={`h-2 w-2 rounded-full ${testCaseResults[index]?.success ? 'bg-green-500' : testCaseResults[index] ? 'bg-red-500' : 'bg-muted'}`}></div>
+                                    <div
+                                      className={`h-2 w-2 rounded-full ${testCaseResults[index]?.success ? "bg-green-500" : testCaseResults[index] ? "bg-red-500" : "bg-muted"}`}
+                                    ></div>
                                     <span className="text-sm text-foreground">
                                       Case {index + 1}
                                     </span>
                                   </div>
-                                  <Button 
-                                    variant="outline" 
+                                  <Button
+                                    variant="outline"
                                     size="sm"
                                     onClick={() => runTestCase(testCase, index)}
                                     disabled={isRunning}
@@ -397,22 +408,34 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                                 </div>
                                 <div className="space-y-1">
                                   <div className="bg-muted rounded p-2">
-                                    <div className="text-xs text-muted-foreground mb-1">Input:</div>
+                                    <div className="text-xs text-muted-foreground mb-1">
+                                      Input:
+                                    </div>
                                     <div className="text-sm font-mono">
-                                      <span className="text-foreground">{testCase.input}</span>
+                                      <span className="text-foreground">
+                                        {testCase.input}
+                                      </span>
                                     </div>
                                   </div>
                                   <div className="bg-muted rounded p-2">
-                                    <div className="text-xs text-muted-foreground mb-1">Expected Output:</div>
+                                    <div className="text-xs text-muted-foreground mb-1">
+                                      Expected Output:
+                                    </div>
                                     <div className="text-sm font-mono">
-                                      <span className="text-foreground">{testCase.output}</span>
+                                      <span className="text-foreground">
+                                        {testCase.output}
+                                      </span>
                                     </div>
                                   </div>
                                   {testCaseResults[index] && (
                                     <div className="bg-muted rounded p-2">
-                                      <div className="text-xs text-muted-foreground mb-1">Output:</div>
+                                      <div className="text-xs text-muted-foreground mb-1">
+                                        Output:
+                                      </div>
                                       <div className="text-sm font-mono">
-                                        <span className={`${testCaseResults[index]?.success ? 'text-green-500' : 'text-red-500'}`}>
+                                        <span
+                                          className={`${testCaseResults[index]?.success ? "text-green-500" : "text-red-500"}`}
+                                        >
                                           {testCaseResults[index]?.output}
                                         </span>
                                       </div>

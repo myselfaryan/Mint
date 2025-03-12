@@ -118,7 +118,9 @@ export const createProblemSchema = z.object({
   allowedLanguages: z.array(z.string()),
 });
 
-export const updateProblemSchema = createProblemSchema.partial().omit({ code: true });
+export const updateProblemSchema = createProblemSchema
+  .partial()
+  .omit({ code: true });
 
 export const problemSchema = z.object({
   id: z.number().int().positive(),

@@ -55,10 +55,7 @@ export async function removeProblemFromContest(
   return await db.transaction(async (tx) => {
     // First, find the problem ID from the problem code
     const problem = await tx.query.problems.findFirst({
-      where: and(
-        eq(problems.orgId, orgId),
-        eq(problems.code, problemCode)
-      ),
+      where: and(eq(problems.orgId, orgId), eq(problems.code, problemCode)),
     });
 
     if (!problem) {
@@ -71,8 +68,8 @@ export async function removeProblemFromContest(
       .where(
         and(
           eq(contestProblems.contestId, contestId),
-          eq(contestProblems.problemId, problem.id)
-        )
+          eq(contestProblems.problemId, problem.id),
+        ),
       )
       .returning();
 
