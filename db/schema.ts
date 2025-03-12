@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -191,6 +192,17 @@ export const testCases = pgTable(
     };
   },
 );
+
+export const problemsRelations = relations(problems, ({ many }) => ({
+  testCases: many(testCases),
+}));
+
+export const testCasesRelations = relations(testCases, ({ one }) => ({
+  problem: one(problems, {
+    fields: [testCases.problemId],
+    references: [problems.id],
+  }),
+}));
 
 export const contestProblems = pgTable(
   "contest_problems",
