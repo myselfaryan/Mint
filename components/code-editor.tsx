@@ -68,6 +68,16 @@ export interface CodeEditorProps {
   problem?: Problem | null;
 }
 
+interface TestCase {
+  input: string;
+  output: string;
+}
+
+interface TestCaseResult {
+  output: string;
+  success: boolean;
+}
+
 export function CodeEditor({ problem }: CodeEditorProps) {
   if (!problem) {
     return <div className="p-4">Loading problem...</div>;
@@ -92,7 +102,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
   const [executionError, setExecutionError] = useState<string | null>(null);
 
   // Add this state to track test case results
-  const [testCaseResults, setTestCaseResults] = useState<{[key: number]: {output: string, success: boolean}}>({});
+  const [testCaseResults, setTestCaseResults] = useState<Record<number, TestCaseResult>>({});
 
   const languageVersions = {
     javascript: "18.15.0",
@@ -130,7 +140,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     }
   };
 
-  const runCode = async (testCaseInput: string) => {
+  const runCode = async (testCaseInput: string): Promise<{success: boolean, output: string}> => {
     console.log("Starting code execution...");
     setIsRunning(true);
     setOutput("");
@@ -189,7 +199,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
   };
 
   // Add this function to run a specific test case
-  const runTestCase = async (testCase: any, index: number) => {
+  const runTestCase = async (testCase: TestCase, index: number) => {
     if (isRunning) return;
     
     const result = await runCode(testCase.input);
@@ -223,7 +233,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     if (isRunning || !problem.testCases || problem.testCases.length === 0) return;
     
     setIsRunning(true);
-    const newResults = {};
+    const newResults: Record<number, TestCaseResult> = {};
     let passedCount = 0;
     
     for (let i = 0; i < problem.testCases.length; i++) {
