@@ -159,6 +159,15 @@ function SidebarSkeleton({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Add this new component near the RoleBadge component
+function ComingSoonBadge() {
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground dark:bg-muted/50">
+      coming soon
+    </span>
+  );
+}
+
 // First, let's remove the static data object and make it a function
 // that returns filtered items based on role
 const getNavItems = (role?: string) => {
@@ -174,6 +183,8 @@ const getNavItems = (role?: string) => {
       url: "groups",
       icon: Contact,
       allowedRoles: ["owner"],
+      disabled: true,
+      comingSoon: true,
       items: [],
     },
     {
@@ -400,16 +411,30 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        asChild
+                        asChild={!item.disabled}
                         tooltip={item.title}
-                        className={`hover:bg-accent hover:text-accent-foreground ${
-                          isActive ? "bg-accent text-accent-foreground" : ""
-                        }`}
+                        className={`
+                          ${item.disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-accent hover:text-accent-foreground"}
+                          ${isActive ? "bg-accent text-accent-foreground" : ""}
+                        `}
                       >
-                        <Link href={`${basePath}/${item.url}`}>
-                          {item.icon && <item.icon />}
-                          <span>{item.title}</span>
-                        </Link>
+                        {item.disabled ? (
+                          <div className="flex items-center w-full">
+                            {item.icon && <item.icon className="size-4 mr-2" />}
+                            <div className="flex items-center justify-between w-full">
+                              <span>{item.title}</span>
+                              {item.comingSoon && <ComingSoonBadge />}
+                            </div>
+                          </div>
+                        ) : (
+                          <Link
+                            href={`${basePath}/${item.url}`}
+                            className="flex items-center w-full"
+                          >
+                            {item.icon && <item.icon className="size-4 mr-2" />}
+                            <span>{item.title}</span>
+                          </Link>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
