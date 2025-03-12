@@ -1,0 +1,85 @@
+import { db } from "@/db/drizzle";
+import { problems, contestProblems } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
+import { getProblemIdFromCode } from "../../../../problems/service";
+
+export async function getContestProblem(contestId: number, problemCode: string) {
+  const problem = await db
+    .select({
+      id: problems.id,
+      code: problems.code,
+      title: problems.title,
+      description: problems.description,
+      allowedLanguages: problems.allowedLanguages,
+      order: contestProblems.order,
+    })
+    .from(contestProblems)
+    .innerJoin(problems, eq(problems.id, contestProblems.problemId))
+    .where(
+      and(
+        eq(contestProblems.contestId, contestId),
+        eq(problems.code, problemCode)
+      )
+    )
+    .limit(1);
+
+  if (!problem[0]) {
+    throw new Error("Problem not found");
+  }
+
+  return problem[0];
+}
+
+export async function updateContestProblem(
+  contestId: number,
+  problemCode: string,
+  order: number
+) {
+  return await db.transaction(async (tx) => {
+    // Get the problem ID from the code
+    const problemId = await getProblemIdFromCode(contestId, problemCode);
+
+    // Update the order
+    const [updated] = await tx
+      .update(contestProblems)
+      .set({ order })
+      .where(
+        and(
+          eq(contestProblems.contestId, contestId),
+          eq(contestProblems.problemId, problemId)
+        )
+      )
+      .returning();
+
+    if (!updated) {
+      throw new Error("Problem not found");
+    }
+
+    // Return the full problem details
+    return await getContestProblem(contestId, problemCode);
+  });
+}
+
+export async function removeContestProblem(contestId: number, problemCode: string) {
+  return await db.transaction(async (tx) => {
+    // Get the problem ID from the code
+    const problemId = await getProblemIdFromCode(contestId, problemCode);
+
+    // Delete the contest problem association
+    const [deleted] = await tx
+      .delete(contestProblems)
+      .where(
+        and(
+          eq(contestProblems.contestId, contestId),
+          eq(contestProblems.problemId, problemId)
+        )
+      )
+      .returning();
+
+    if (!deleted) {
+      throw new Error("Problem not found");
+    }
+
+    return deleted;
+  });
+} 
