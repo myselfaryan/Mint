@@ -218,6 +218,32 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     setOutput(`Passed ${passedCases} of ${totalCases} test cases`);
   };
 
+  // Add a function to run all test cases
+  const runAllTestCases = async () => {
+    if (isRunning || !problem.testCases || problem.testCases.length === 0) return;
+    
+    setIsRunning(true);
+    const newResults = {};
+    let passedCount = 0;
+    
+    for (let i = 0; i < problem.testCases.length; i++) {
+      const testCase = problem.testCases[i];
+      const result = await runCode(testCase.input);
+      const isSuccess = result.output.trim() === testCase.output.trim();
+      
+      newResults[i] = {
+        output: result.output,
+        success: isSuccess
+      };
+      
+      if (isSuccess) passedCount++;
+    }
+    
+    setTestCaseResults(newResults);
+    setOutput(`Passed ${passedCount} of ${problem.testCases.length} test cases`);
+    setIsRunning(false);
+  };
+
   const toggleFullscreen = () => {
     try {
       if (!document.fullscreenElement) {
@@ -286,6 +312,14 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                   </Select>
                 </div>
                 <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
+                    onClick={runAllTestCases}
+                    disabled={isRunning}
+                  >
+                    {isRunning ? "Running..." : "Run"}
+                  </Button>
                   <Button
                     variant="outline"
                     className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
@@ -364,14 +398,16 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                                       <span className="text-foreground">{testCase.output}</span>
                                     </div>
                                   </div>
-                                  <div className="bg-muted rounded p-2">
-                                    <div className="text-xs text-muted-foreground mb-1">Output:</div>
-                                    <div className="text-sm font-mono">
-                                      <span className={`${testCaseResults[index]?.success ? 'text-green-500' : 'text-red-500'}`}>
-                                        {testCaseResults[index]?.output || 'Not run yet'}
-                                      </span>
+                                  {testCaseResults[index] && (
+                                    <div className="bg-muted rounded p-2">
+                                      <div className="text-xs text-muted-foreground mb-1">Output:</div>
+                                      <div className="text-sm font-mono">
+                                        <span className={`${testCaseResults[index]?.success ? 'text-green-500' : 'text-red-500'}`}>
+                                          {testCaseResults[index]?.output}
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
+                                  )}
                                 </div>
                               </div>
                             ))
