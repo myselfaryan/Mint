@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { problems, contestProblems } from "@/db/schema";
+import { problems, contestProblems, testCases } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { getProblemIdFromCode } from "../../../../problems/service";
 
@@ -7,13 +7,10 @@ export async function getContestProblem(
   contestId: number,
   problemCode: string,
 ) {
-  const problem = await db
+  // First, find the problem ID from the contest problems
+  const contestProblemResult = await db
     .select({
-      id: problems.id,
-      code: problems.code,
-      title: problems.title,
-      description: problems.description,
-      allowedLanguages: problems.allowedLanguages,
+      problemId: contestProblems.problemId,
       order: contestProblems.order,
     })
     .from(contestProblems)
@@ -26,11 +23,42 @@ export async function getContestProblem(
     )
     .limit(1);
 
-  if (!problem[0]) {
+  if (!contestProblemResult[0]) {
     throw new Error("Problem not found");
   }
 
-  return problem[0];
+  const { problemId, order } = contestProblemResult[0];
+
+  // Then, get the problem with its example test cases
+  const problem = await db.query.problems.findFirst({
+    where: eq(problems.id, problemId),
+    columns: {
+      id: true,
+      code: true,
+      title: true,
+      description: true,
+      allowedLanguages: true,
+    },
+    with: {
+      testCases: {
+        where: eq(testCases.kind, "example"),
+        columns: {
+          input: true,
+          output: true,
+        },
+      },
+    },
+  });
+
+  if (!problem) {
+    throw new Error("Problem not found");
+  }
+
+  // Add the order from contest problems
+  return {
+    ...problem,
+    order,
+  };
 }
 
 export async function updateContestProblem(

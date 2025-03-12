@@ -50,12 +50,12 @@ const defaultCode = {
   python: `def solution(nums, target):
     # Your code here
     return []`,
-  cpp: `class Solution {
-public:
-    vector<int> missingRolls(vector<int>& rolls, int mean, int n) {
-        // Your code here
-    }
-};`,
+  cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  
+}`,
 };
 
 const extensions = {
@@ -66,6 +66,16 @@ const extensions = {
 
 export interface CodeEditorProps {
   problem?: Problem | null;
+}
+
+interface TestCase {
+  input: string;
+  output: string;
+}
+
+interface TestCaseResult {
+  output: string;
+  success: boolean;
 }
 
 export function CodeEditor({ problem }: CodeEditorProps) {
@@ -90,6 +100,11 @@ export function CodeEditor({ problem }: CodeEditorProps) {
   const [output, setOutput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
   const [executionError, setExecutionError] = useState<string | null>(null);
+
+  // Add this state to track test case results
+  const [testCaseResults, setTestCaseResults] = useState<
+    Record<number, TestCaseResult>
+  >({});
 
   const languageVersions = {
     javascript: "18.15.0",
@@ -127,7 +142,9 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     }
   };
 
-  const runCode = async () => {
+  const runCode = async (
+    testCaseInput: string,
+  ): Promise<{ success: boolean; output: string }> => {
     console.log("Starting code execution...");
     setIsRunning(true);
     setOutput("");
@@ -153,7 +170,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
               content: code,
             },
           ],
-          stdin: "",
+          stdin: testCaseInput + "\n", // Add newline to input
           args: [],
           compile_timeout: 10000,
           run_timeout: 5000,
@@ -164,26 +181,86 @@ export function CodeEditor({ problem }: CodeEditorProps) {
       console.log("Code execution result:", result);
 
       if (result.run?.output) {
-        setOutput(result.run.output);
+        return { success: true, output: result.run.output };
       } else if (result.compile?.output) {
-        setOutput(result.compile.output);
+        return { success: false, output: result.compile.output };
       } else if (result.message) {
-        setOutput(result.message);
+        return { success: false, output: result.message };
       } else if (result.error) {
         const errorMsg = `Execution Error: ${result.error}`;
         console.error(errorMsg);
-        setExecutionError(errorMsg);
-        setOutput(errorMsg);
+        return { success: false, output: errorMsg };
       }
+      return { success: false, output: "Unknown error" };
     } catch (error) {
       const errorMsg = `Runtime Error: ${(error as Error).message}`;
       console.error("Code execution failed:", error);
-      setExecutionError(errorMsg);
-      setOutput(errorMsg);
+      return { success: false, output: errorMsg };
     } finally {
       setIsRunning(false);
       console.log("Code execution completed");
     }
+  };
+
+  // Add this function to run a specific test case
+  const runTestCase = async (testCase: TestCase, index: number) => {
+    if (isRunning) return;
+
+    const result = await runCode(testCase.input);
+
+    // Update the results for this specific test case
+    setTestCaseResults((prev) => ({
+      ...prev,
+      [index]: {
+        output: result.output,
+        success: result.output.trim() === testCase.output.trim(),
+      },
+    }));
+
+    // Update the overall output summary
+    const updatedResults = {
+      ...testCaseResults,
+      [index]: {
+        output: result.output,
+        success: result.output.trim() === testCase.output.trim(),
+      },
+    };
+
+    const totalCases = problem.testCases?.length || 0;
+    const passedCases = Object.values(updatedResults).filter(
+      (r) => r.success,
+    ).length;
+
+    setOutput(`Passed ${passedCases} of ${totalCases} test cases`);
+  };
+
+  // Add a function to run all test cases
+  const runAllTestCases = async () => {
+    if (isRunning || !problem.testCases || problem.testCases.length === 0)
+      return;
+
+    setIsRunning(true);
+    const newResults: Record<number, TestCaseResult> = {};
+    let passedCount = 0;
+
+    for (let i = 0; i < problem.testCases.length; i++) {
+      const testCase = problem.testCases[i];
+      const result = await runCode(testCase.input);
+      const isSuccess = result.output.trim() === testCase.output.trim();
+
+      newResults[i] = {
+        output: result.output,
+        success: isSuccess,
+      };
+
+      if (isSuccess) passedCount++;
+    }
+
+    setTestCaseResults(newResults);
+    setOutput(
+      `Passed ${passedCount} of ${problem.testCases.length} test cases`,
+    );
+    setIsRunning(false);
   };
 
   const toggleFullscreen = () => {
@@ -257,7 +334,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                   <Button
                     variant="outline"
                     className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
-                    onClick={runCode}
+                    onClick={runAllTestCases}
                     disabled={isRunning}
                   >
                     {isRunning ? "Running..." : "Run"}
@@ -307,32 +384,71 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                           </h2>
                         </div>
                         <div className="p-2 space-y-2 overflow-auto flex-1">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 px-2 py-1">
-                              <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                              <span className="text-sm text-foreground">
-                                Case 1
-                              </span>
-                            </div>
-                            <div className="bg-muted rounded p-2">
-                              <div className="text-sm font-mono">
-                                <span className="text-foreground">121</span>
+                          {problem.testCases && problem.testCases.length > 0 ? (
+                            problem.testCases.map((testCase, index) => (
+                              <div key={index} className="space-y-2">
+                                <div className="flex items-center justify-between gap-2 px-2 py-1">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`h-2 w-2 rounded-full ${testCaseResults[index]?.success ? "bg-green-500" : testCaseResults[index] ? "bg-red-500" : "bg-muted"}`}
+                                    ></div>
+                                    <span className="text-sm text-foreground">
+                                      Case {index + 1}
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => runTestCase(testCase, index)}
+                                    disabled={isRunning}
+                                    className="h-7 text-xs"
+                                  >
+                                    Run
+                                  </Button>
+                                </div>
+                                <div className="space-y-1">
+                                  <div className="bg-muted rounded p-2">
+                                    <div className="text-xs text-muted-foreground mb-1">
+                                      Input:
+                                    </div>
+                                    <div className="text-sm font-mono">
+                                      <span className="text-foreground">
+                                        {testCase.input}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="bg-muted rounded p-2">
+                                    <div className="text-xs text-muted-foreground mb-1">
+                                      Expected Output:
+                                    </div>
+                                    <div className="text-sm font-mono">
+                                      <span className="text-foreground">
+                                        {testCase.output}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {testCaseResults[index] && (
+                                    <div className="bg-muted rounded p-2">
+                                      <div className="text-xs text-muted-foreground mb-1">
+                                        Output:
+                                      </div>
+                                      <div className="text-sm font-mono">
+                                        <span
+                                          className={`${testCaseResults[index]?.success ? "text-green-500" : "text-red-500"}`}
+                                        >
+                                          {testCaseResults[index]?.output}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+                            ))
+                          ) : (
+                            <div className="p-4 text-sm text-muted-foreground">
+                              No test cases available
                             </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 px-2 py-1">
-                              <div className="h-2 w-2 rounded-full bg-muted"></div>
-                              <span className="text-sm text-foreground">
-                                Case 2
-                              </span>
-                            </div>
-                            <div className="bg-muted rounded p-2">
-                              <div className="text-sm font-mono">
-                                <span className="text-foreground">-121</span>
-                              </div>
-                            </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     </ResizablePanel>

@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { problems, contestProblems } from "@/db/schema";
+import { problems, contestProblems, testCases } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { updateProblemSchema } from "@/lib/validations";
@@ -7,6 +7,15 @@ import { updateProblemSchema } from "@/lib/validations";
 export async function getProblem(orgId: number, code: string) {
   const problem = await db.query.problems.findFirst({
     where: and(eq(problems.orgId, orgId), eq(problems.code, code)),
+    with: {
+      testCases: {
+        where: eq(testCases.kind, "example"),
+        columns: {
+          input: true,
+          output: true,
+        },
+      },
+    },
   });
 
   if (!problem) {
