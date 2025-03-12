@@ -64,40 +64,6 @@ import Link from "next/link";
 import { AuthContext } from "@/contexts/auth-context";
 import { notFound } from "next/navigation";
 
-const data = {
-  navMain: [
-    {
-      title: "Users",
-      url: "users",
-      icon: Users,
-    },
-    {
-      title: "Groups",
-      url: "groups",
-      icon: Contact,
-      items: [],
-    },
-    {
-      title: "Contests",
-      url: "contests",
-      icon: Trophy,
-      items: [],
-    },
-    {
-      title: "Problems",
-      url: "problems",
-      icon: FileCode,
-      items: [],
-    },
-    {
-      title: "Submissions",
-      url: "submissions",
-      icon: FileCheck,
-      items: [],
-    },
-  ],
-};
-
 const defaultUser = {
   name: "shadcn",
   email: "m@example.com",
@@ -193,18 +159,57 @@ function SidebarSkeleton({ children }: { children: React.ReactNode }) {
   );
 }
 
+// First, let's remove the static data object and make it a function
+// that returns filtered items based on role
+const getNavItems = (role?: string) => {
+  const allItems = [
+    {
+      title: "Users",
+      url: "users",
+      icon: Users,
+      allowedRoles: ["owner", "admin"],
+    },
+    {
+      title: "Groups",
+      url: "groups",
+      icon: Contact,
+      allowedRoles: ["owner"],
+      items: [],
+    },
+    {
+      title: "Contests",
+      url: "contests",
+      icon: Trophy,
+      allowedRoles: ["owner", "admin", "member"],
+      items: [],
+    },
+    {
+      title: "Problems",
+      url: "problems",
+      icon: FileCode,
+      allowedRoles: ["owner", "admin"],
+      items: [],
+    },
+    {
+      title: "Submissions",
+      url: "submissions",
+      icon: FileCheck,
+      allowedRoles: ["owner", "admin"],
+      items: [],
+    },
+  ];
+
+  if (!role) return [];
+  return allItems.filter((item) => item.allowedRoles.includes(role));
+};
+
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const { logout, user, isAuthenticated, isLoading } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
   const pathName = usePathname();
-
-  // Get orgId from URL
   const orgId = pathname.split("/")[1];
 
-  console.log("orgId", orgId);
-
-  // Transform user orgs into teams format or use default teams
   const teams = useMemo(() => {
     if (user?.orgs && user.orgs.length > 0) {
       return user.orgs.map((org) => ({
@@ -215,13 +220,13 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     return [];
   }, [user?.orgs]);
 
-  console.log("teams in sidebar", teams);
+  const [activeTeam, setActiveTeam] = useState<(typeof teams)[0] | null>(() => {
+    const teamFromUrl = teams.find((team) => team.nameId === orgId);
+    return teamFromUrl || null;
+  });
 
-  // Check if the orgId exists in teams, if not return 404
+  // Move this useEffect up here with other hooks
   useEffect(() => {
-    console.log("404 check - orgId:", orgId, "type:", typeof orgId);
-    console.log("404 check - teams:", teams);
-    console.log("404 check - teams.length:", teams.length);
     if (
       isAuthenticated &&
       orgId &&
@@ -230,17 +235,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     ) {
       notFound();
     }
-    console.log("WTF");
-  }, [orgId, teams, isAuthenticated]);
-
-  // Set active team based on URL orgId
-  const [activeTeam, setActiveTeam] = useState<(typeof teams)[0] | null>(() => {
-    const teamFromUrl = teams.find((team) => team.nameId === orgId);
-    return teamFromUrl || null;
-  });
-
-  // Update activeTeam when URL changes or teams load
-  useEffect(() => {
     const teamFromUrl = teams.find((team) => team.nameId === orgId);
     if (
       teamFromUrl &&
@@ -248,26 +242,18 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     ) {
       setActiveTeam(teamFromUrl);
     }
-  }, [orgId, teams, activeTeam]);
+  }, [orgId, teams, activeTeam, isAuthenticated]);
 
-  // Handle team change with URL update
-  const handleTeamChange = (team: (typeof teams)[0]) => {
-    setActiveTeam(team);
-    // Get the current path segments after the org ID
-    const pathSegments = pathname.split("/").slice(2);
-    // Construct new path with new org ID and maintain the rest of the path
-    const newPath = `/${team.nameId}${pathSegments.length ? "/" + pathSegments.join("/") : ""}`;
-    router.push(newPath);
-  };
+  const currentOrgRole = useMemo(() => {
+    if (!activeTeam) return undefined;
+    return activeTeam.role;
+  }, [activeTeam]);
 
-  const handleLogout = () => {
-    logout();
-  };
+  const navItems = useMemo(() => {
+    return getNavItems(currentOrgRole);
+  }, [currentOrgRole]);
 
-  console.log("NEXT_PUBLIC_DEBUG", process.env.NEXT_PUBLIC_DEBUG);
-  console.log("user", user);
-  console.log("isLoading", isLoading);
-
+  // Conditional returns can now come after all hooks
   if (isLoading) {
     return <SidebarSkeleton>{children}</SidebarSkeleton>;
   }
@@ -294,6 +280,24 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         .join(" "),
     }));
   };
+
+  // Handle team change with URL update
+  const handleTeamChange = (team: (typeof teams)[0]) => {
+    setActiveTeam(team);
+    // Get the current path segments after the org ID
+    const pathSegments = pathname.split("/").slice(2);
+    // Construct new path with new org ID and maintain the rest of the path
+    const newPath = `/${team.nameId}${pathSegments.length ? "/" + pathSegments.join("/") : ""}`;
+    router.push(newPath);
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  console.log("NEXT_PUBLIC_DEBUG", process.env.NEXT_PUBLIC_DEBUG);
+  console.log("user", user);
+  console.log("isLoading", isLoading);
 
   return (
     <ThemeProvider>
@@ -367,7 +371,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             <SidebarGroup>
               <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
               <SidebarMenu>
-                {data.navMain.map((item) => {
+                {navItems.map((item) => {
                   const isActive = pathname.includes(`${basePath}/${item.url}`);
                   return (
                     <SidebarMenuItem key={item.title}>
