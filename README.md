@@ -120,11 +120,43 @@ All test users are created with password: `password123`
 ```bash
 mint/
 ├── app/            # Next.js app router pages
+│   ├── api-doc/    # Swagger API documentation
+│   └── api/       # API routes
 ├── components/     # React components
 ├── db/            # Database schema and migrations
 ├── lib/           # Utility functions and shared logic
+├── middleware/    # Request middleware (logging, metrics, error handling)
 ├── public/        # Static assets
 └── scripts/       # CLI scripts for development
+```
+
+## Monitoring
+
+The application includes built-in monitoring with Prometheus metrics:
+
+- HTTP request counts and durations
+- Active user counts
+- Database query durations
+
+Metrics are available at: `http://localhost:3000/api/metrics`
+
+### Available Metrics
+
+- `http_requests_total`: Counter of HTTP requests
+- `http_request_duration_ms`: Histogram of HTTP request durations
+- `active_users`: Gauge of currently active users
+- `db_query_duration_ms`: Histogram of database query durations
+
+### Prometheus Configuration
+
+Add to your `prometheus.yml`:
+
+```yaml
+scrape_configs:
+  - job_name: 'mint'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/api/metrics'
 ```
 
 ## Troubleshooting
@@ -169,3 +201,28 @@ bun db:seed
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## API Documentation
+
+The API documentation is available at `/api-doc` when running the development server.
+It provides:
+
+- Interactive API documentation
+- Request/response examples
+- API endpoint testing interface
+
+### Adding Documentation
+
+Add JSDoc comments with Swagger annotations to your API routes:
+
+```typescript
+/**
+ * @swagger
+ * /api/your-endpoint:
+ *   get:
+ *     summary: Endpoint description
+ *     responses:
+ *       200:
+ *         description: Success response
+ */
+```
