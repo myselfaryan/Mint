@@ -1,81 +1,72 @@
 "use client";
-import Charts from "@/components/statstable";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/auth-context";
+import { useOrgStats } from "@/hooks/use-org-stats";
+import { useParams } from "next/navigation";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import StatCard from "@/components/stat-card";
 
-interface ChartData {
-  submissions: {
-    total: number;
-    weeklyData: Array<{
-      date: string;
-      steps: number;
-    }>;
-    weeklyTotal: number;
-  };
-  upcomingContest: {
-    count: number;
-    variability: number;
-    weeklyData: Array<{
-      date: string;
-      resting: number;
-    }>;
-  };
-  contestDetails: {
-    currentYear: {
-      year: string;
-      contestsPerDay: number;
-    };
-    previousYear: {
-      year: string;
-      contestsPerDay: number;
-    };
-  };
+function StatsLoadingSkeleton() {
+  return (
+    <div className="container mx-auto max-w-5xl py-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="p-4 border rounded-lg">
+            <Skeleton className="h-4 w-24 mb-2" />
+            <Skeleton className="h-8 w-16" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function GraphicsPage() {
-  const chartData: ChartData = {
-    submissions: {
-      total: 12584,
-      weeklyData: [
-        { date: "2024-01-01", steps: 2000 },
-        { date: "2024-01-02", steps: 2100 },
-        { date: "2024-01-03", steps: 2200 },
-        { date: "2024-01-04", steps: 2300 },
-        { date: "2024-01-05", steps: 2400 },
-        { date: "2024-01-06", steps: 2500 },
-        { date: "2024-01-07", steps: 2600 },
-        // ... more data
-      ],
-      weeklyTotal: 5305,
-    },
-    upcomingContest: {
-      count: 62,
-      variability: 35,
-      weeklyData: [
-        { date: "2024-01-01", resting: 62 },
-        { date: "2024-01-02", resting: 63 },
-        { date: "2024-01-03", resting: 64 },
-        { date: "2024-01-04", resting: 65 },
-        { date: "2024-01-05", resting: 66 },
-        { date: "2024-01-06", resting: 67 },
-        { date: "2024-01-07", resting: 68 },
+  const { user } = useContext(AuthContext);
+  const params = useParams();
+  const orgId = params.orgId as string;
 
-        // ... more data
-      ],
-    },
-    contestDetails: {
-      currentYear: {
-        year: "2024",
-        contestsPerDay: 12453,
-      },
-      previousYear: {
-        year: "2023",
-        contestsPerDay: 10103,
-      },
-    },
-  };
+  const currentOrg = user?.orgs.find((org) => org.nameId === orgId);
+  const { stats, loading, error } = useOrgStats(orgId, currentOrg?.role);
+
+  if (loading) return <StatsLoadingSkeleton />;
+  if (error)
+    return (
+      <Alert variant="destructive" className="max-w-lg mx-auto my-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
 
   return (
-    <div>
-      <Charts data={chartData} />
+    <div className="container mx-auto max-w-5xl py-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <StatCard
+          heading="Total Contests"
+          value={stats.totalContests}
+          unit="contests"
+        />
+        <StatCard
+          heading="Upcoming Contests"
+          value={stats.upcomingContests}
+          unit="contests"
+        />
+        <StatCard
+          heading="Ended Contests"
+          value={stats.endedContests}
+          unit="contests"
+        />
+        {currentOrg?.role === "owner" && (
+          <StatCard
+            heading="Total Members"
+            value={stats.totalMembers}
+            unit="members"
+          />
+        )}
+      </div>
     </div>
   );
 }
