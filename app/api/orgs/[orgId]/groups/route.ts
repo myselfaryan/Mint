@@ -26,28 +26,26 @@ export async function POST(
 ) {
   try {
     // console.log("request",await request.json());
-   
-    
+
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     const requestData = await request.json();
-    console.log("request data",requestData);
-    
+    console.log("request data", requestData);
+
     // Rename 'users' to 'emails' in the request data
     const { users, ...restRequestData } = requestData;
     const processedData = {
       ...restRequestData,
       emails: users, // Rename 'users' to 'emails'
     };
-    console.log("emails",processedData.emails);
-    console.log("emails",restRequestData);
-    
+    console.log("emails", processedData.emails);
+    console.log("emails", restRequestData);
+
     // Now validate with your schema
     const { emails, ...rest } = createGroupSchema.parse(processedData);
-    
+
     console.log("emails", emails);
     console.log("rest", rest);
-    
-    
+
     const group = await groupsService.createGroup(orgId, rest);
 
     if (emails) {

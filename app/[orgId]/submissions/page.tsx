@@ -30,8 +30,8 @@ export default function SubmissionsPage({
   const fetchSubmissions = useCallback(async () => {
     try {
       const response = await fetch(`/api/orgs/${params.orgId}/submissions`);
-      console.log('submission',response);
-      
+      console.log("submission", response);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(formatValidationErrors(errorData));

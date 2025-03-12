@@ -46,8 +46,8 @@ export async function updateGroupMembers(
       .where(and(eq(groups.id, groupId), eq(groups.orgId, orgId)))
       .limit(1);
 
-      console.log("group selected",group);
-      
+    console.log("group selected", group);
+
     if (group.length === 0) {
       throw new Error("Group not found");
     }
@@ -58,11 +58,11 @@ export async function updateGroupMembers(
       .from(users)
       .where(inArray(users.email, emails));
 
-      console.log("users to keep",users_to_keep);
-      
+    console.log("users to keep", users_to_keep);
+
     const user_ids_to_keep = users_to_keep.map((u) => u.id);
 
-    console.log("users ids to keep",user_ids_to_keep);
+    console.log("users ids to keep", user_ids_to_keep);
     // Remove members not in the new list
     await tx
       .delete(groupMemberships)
