@@ -2,12 +2,12 @@ import { db } from "@/db/drizzle";
 import { users } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { generateUsername } from "@/lib/username";
-import * as readline from 'readline';
+import * as readline from "readline";
 
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   return new Promise((resolve) => {
@@ -24,7 +24,7 @@ async function main() {
 
     // Get email
     const email = await prompt("Enter email: ");
-    if (!email.includes('@')) {
+    if (!email.includes("@")) {
       throw new Error("Invalid email address");
     }
 
@@ -45,13 +45,16 @@ async function main() {
 
     // Create user
     const hashedPassword = await hashPassword(password);
-    const [user] = await db.insert(users).values({
-      nameId,
-      name: email.split('@')[0], // Use part before @ as name
-      email,
-      hashedPassword,
-      isSuperuser: true,
-    }).returning();
+    const [user] = await db
+      .insert(users)
+      .values({
+        nameId,
+        name: email.split("@")[0], // Use part before @ as name
+        email,
+        hashedPassword,
+        isSuperuser: true,
+      })
+      .returning();
 
     console.log("\nSuperuser created successfully!");
     console.log("Username:", nameId);
@@ -59,7 +62,10 @@ async function main() {
 
     process.exit(0);
   } catch (error) {
-    console.error("\nFailed to create superuser:", error instanceof Error ? error.message : error);
+    console.error(
+      "\nFailed to create superuser:",
+      error instanceof Error ? error.message : error,
+    );
     process.exit(1);
   }
 }

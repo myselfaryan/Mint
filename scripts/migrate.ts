@@ -1,12 +1,12 @@
-import { execSync } from 'child_process';
+import { execSync } from "child_process";
 
 function main() {
   try {
     console.log("\n🔄 Generating migrations...");
-    execSync('bunx drizzle-kit generate', { stdio: 'inherit' });
+    execSync("bunx drizzle-kit generate", { stdio: "inherit" });
 
     console.log("\n⬆️  Applying migrations...");
-    execSync('bunx drizzle-kit push', { stdio: 'inherit' });
+    execSync("bunx drizzle-kit push", { stdio: "inherit" });
 
     console.log("\n✅ Database migrations completed successfully!");
   } catch (error) {

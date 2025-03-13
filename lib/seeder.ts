@@ -55,7 +55,7 @@ export async function seedDatabase(config = seedConfig) {
       return false;
     }
     */
-    
+
     // Create users
     const users = await createUsers(config.users);
     const orgs = await createOrganizations(config.organizations, users);
@@ -129,7 +129,7 @@ async function createOrganizations(
     admins: SelectUser[];
     organizers: SelectUser[];
     members: SelectUser[];
-  }
+  },
 ) {
   const createdOrgs = [];
 
@@ -167,12 +167,12 @@ async function createOrganizations(
 }
 
 async function createOrgMemberships(
-  orgId: number, 
+  orgId: number,
   users: {
     admins: SelectUser[];
     organizers: SelectUser[];
     members: SelectUser[];
-  }
+  },
 ) {
   const membershipValues = [
     // Assign first admin as owner
@@ -247,8 +247,8 @@ async function createContests(
         ),
         organizerId: orgId,
         organizerKind: "org",
-        allowList: [],     // Add missing required fields
-        disallowList: [],  // Add missing required fields
+        allowList: [], // Add missing required fields
+        disallowList: [], // Add missing required fields
       })
       .returning();
 
@@ -287,10 +287,12 @@ async function createGroups(
       .returning();
 
     // Add random members to group
-    const memberUsers = users.members.slice(0, membersPerGroup).map((user: SelectUser) => ({
-      groupId: group.id,
-      userId: user.id,
-    }));
+    const memberUsers = users.members
+      .slice(0, membersPerGroup)
+      .map((user: SelectUser) => ({
+        groupId: group.id,
+        userId: user.id,
+      }));
 
     await db.insert(groupMemberships).values(memberUsers);
   }

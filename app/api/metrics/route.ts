@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
-import { metrics } from "@/lib/metrics"
+import { NextResponse } from "next/server";
+import { metrics } from "@/lib/metrics";
 
 /**
  * @swagger
@@ -22,12 +22,12 @@ import { metrics } from "@/lib/metrics"
  *               # TYPE http_request_duration_ms histogram
  *               http_request_duration_ms_bucket{method="GET",path="/api/metrics",le="10"} 1
  */
-export const runtime = 'edge'
+export const runtime = "edge";
 
 export async function GET() {
   return new NextResponse(metrics.getMetrics(), {
     headers: {
-      'Content-Type': 'text/plain; version=0.0.4',
+      "Content-Type": "text/plain; version=0.0.4",
     },
-  })
+  });
 }

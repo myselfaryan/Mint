@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
-const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
+const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
 
 type Props = {
   spec: Record<string, any>;
