@@ -11,6 +11,8 @@ import {
   groupMemberships,
   sessionTable,
   SelectUser,
+  SelectProblem,
+  testCases,
 } from "@/db/schema";
 import { hashPassword } from "./password";
 
@@ -24,13 +26,14 @@ const seedConfig = {
   },
   organizations: {
     count: 3,
-    problemsPerOrg: 2,
-    contestsPerOrg: 2,
+    problemsPerOrg: 5,
+    contestsPerOrg: 3,
     groupsPerOrg: 2,
     membersPerGroup: 3,
   },
   contests: {
-    problemsPerContest: 2,
+    count: 3,
+    problemsPerContest: 3,
     // Contest time windows in milliseconds
     timeWindows: {
       registration: {
@@ -44,6 +47,221 @@ const seedConfig = {
     },
   },
 };
+
+// First, let's define realistic problem templates
+const problemTemplates = [
+  {
+    title: "Sum of Two Numbers",
+    description: `# Sum of Two Numbers
+
+## Problem Statement
+Write a program that takes two integers as input and outputs their sum.
+
+## Input Format
+The input consists of a single line containing two space-separated integers, a and b.
+
+## Output Format
+Output a single integer, the sum of a and b.
+
+## Constraints
+- -1000 ≤ a, b ≤ 1000
+
+## Example
+### Input
+\`\`\`
+3 5
+\`\`\`
+
+### Output
+\`\`\`
+8
+\`\`\``,
+    testCases: [
+      { input: "3 5", output: "8", kind: "example" },
+      { input: "10 20", output: "30", kind: "example" },
+      { input: "-5 8", output: "3", kind: "example" },
+      { input: "0 0", output: "0", kind: "test" },
+      { input: "-10 -20", output: "-30", kind: "test" },
+      { input: "999 1", output: "1000", kind: "test" },
+    ],
+  },
+  {
+    title: "Product of Three Numbers",
+    description: `# Product of Three Numbers
+
+## Problem Statement
+Write a program that takes three integers as input and outputs their product.
+
+## Input Format
+The input consists of a single line containing three space-separated integers: a, b, and c.
+
+## Output Format
+Output a single integer, the product of a, b, and c.
+
+## Constraints
+- -100 ≤ a, b, c ≤ 100
+
+## Example
+### Input
+\`\`\`
+2 3 4
+\`\`\`
+
+### Output
+\`\`\`
+24
+\`\`\``,
+    testCases: [
+      { input: "2 3 4", output: "24", kind: "example" },
+      { input: "1 5 10", output: "50", kind: "example" },
+      { input: "-2 3 -4", output: "24", kind: "example" },
+      { input: "0 5 10", output: "0", kind: "test" },
+      { input: "-1 -1 -1", output: "-1", kind: "test" },
+      { input: "10 10 10", output: "1000", kind: "test" },
+    ],
+  },
+  {
+    title: "Maximum of Three Numbers",
+    description: `# Maximum of Three Numbers
+
+## Problem Statement
+Write a program that takes three integers as input and outputs the maximum value among them.
+
+## Input Format
+The input consists of a single line containing three space-separated integers: a, b, and c.
+
+## Output Format
+Output a single integer, the maximum value among a, b, and c.
+
+## Constraints
+- -1000 ≤ a, b, c ≤ 1000
+
+## Example
+### Input
+\`\`\`
+5 2 8
+\`\`\`
+
+### Output
+\`\`\`
+8
+\`\`\``,
+    testCases: [
+      { input: "5 2 8", output: "8", kind: "example" },
+      { input: "10 10 5", output: "10", kind: "example" },
+      { input: "-5 -2 -10", output: "-2", kind: "example" },
+      { input: "0 0 0", output: "0", kind: "test" },
+      { input: "999 998 997", output: "999", kind: "test" },
+      { input: "-50 -20 -30", output: "-20", kind: "test" },
+    ],
+  },
+  {
+    title: "Fibonacci Number",
+    description: `# Fibonacci Number
+
+## Problem Statement
+Write a program that calculates the nth Fibonacci number. The Fibonacci sequence starts with 0 and 1, and each subsequent number is the sum of the two preceding ones.
+
+## Input Format
+The input consists of a single integer n.
+
+## Output Format
+Output the nth Fibonacci number.
+
+## Constraints
+- 0 ≤ n ≤ 30
+
+## Example
+### Input
+\`\`\`
+5
+\`\`\`
+
+### Output
+\`\`\`
+5
+\`\`\`
+
+### Explanation
+The Fibonacci sequence starts: 0, 1, 1, 2, 3, 5, 8, ...
+So the 5th Fibonacci number is 5.`,
+    testCases: [
+      { input: "5", output: "5", kind: "example" },
+      { input: "0", output: "0", kind: "example" },
+      { input: "10", output: "55", kind: "example" },
+      { input: "1", output: "1", kind: "test" },
+      { input: "20", output: "6765", kind: "test" },
+      { input: "15", output: "610", kind: "test" },
+    ],
+  },
+  {
+    title: "Prime Number Check",
+    description: `# Prime Number Check
+
+## Problem Statement
+Write a program that determines whether a given number is prime or not.
+
+## Input Format
+The input consists of a single integer n.
+
+## Output Format
+Output "Yes" if n is prime, and "No" otherwise.
+
+## Constraints
+- 1 ≤ n ≤ 10^6
+
+## Example
+### Input
+\`\`\`
+7
+\`\`\`
+
+### Output
+\`\`\`
+Yes
+\`\`\`
+
+### Note
+A prime number is a natural number greater than 1 that is not divisible by any positive integer other than 1 and itself.`,
+    testCases: [
+      { input: "7", output: "Yes", kind: "example" },
+      { input: "4", output: "No", kind: "example" },
+      { input: "1", output: "No", kind: "example" },
+      { input: "2", output: "Yes", kind: "test" },
+      { input: "997", output: "Yes", kind: "test" },
+      { input: "100", output: "No", kind: "test" },
+    ],
+  },
+];
+
+// Contest templates with realistic names and descriptions
+const contestTemplates = [
+  {
+    name: "Algorithmic Programming Challenge",
+    description: "A competitive programming contest focusing on algorithmic problem-solving skills.",
+    rules: "Standard ACM-ICPC rules apply. Each incorrect submission adds a 20-minute penalty.",
+  },
+  {
+    name: "Annual Coding Competition",
+    description: "Our yearly coding competition open to all students and professionals.",
+    rules: "Participants can use any programming language supported by the platform. Internet access is allowed for documentation only.",
+  },
+  {
+    name: "University Programming Olympiad",
+    description: "A prestigious competition for university students to showcase their programming talents.",
+    rules: "Teams of up to 3 members can participate. The team with the most solved problems wins.",
+  },
+  {
+    name: "Data Structures and Algorithms Contest",
+    description: "Test your knowledge of fundamental data structures and algorithms in this challenging contest.",
+    rules: "Individual participation only. Submissions are evaluated based on correctness and efficiency.",
+  },
+  {
+    name: "Hackathon Challenge",
+    description: "A 24-hour coding marathon to solve real-world problems through innovative solutions.",
+    rules: "Participants must submit their code and a brief presentation of their solution.",
+  },
+];
 
 export async function seedDatabase(config = seedConfig) {
   try {
@@ -199,63 +417,91 @@ async function createOrgMemberships(
 }
 
 async function createProblems(orgId: number, count: number) {
-  const createdProblems: Array<typeof problems.$inferSelect> = [];
+  const createdProblems: Array<SelectProblem> = [];
 
+  // Use problem templates to create more realistic problems
   for (let i = 0; i < count; i++) {
+    // Select a template (cycling through them if count > templates.length)
+    const template = problemTemplates[i % problemTemplates.length];
+    
     const [problem] = await db
       .insert(problems)
       .values({
         code: `problem-${orgId}-${i + 1}`,
-        title: `Problem ${i + 1}`,
-        description: `This is test problem ${i + 1} for organization ${orgId}`,
-        allowedLanguages: ["python", "javascript"],
+        title: template.title,
+        description: template.description,
+        allowedLanguages: ["python", "javascript", "cpp"],
         orgId,
       })
       .returning();
     createdProblems.push(problem);
+    
+    // Create test cases for this problem
+    await createTestCases(problem.id, template.testCases);
   }
 
   return createdProblems;
 }
 
+async function createTestCases(problemId: number, testCaseData: Array<{input: string, output: string, kind: string}>) {
+  const testCaseValues = testCaseData.map(tc => ({
+    problemId,
+    input: tc.input,
+    output: tc.output,
+    kind: tc.kind,
+  }));
+  
+  await db.insert(testCases).values(testCaseValues);
+}
+
 async function createContests(
   orgId: number,
-  problems: Array<typeof problems.$inferSelect>,
+  problemsList: Array<SelectProblem>,
   contestConfig: typeof seedConfig.contests,
 ) {
   const now = new Date();
-
-  for (let i = 0; i < contestConfig.problemsPerContest; i++) {
+  
+  // Create multiple contests with different time schedules
+  for (let i = 0; i < contestConfig.count; i++) {
+    // Select a template (cycling through them if count > templates.length)
+    const template = contestTemplates[i % contestTemplates.length];
+    
+    // Create different time schedules for each contest
+    const registrationStart = new Date(now);
+    registrationStart.setDate(registrationStart.getDate() - 7 + i); // Stagger registration starts
+    
+    const registrationEnd = new Date(registrationStart);
+    registrationEnd.setDate(registrationEnd.getDate() + 5); // 5-day registration period
+    
+    const contestStart = new Date(registrationEnd);
+    contestStart.setHours(contestStart.getHours() + 2); // 2 hours after registration ends
+    
+    const contestEnd = new Date(contestStart);
+    contestEnd.setHours(contestEnd.getHours() + 3); // 3-hour contest
+    
     const [contest] = await db
       .insert(contests)
       .values({
         nameId: `contest-${orgId}-${i + 1}`,
-        name: `Contest ${i + 1}`,
-        description: `This is test contest ${i + 1} for organization ${orgId}`,
-        rules: "Standard contest rules apply",
-        registrationStartTime: new Date(
-          now.getTime() + contestConfig.timeWindows.registration.start,
-        ),
-        registrationEndTime: new Date(
-          now.getTime() + contestConfig.timeWindows.registration.end,
-        ),
-        startTime: new Date(
-          now.getTime() + contestConfig.timeWindows.contest.start,
-        ),
-        endTime: new Date(
-          now.getTime() + contestConfig.timeWindows.contest.end,
-        ),
+        name: template.name,
+        description: template.description,
+        rules: template.rules,
+        registrationStartTime: registrationStart,
+        registrationEndTime: registrationEnd,
+        startTime: contestStart,
+        endTime: contestEnd,
         organizerId: orgId,
         organizerKind: "org",
-        allowList: [],     // Add missing required fields
-        disallowList: [],  // Add missing required fields
+        allowList: [],
+        disallowList: [],
       })
       .returning();
 
-    // Add problems to contest
-    const contestProblemsData = problems
-      .slice(0, contestConfig.problemsPerContest)
-      .map((problem, index) => ({
+    // Add problems to contest - select a subset of problems for each contest
+    const startIdx = i % Math.max(1, problemsList.length - contestConfig.problemsPerContest);
+    const contestProblemsData = problemsList
+      .slice(startIdx, startIdx + contestConfig.problemsPerContest)
+      .map((problem: SelectProblem, index: number) => ({
         contestId: contest.id,
         problemId: problem.id,
         order: index,
