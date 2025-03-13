@@ -163,10 +163,18 @@ export default function UsersPage({
       const result = await response.json();
       await fetchUsers();
 
-      // Show failures if any
       const failedCount = result.results?.filter(
         (r: any) => r.status === "error",
       ).length;
+
+      if (failedCount > 0) {
+        console.error("Failed imports details:", {
+          failures: result.results.filter((r: any) => r.status === "error"),
+          stackTraces: result.results
+            .filter((r: any) => r.status === "error")
+            .map((r: any) => ({ email: r.email, error: r.error })),
+        });
+      }
 
       toast({
         variant: failedCount > 0 ? "destructive" : "default",
@@ -177,7 +185,10 @@ export default function UsersPage({
             : result.message,
       });
     } catch (error) {
-      console.error("Error uploading CSV:", error);
+      console.error("Error uploading CSV:", {
+        error,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       toast({
         variant: "destructive",
         title: "Error",

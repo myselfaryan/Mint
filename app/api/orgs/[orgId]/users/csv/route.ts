@@ -116,25 +116,47 @@ export async function POST(
             membership,
           };
         } catch (error) {
+          console.error("Error processing user:", {
+            email: user.email,
+            error,
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+
+          // Handle specific error types
+          let errorMessage = "Unknown error";
+          if (error instanceof Error) {
+            if (error.message === "User not found") {
+              errorMessage = `User ${user.email} needs to register first before being invited`;
+            } else {
+              errorMessage = error.message;
+            }
+          }
+
           return {
             email: user.email,
             status: "error",
-            error: error instanceof Error ? error.message : "Unknown error",
+            error: errorMessage,
           };
         }
       }),
     );
 
-    // Prepare response
+    // Prepare response with more details
     const successful = results.filter(
       (r) => r.status === "fulfilled" && r.value.status === "success",
     ).length;
     const failed = results.filter(
       (r) => r.status === "rejected" || r.value.status === "error",
     ).length;
+    const notFound = results.filter(
+      (r) =>
+        r.status === "fulfilled" &&
+        r.value.status === "error" &&
+        r.value.error.includes("needs to register first"),
+    ).length;
 
     return NextResponse.json({
-      message: `Processed ${users.length} users (${successful} successful, ${failed} failed)`,
+      message: `Processed ${users.length} users (${successful} successful, ${failed} failed, ${notFound} need to register)`,
       results: results.map((r) =>
         r.status === "fulfilled"
           ? r.value
@@ -142,7 +164,10 @@ export async function POST(
       ),
     });
   } catch (error) {
-    console.error("Error processing CSV:", error);
+    console.error("Error processing CSV:", {
+      error,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       {
         message:
