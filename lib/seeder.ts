@@ -238,28 +238,38 @@ A prime number is a natural number greater than 1 that is not divisible by any p
 const contestTemplates = [
   {
     name: "Algorithmic Programming Challenge",
-    description: "A competitive programming contest focusing on algorithmic problem-solving skills.",
-    rules: "Standard ACM-ICPC rules apply. Each incorrect submission adds a 20-minute penalty.",
+    description:
+      "A competitive programming contest focusing on algorithmic problem-solving skills.",
+    rules:
+      "Standard ACM-ICPC rules apply. Each incorrect submission adds a 20-minute penalty.",
   },
   {
     name: "Annual Coding Competition",
-    description: "Our yearly coding competition open to all students and professionals.",
-    rules: "Participants can use any programming language supported by the platform. Internet access is allowed for documentation only.",
+    description:
+      "Our yearly coding competition open to all students and professionals.",
+    rules:
+      "Participants can use any programming language supported by the platform. Internet access is allowed for documentation only.",
   },
   {
     name: "University Programming Olympiad",
-    description: "A prestigious competition for university students to showcase their programming talents.",
-    rules: "Teams of up to 3 members can participate. The team with the most solved problems wins.",
+    description:
+      "A prestigious competition for university students to showcase their programming talents.",
+    rules:
+      "Teams of up to 3 members can participate. The team with the most solved problems wins.",
   },
   {
     name: "Data Structures and Algorithms Contest",
-    description: "Test your knowledge of fundamental data structures and algorithms in this challenging contest.",
-    rules: "Individual participation only. Submissions are evaluated based on correctness and efficiency.",
+    description:
+      "Test your knowledge of fundamental data structures and algorithms in this challenging contest.",
+    rules:
+      "Individual participation only. Submissions are evaluated based on correctness and efficiency.",
   },
   {
     name: "Hackathon Challenge",
-    description: "A 24-hour coding marathon to solve real-world problems through innovative solutions.",
-    rules: "Participants must submit their code and a brief presentation of their solution.",
+    description:
+      "A 24-hour coding marathon to solve real-world problems through innovative solutions.",
+    rules:
+      "Participants must submit their code and a brief presentation of their solution.",
   },
 ];
 
@@ -273,7 +283,7 @@ export async function seedDatabase(config = seedConfig) {
       return false;
     }
     */
-    
+
     // Create users
     const users = await createUsers(config.users);
     const orgs = await createOrganizations(config.organizations, users);
@@ -347,7 +357,7 @@ async function createOrganizations(
     admins: SelectUser[];
     organizers: SelectUser[];
     members: SelectUser[];
-  }
+  },
 ) {
   const createdOrgs = [];
 
@@ -385,12 +395,12 @@ async function createOrganizations(
 }
 
 async function createOrgMemberships(
-  orgId: number, 
+  orgId: number,
   users: {
     admins: SelectUser[];
     organizers: SelectUser[];
     members: SelectUser[];
-  }
+  },
 ) {
   const membershipValues = [
     // Assign first admin as owner
@@ -423,7 +433,7 @@ async function createProblems(orgId: number, count: number) {
   for (let i = 0; i < count; i++) {
     // Select a template (cycling through them if count > templates.length)
     const template = problemTemplates[i % problemTemplates.length];
-    
+
     const [problem] = await db
       .insert(problems)
       .values({
@@ -435,7 +445,7 @@ async function createProblems(orgId: number, count: number) {
       })
       .returning();
     createdProblems.push(problem);
-    
+
     // Create test cases for this problem
     await createTestCases(problem.id, template.testCases);
   }
@@ -443,14 +453,17 @@ async function createProblems(orgId: number, count: number) {
   return createdProblems;
 }
 
-async function createTestCases(problemId: number, testCaseData: Array<{input: string, output: string, kind: string}>) {
-  const testCaseValues = testCaseData.map(tc => ({
+async function createTestCases(
+  problemId: number,
+  testCaseData: Array<{ input: string; output: string; kind: string }>,
+) {
+  const testCaseValues = testCaseData.map((tc) => ({
     problemId,
     input: tc.input,
     output: tc.output,
     kind: tc.kind,
   }));
-  
+
   await db.insert(testCases).values(testCaseValues);
 }
 
@@ -460,25 +473,25 @@ async function createContests(
   contestConfig: typeof seedConfig.contests,
 ) {
   const now = new Date();
-  
+
   // Create multiple contests with different time schedules
   for (let i = 0; i < contestConfig.count; i++) {
     // Select a template (cycling through them if count > templates.length)
     const template = contestTemplates[i % contestTemplates.length];
-    
+
     // Create different time schedules for each contest
     const registrationStart = new Date(now);
     registrationStart.setDate(registrationStart.getDate() - 7 + i); // Stagger registration starts
-    
+
     const registrationEnd = new Date(registrationStart);
     registrationEnd.setDate(registrationEnd.getDate() + 5); // 5-day registration period
-    
+
     const contestStart = new Date(registrationEnd);
     contestStart.setHours(contestStart.getHours() + 2); // 2 hours after registration ends
-    
+
     const contestEnd = new Date(contestStart);
     contestEnd.setHours(contestEnd.getHours() + 3); // 3-hour contest
-    
+
     const [contest] = await db
       .insert(contests)
       .values({
@@ -498,7 +511,8 @@ async function createContests(
       .returning();
 
     // Add problems to contest - select a subset of problems for each contest
-    const startIdx = i % Math.max(1, problemsList.length - contestConfig.problemsPerContest);
+    const startIdx =
+      i % Math.max(1, problemsList.length - contestConfig.problemsPerContest);
     const contestProblemsData = problemsList
       .slice(startIdx, startIdx + contestConfig.problemsPerContest)
       .map((problem: SelectProblem, index: number) => ({
@@ -533,10 +547,12 @@ async function createGroups(
       .returning();
 
     // Add random members to group
-    const memberUsers = users.members.slice(0, membersPerGroup).map((user: SelectUser) => ({
-      groupId: group.id,
-      userId: user.id,
-    }));
+    const memberUsers = users.members
+      .slice(0, membersPerGroup)
+      .map((user: SelectUser) => ({
+        groupId: group.id,
+        userId: user.id,
+      }));
 
     await db.insert(groupMemberships).values(memberUsers);
   }

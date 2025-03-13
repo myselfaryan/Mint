@@ -10,17 +10,19 @@ import { IdSchema } from "@/app/api/types";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string; contestId: string; problemId: string } }
+  {
+    params,
+  }: { params: { orgId: string; contestId: string; problemId: string } },
 ) {
   try {
     // Parse and validate parameters
     const orgNameId = NameIdSchema.parse(params.orgId);
     const contestNameId = NameIdSchema.parse(params.contestId);
     const problemId = params.problemId;
-    
+
     // Get numeric orgId
     const orgId = await getOrgIdFromNameId(orgNameId);
-    
+
     // Find the contest by nameId
     const contestResult = await db
       .select({ id: contests.id })
@@ -29,17 +31,20 @@ export async function GET(
         and(
           eq(contests.nameId, contestNameId),
           eq(contests.organizerId, orgId),
-          eq(contests.organizerKind, "org")
-        )
+          eq(contests.organizerKind, "org"),
+        ),
       )
       .limit(1);
-      
+
     if (contestResult.length === 0) {
-      return NextResponse.json({ message: "Contest not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Contest not found" },
+        { status: 404 },
+      );
     }
-    
+
     const contestId = contestResult[0].id;
-    
+
     // Find the problem and its associated contest problem
     const problemResult = await db
       .select({
@@ -51,27 +56,30 @@ export async function GET(
         contestProblems,
         and(
           eq(contestProblems.problemId, problems.id),
-          eq(contestProblems.contestId, contestId)
-        )
+          eq(contestProblems.contestId, contestId),
+        ),
       )
       .where(eq(problems.code, problemId))
       .limit(1);
-      
+
     if (problemResult.length === 0) {
-      return NextResponse.json({ message: "Problem not found in this contest" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Problem not found in this contest" },
+        { status: 404 },
+      );
     }
-    
+
     // Get test cases for the problem
     const testCasesResult = await db
       .select()
       .from(testCases)
       .where(eq(testCases.problemId, problemResult[0].problem.id));
-      
+
     // Combine the data
     const problem = {
       ...problemResult[0].problem,
       contestProblemId: problemResult[0].contestProblem.id,
-      testCases: testCasesResult.map(tc => ({
+      testCases: testCasesResult.map((tc) => ({
         input: tc.input,
         output: tc.output,
         kind: tc.kind,
@@ -79,7 +87,7 @@ export async function GET(
       orgId,
       contestId,
     };
-    
+
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -87,7 +95,7 @@ export async function GET(
     }
     return NextResponse.json(
       { message: "Failed to fetch problem" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

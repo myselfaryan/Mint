@@ -2,7 +2,12 @@ import { CodeEditor } from "@/components/code-editor";
 import { notFound } from "next/navigation";
 
 async function getProblem(orgId: string, contestId: string, problemId: string) {
-  console.log(`ENV: ${process.env.NEXT_PUBLIC_APP_URL}`, orgId, contestId, problemId);
+  console.log(
+    `ENV: ${process.env.NEXT_PUBLIC_APP_URL}`,
+    orgId,
+    contestId,
+    problemId,
+  );
 
   try {
     // Fetch the problem with contest context
@@ -18,7 +23,7 @@ async function getProblem(orgId: string, contestId: string, problemId: string) {
     }
 
     const problem = await response.json();
-    
+
     // Add the contest ID to the problem data
     return {
       ...problem,
@@ -47,4 +52,4 @@ export default async function Page({
       <CodeEditor problem={problem} />
     </>
   );
-} 
+}

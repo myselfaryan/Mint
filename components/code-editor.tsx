@@ -281,38 +281,38 @@ export function CodeEditor({ problem }: CodeEditorProps) {
 
   const handleSubmit = async () => {
     if (isRunning || !problem) return;
-    
+
     setIsRunning(true);
     setOutput("Processing submission...");
-    
+
     try {
       // Check if we're in a contest context
       if (!problem.contestNameId) {
         setOutput("Error: Submissions are only allowed within a contest");
         return;
       }
-      
+
       // First, get the current user's ID
-      const userResponse = await fetch('/api/me');
+      const userResponse = await fetch("/api/me");
       if (!userResponse.ok) {
         throw new Error("You must be logged in to submit solutions");
       }
-      
+
       const userData = await userResponse.json();
       console.log("userData", userData);
-      
+
       // Find the organization in the user's orgs array
       const userId = userData.nameId;
 
       // Use the submissions endpoint with the correct orgId
       const submissionEndpoint = `/api/orgs/${problem.orgId}/submissions`;
-      console.log('submitting to', submissionEndpoint);
-      
+      console.log("submitting to", submissionEndpoint);
+
       // Now submit with the user ID included
       const response = await fetch(submissionEndpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId,
@@ -322,16 +322,15 @@ export function CodeEditor({ problem }: CodeEditorProps) {
           contestNameId: problem.contestNameId,
         }),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         console.log("error", error);
         throw new Error(error.message || "Failed to submit solution");
       }
-      
+
       const result = await response.json();
       setOutput(`Submission successful! ID: ${result.id}`);
-      
     } catch (error) {
       setOutput(`Submission error: ${(error as Error).message}`);
     } finally {

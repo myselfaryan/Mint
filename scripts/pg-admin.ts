@@ -1,16 +1,18 @@
-import { execSync } from 'child_process';
+import { execSync } from "child_process";
 
 function main() {
   try {
     console.log("\n🚀 Starting pgAdmin...");
-    execSync('docker run --name mint-pgadmin \
+    execSync(
+      "docker run --name mint-pgadmin \
       --network mint-network \
       -e PGADMIN_DEFAULT_EMAIL=admin@admin.com \
       -e PGADMIN_DEFAULT_PASSWORD=admin \
       -e PGADMIN_SERVER_JSON_FILE=/pgadmin4/servers.json \
       -v ${PWD}/scripts/pgadmin-servers.json:/pgadmin4/servers.json \
       -p 5050:80 \
-      -d dpage/pgadmin4');
+      -d dpage/pgadmin4",
+    );
 
     console.log("\n✅ pgAdmin is running!");
     console.log("\nAccess Details:");

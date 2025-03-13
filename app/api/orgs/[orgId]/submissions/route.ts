@@ -71,10 +71,10 @@ export async function POST(
   try {
     const orgNameId = NameIdSchema.parse(params.orgId);
     const orgId = await getOrgIdFromNameId(orgNameId);
-    
+
     const requestData = await request.json();
     console.log("requestData", requestData);
-    
+
     // Parse the submission data including the userId and contestNameId
     const data = createSubmissionSchema.parse(requestData);
     console.log("data", data);

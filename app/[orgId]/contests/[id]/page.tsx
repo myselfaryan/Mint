@@ -40,19 +40,21 @@ export default function ContestDetailsPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await fetch('/api/me');
+        const res = await fetch("/api/me");
         if (!res.ok) {
-          throw new Error('Failed to fetch user data');
+          throw new Error("Failed to fetch user data");
         }
         const userData = await res.json();
-        
+
         // Find the user's role in the current organization
-        const currentOrg = userData.orgs.find((org: any) => org.nameId === orgId);
+        const currentOrg = userData.orgs.find(
+          (org: any) => org.nameId === orgId,
+        );
         if (currentOrg) {
           setUserRole(currentOrg.role);
         }
       } catch (err) {
-        console.error('Error fetching user data:', err);
+        console.error("Error fetching user data:", err);
       }
     };
 
@@ -145,17 +147,17 @@ export default function ContestDetailsPage() {
   };
 
   const status = getContestStatus();
-  
+
   // Determine if problems should be shown
   const shouldShowProblems = () => {
     const now = new Date();
     const startTime = new Date(contestData.startTime);
-    
+
     // If contest has started, show problems to everyone
     if (now >= startTime) return true;
-    
+
     // For upcoming contests, only show problems to non-members (admins, instructors)
-    return userRole !== 'member';
+    return userRole !== "member";
   };
 
   if (isLoading) {
@@ -223,7 +225,9 @@ export default function ContestDetailsPage() {
                 {contestData.problems.map(
                   (problem: { id: string; title: string }) => (
                     <li key={problem.id}>
-                      <Link href={`/${orgId}/contests/${contestId}/problems/${problem.id}`}>
+                      <Link
+                        href={`/${orgId}/contests/${contestId}/problems/${problem.id}`}
+                      >
                         <Button
                           variant="link"
                           className="p-0 h-auto text-primary hover:text-primary/80"

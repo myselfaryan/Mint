@@ -24,11 +24,15 @@ const languageVersions = {
 // Helper function to execute code
 async function executeCode(code: string, language: string, input: string) {
   try {
-    const fileName = 
-      language === "javascript" || language === "node" ? "index.js" :
-      language === "python" ? "main.py" :
-      language === "cpp" ? "main.cpp" : "code";
-    
+    const fileName =
+      language === "javascript" || language === "node"
+        ? "index.js"
+        : language === "python"
+          ? "main.py"
+          : language === "cpp"
+            ? "main.cpp"
+            : "code";
+
     const response = await fetch(`${PISTON_API}/execute`, {
       method: "POST",
       headers: {
@@ -36,7 +40,9 @@ async function executeCode(code: string, language: string, input: string) {
       },
       body: JSON.stringify({
         language,
-        version: languageVersions[language as keyof typeof languageVersions] || "latest",
+        version:
+          languageVersions[language as keyof typeof languageVersions] ||
+          "latest",
         files: [
           {
             name: fileName,
@@ -51,7 +57,7 @@ async function executeCode(code: string, language: string, input: string) {
     });
 
     const result = await response.json();
-    
+
     if (result.run?.output) {
       return { success: true, output: result.run.output.trim() };
     } else if (result.compile?.output) {
@@ -61,12 +67,12 @@ async function executeCode(code: string, language: string, input: string) {
     } else if (result.error) {
       return { success: false, output: `Execution Error: ${result.error}` };
     }
-    
+
     return { success: false, output: "Unknown error" };
   } catch (error) {
-    return { 
-      success: false, 
-      output: `Runtime Error: ${(error as Error).message}` 
+    return {
+      success: false,
+      output: `Runtime Error: ${(error as Error).message}`,
     };
   }
 }
@@ -85,8 +91,8 @@ export async function createSubmission(
         and(
           eq(contests.nameId, data.contestNameId),
           eq(contests.organizerId, orgId),
-          eq(contests.organizerKind, "org")
-        )
+          eq(contests.organizerKind, "org"),
+        ),
       )
       .limit(1);
 
@@ -103,8 +109,8 @@ export async function createSubmission(
       .where(
         and(
           eq(contestProblems.contestId, contestId),
-          eq(contestProblems.problemId, data.problemId)
-        )
+          eq(contestProblems.problemId, data.problemId),
+        ),
       )
       .limit(1);
 
@@ -159,7 +165,7 @@ export async function createSubmission(
         .update(problemSubmissions)
         .set({ status: "error" })
         .where(eq(problemSubmissions.id, submission.id));
-      
+
       throw new Error("No test cases found for this problem");
     }
 
@@ -167,18 +173,18 @@ export async function createSubmission(
     let allPassed = true;
     let executionTime = 0;
     let memoryUsage = 0;
-    
+
     for (const testCase of testCasesResult) {
       const result = await executeCode(
         data.content,
         data.language,
-        testCase.input
+        testCase.input,
       );
-      
+
       // Compare output (trimming whitespace)
       const expectedOutput = testCase.output.trim();
       const actualOutput = result.output.trim();
-      
+
       if (!result.success || expectedOutput !== actualOutput) {
         allPassed = false;
         break;
@@ -187,13 +193,13 @@ export async function createSubmission(
 
     // Update submission status based on test results
     const finalStatus = allPassed ? "accepted" : "rejected";
-    
+
     const [updatedSubmission] = await tx
       .update(problemSubmissions)
-      .set({ 
+      .set({
         status: finalStatus,
         executionTime,
-        memoryUsage
+        memoryUsage,
       })
       .where(eq(problemSubmissions.id, submission.id))
       .returning();

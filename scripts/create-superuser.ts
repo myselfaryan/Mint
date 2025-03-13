@@ -1,13 +1,24 @@
 import { db } from "@/db/drizzle";
-import { users, orgs, memberships, contests, problems, contestProblems, groups, groupMemberships, sessionTable, testCases } from "@/db/schema";
+import {
+  users,
+  orgs,
+  memberships,
+  contests,
+  problems,
+  contestProblems,
+  groups,
+  groupMemberships,
+  sessionTable,
+  testCases,
+} from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { generateUsername } from "@/lib/username";
-import * as readline from 'readline';
+import * as readline from "readline";
 
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   return new Promise((resolve) => {
@@ -21,7 +32,7 @@ function prompt(question: string): Promise<string> {
 async function clearDatabase() {
   try {
     console.log("Clearing database...");
-    
+
     // Delete tables in order to respect foreign key constraints
     await db.delete(groupMemberships);
     await db.delete(groups);
@@ -33,7 +44,7 @@ async function clearDatabase() {
     await db.delete(sessionTable);
     await db.delete(orgs);
     await db.delete(users);
-    
+
     console.log("Database cleared successfully!");
     return true;
   } catch (error) {
@@ -45,20 +56,22 @@ async function clearDatabase() {
 async function main() {
   try {
     console.log("\n=== Create Superuser ===\n");
-    
+
     // First, clear the database
-    const shouldClear = await prompt("This will clear ALL data in the database. Continue? (y/n): ");
-    if (shouldClear.toLowerCase() !== 'y') {
+    const shouldClear = await prompt(
+      "This will clear ALL data in the database. Continue? (y/n): ",
+    );
+    if (shouldClear.toLowerCase() !== "y") {
       console.log("Operation cancelled.");
       process.exit(0);
     }
-    
+
     await clearDatabase();
     console.log("Database cleared. Creating superuser...\n");
 
     // Get email
     const email = await prompt("Enter email: ");
-    if (!email.includes('@')) {
+    if (!email.includes("@")) {
       throw new Error("Invalid email address");
     }
 
@@ -79,13 +92,16 @@ async function main() {
 
     // Create user
     const hashedPassword = await hashPassword(password);
-    const [user] = await db.insert(users).values({
-      nameId,
-      name: email.split('@')[0], // Use part before @ as name
-      email,
-      hashedPassword,
-      isSuperuser: true,
-    }).returning();
+    const [user] = await db
+      .insert(users)
+      .values({
+        nameId,
+        name: email.split("@")[0], // Use part before @ as name
+        email,
+        hashedPassword,
+        isSuperuser: true,
+      })
+      .returning();
 
     console.log("\nSuperuser created successfully!");
     console.log("Username:", nameId);
@@ -93,7 +109,10 @@ async function main() {
 
     process.exit(0);
   } catch (error) {
-    console.error("\nFailed to create superuser:", error instanceof Error ? error.message : error);
+    console.error(
+      "\nFailed to create superuser:",
+      error instanceof Error ? error.message : error,
+    );
     process.exit(1);
   }
 }
