@@ -48,11 +48,13 @@ const seedConfig = {
 export async function seedDatabase(config = seedConfig) {
   try {
     // Check if database is already populated
+    /*
     const isEmpty = await isDatabaseEmpty();
     if (!isEmpty) {
       console.log("Database already contains data. Skipping seed operation.");
       return false;
     }
+    */
     
     // Create users
     const users = await createUsers(config.users);
