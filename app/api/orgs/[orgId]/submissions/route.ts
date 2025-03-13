@@ -8,6 +8,7 @@ import { z } from "zod";
 import * as submissionService from "./service";
 import { getOrgIdFromNameId } from "@/app/api/service";
 import { NameIdSchema } from "@/app/api/types";
+import { auth } from "@/auth";
 
 export async function GET(
   request: NextRequest,
@@ -69,7 +70,22 @@ export async function POST(
 ) {
   try {
     const orgId = IdSchema.parse(params.orgId);
-    const data = createSubmissionSchema.parse(await request.json());
+    const requestData = await request.json();
+    
+    // Get the current user from the session
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { message: "You must be logged in to submit solutions" },
+        { status: 401 }
+      );
+    }
+    
+    // Add the user ID to the submission data
+    const data = createSubmissionSchema.parse({
+      ...requestData,
+      userId: session.user.id,
+    });
 
     const submission = await submissionService.createSubmission(orgId, data);
     return NextResponse.json(submission, { status: 201 });

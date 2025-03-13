@@ -279,6 +279,59 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     }
   };
 
+  const handleSubmit = async () => {
+    if (isRunning || !problem) return;
+    
+    setIsRunning(true);
+    setOutput("Processing submission...");
+    
+    try {
+      // Get the current contest problem ID from the problem
+      const contestProblemId = problem.contestProblemId;
+      
+      if (!contestProblemId) {
+        setOutput("Error: Cannot submit - missing contest problem ID");
+        return;
+      }
+      
+      // First, get the current user's ID
+      const userResponse = await fetch('/api/me');
+      if (!userResponse.ok) {
+        throw new Error("You must be logged in to submit solutions");
+      }
+      
+      const userData = await userResponse.json();
+      const userId = userData.id;
+      
+      // Now submit with the user ID included
+      const response = await fetch(`/api/orgs/${problem.orgId}/submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          contestProblemId,
+          content: code,
+          language: languageAliases[language],
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to submit solution");
+      }
+      
+      const result = await response.json();
+      setOutput(`Submission successful! ID: ${result.id}`);
+      
+    } catch (error) {
+      setOutput(`Submission error: ${(error as Error).message}`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   return (
     <div className="h-screen bg-background">
       <ResizablePanelGroup direction="horizontal" className="min-h-screen">
@@ -342,6 +395,8 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                   <Button
                     variant="outline"
                     className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
+                    onClick={handleSubmit}
+                    disabled={isRunning}
                   >
                     Submit
                   </Button>

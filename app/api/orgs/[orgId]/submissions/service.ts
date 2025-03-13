@@ -5,10 +5,71 @@ import {
   contests,
   problems,
   users,
+  testCases,
 } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { createSubmissionSchema } from "./validation";
+
+const PISTON_API = "https://emkc.org/api/v2/piston";
+
+// Language mapping for code execution
+const languageVersions = {
+  javascript: "18.15.0",
+  node: "18.15.0",
+  python: "3.10.0",
+  cpp: "10.2.0",
+};
+
+// Helper function to execute code
+async function executeCode(code: string, language: string, input: string) {
+  try {
+    const fileName = 
+      language === "javascript" || language === "node" ? "index.js" :
+      language === "python" ? "main.py" :
+      language === "cpp" ? "main.cpp" : "code";
+    
+    const response = await fetch(`${PISTON_API}/execute`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        language,
+        version: languageVersions[language as keyof typeof languageVersions] || "latest",
+        files: [
+          {
+            name: fileName,
+            content: code,
+          },
+        ],
+        stdin: input + "\n", // Add newline to input
+        args: [],
+        compile_timeout: 10000,
+        run_timeout: 5000,
+      }),
+    });
+
+    const result = await response.json();
+    
+    if (result.run?.output) {
+      return { success: true, output: result.run.output.trim() };
+    } else if (result.compile?.output) {
+      return { success: false, output: result.compile.output };
+    } else if (result.message) {
+      return { success: false, output: result.message };
+    } else if (result.error) {
+      return { success: false, output: `Execution Error: ${result.error}` };
+    }
+    
+    return { success: false, output: "Unknown error" };
+  } catch (error) {
+    return { 
+      success: false, 
+      output: `Runtime Error: ${(error as Error).message}` 
+    };
+  }
+}
 
 export async function createSubmission(
   orgId: number,
@@ -16,8 +77,12 @@ export async function createSubmission(
 ) {
   return await db.transaction(async (tx) => {
     // Verify contest problem belongs to org's contest
-    const contestProblem = await tx
-      .select()
+    const contestProblemResult = await tx
+      .select({
+        contestProblem: contestProblems,
+        contest: contests,
+        problem: problems,
+      })
       .from(contestProblems)
       .innerJoin(
         contests,
@@ -27,20 +92,25 @@ export async function createSubmission(
           eq(contests.organizerKind, "org"),
         ),
       )
+      .innerJoin(
+        problems,
+        eq(problems.id, contestProblems.problemId)
+      )
       .where(eq(contestProblems.id, data.contestProblemId))
       .limit(1);
 
-    if (contestProblem.length === 0) {
+    if (contestProblemResult.length === 0) {
       throw new Error("Contest problem not found in this organization");
     }
 
     // Verify contest is ongoing
     const now = new Date();
-    const contest = contestProblem[0].contests;
+    const contest = contestProblemResult[0].contest;
     if (now < contest.startTime || now > contest.endTime) {
       throw new Error("Contest is not active");
     }
 
+    // Create the submission with pending status
     const [submission] = await tx
       .insert(problemSubmissions)
       .values({
@@ -50,7 +120,58 @@ export async function createSubmission(
       })
       .returning();
 
-    return submission;
+    // Get test cases for the problem
+    const testCasesResult = await tx
+      .select()
+      .from(testCases)
+      .where(eq(testCases.problemId, contestProblemResult[0].problem.id));
+
+    if (testCasesResult.length === 0) {
+      // Update submission status to error if no test cases found
+      await tx
+        .update(problemSubmissions)
+        .set({ status: "error" })
+        .where(eq(problemSubmissions.id, submission.id));
+      
+      throw new Error("No test cases found for this problem");
+    }
+
+    // Execute code against test cases
+    let allPassed = true;
+    let executionTime = 0;
+    let memoryUsage = 0;
+    
+    for (const testCase of testCasesResult) {
+      const result = await executeCode(
+        data.content,
+        data.language,
+        testCase.input
+      );
+      
+      // Compare output (trimming whitespace)
+      const expectedOutput = testCase.output.trim();
+      const actualOutput = result.output.trim();
+      
+      if (!result.success || expectedOutput !== actualOutput) {
+        allPassed = false;
+        break;
+      }
+    }
+
+    // Update submission status based on test results
+    const finalStatus = allPassed ? "accepted" : "rejected";
+    
+    const [updatedSubmission] = await tx
+      .update(problemSubmissions)
+      .set({ 
+        status: finalStatus,
+        executionTime,
+        memoryUsage
+      })
+      .where(eq(problemSubmissions.id, submission.id))
+      .returning();
+
+    return updatedSubmission;
   });
 }
 
