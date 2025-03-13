@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -26,6 +26,7 @@ import {
   Pencil,
   Trash2,
   Copy,
+  Upload,
 } from "lucide-react";
 import { DeleteConfirmationModal } from "@/mint/delete-confirm";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,8 @@ interface GenericListingProps<T> {
   rowClickAttr?: keyof T; // attribute to use for navigation when row is clicked
   editPathAttr?: keyof T; // attribute containing the edit path for navigation
   editPathSuffix?: string;
+  allowCsvUpload?: boolean;
+  onCsvUpload?: (file: File) => Promise<void>;
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -67,6 +70,8 @@ export function GenericListing<T extends { id: number | undefined }>({
   rowClickAttr,
   editPathAttr,
   editPathSuffix,
+  allowCsvUpload = false,
+  onCsvUpload,
 }: GenericListingProps<T>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -156,6 +161,32 @@ export function GenericListing<T extends { id: number | undefined }>({
     }
   };
 
+  // Add file input ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file || !onCsvUpload) return;
+
+    try {
+      await onCsvUpload(file);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Error uploading CSV:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to upload CSV",
+      });
+    }
+  };
+
   return (
     <div className="px-6 py-2 space-y-6">
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
@@ -169,6 +200,25 @@ export function GenericListing<T extends { id: number | undefined }>({
               className="h-9 pl-8 md:w-[300px] lg:w-[400px]"
             />
           </div>
+
+          {allowCsvUpload && onCsvUpload && (
+            <>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                className="hidden"
+                ref={fileInputRef}
+              />
+              <Button
+                size="default"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                Import CSV
+              </Button>
+            </>
+          )}
 
           {(onAdd || addPage) && (
             <Button
@@ -187,6 +237,7 @@ export function GenericListing<T extends { id: number | undefined }>({
               Add New {title}
             </Button>
           )}
+
           {allowDownload && (
             <Button size="default" onClick={downloadCSV}>
               <Download className="h-4 w-4 mr-2" />
