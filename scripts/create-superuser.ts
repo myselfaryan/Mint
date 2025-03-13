@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { users, orgs, memberships, contests, problems, contestProblems, groups, groupMemberships, sessionTable, testCases } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { generateUsername } from "@/lib/username";
 import * as readline from 'readline';
@@ -18,9 +18,43 @@ function prompt(question: string): Promise<string> {
   });
 }
 
+async function clearDatabase() {
+  try {
+    console.log("Clearing database...");
+    
+    // Delete tables in order to respect foreign key constraints
+    await db.delete(groupMemberships);
+    await db.delete(groups);
+    await db.delete(contestProblems);
+    await db.delete(testCases);
+    await db.delete(problems);
+    await db.delete(contests);
+    await db.delete(memberships);
+    await db.delete(sessionTable);
+    await db.delete(orgs);
+    await db.delete(users);
+    
+    console.log("Database cleared successfully!");
+    return true;
+  } catch (error) {
+    console.error("Error clearing database:", error);
+    throw error;
+  }
+}
+
 async function main() {
   try {
     console.log("\n=== Create Superuser ===\n");
+    
+    // First, clear the database
+    const shouldClear = await prompt("This will clear ALL data in the database. Continue? (y/n): ");
+    if (shouldClear.toLowerCase() !== 'y') {
+      console.log("Operation cancelled.");
+      process.exit(0);
+    }
+    
+    await clearDatabase();
+    console.log("Database cleared. Creating superuser...\n");
 
     // Get email
     const email = await prompt("Enter email: ");
