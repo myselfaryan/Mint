@@ -161,27 +161,21 @@ export default function UsersPage({
       }
 
       const result = await response.json();
-
-      // Refresh the users list
       await fetchUsers();
-
-      toast({
-        title: "Success",
-        description: result.message,
-      });
 
       // Show failures if any
       const failedCount = result.results?.filter(
         (r: any) => r.status === "error",
       ).length;
 
-      if (failedCount > 0) {
-        toast({
-          variant: "destructive",
-          title: "Warning",
-          description: `${failedCount} users failed to be imported. Check the console for details.`,
-        });
-      }
+      toast({
+        variant: failedCount > 0 ? "destructive" : "default",
+        title: failedCount > 0 ? "Warning" : "Success",
+        description:
+          failedCount > 0
+            ? `${result.message} (${failedCount} failed imports. Check console for details)`
+            : result.message,
+      });
     } catch (error) {
       console.error("Error uploading CSV:", error);
       toast({
