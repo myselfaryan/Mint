@@ -211,6 +211,7 @@ export function GenericListing<T extends { id: number | undefined }>({
                 ref={fileInputRef}
               />
               <Button
+                variant="outline"
                 size="default"
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -218,6 +219,13 @@ export function GenericListing<T extends { id: number | undefined }>({
                 Import CSV
               </Button>
             </>
+          )}
+
+          {allowDownload && (
+            <Button size="default" variant="outline" onClick={downloadCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
           )}
 
           {(onAdd || addPage) && (
@@ -235,13 +243,6 @@ export function GenericListing<T extends { id: number | undefined }>({
             >
               <PlusCircle className="h-4 w-4 mr-2" />
               Add New {title}
-            </Button>
-          )}
-
-          {allowDownload && (
-            <Button size="default" onClick={downloadCSV}>
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
             </Button>
           )}
         </div>
