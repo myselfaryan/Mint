@@ -17,6 +17,7 @@ import {
   Moon,
   Monitor,
   Contact,
+  LucideIcon,
 } from "lucide-react";
 import { Check } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -68,29 +69,6 @@ const defaultUser = {
   name: "shadcn",
   email: "m@example.com",
   avatar: "/avatars/shadcn.jpg",
-};
-
-const defaultTeams = {
-  teams: [
-    {
-      name: "IIIT Sri City",
-      logo: GalleryVerticalEnd,
-      nameId: "iiits",
-      role: "owner",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      nameId: "corp",
-      role: "admin",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      nameId: "corp2",
-      role: "member",
-    },
-  ],
 };
 
 function ThemeItems() {
@@ -168,15 +146,25 @@ function ComingSoonBadge() {
   );
 }
 
+interface SidebarItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  allowedRoles: string[];
+  disabled?: boolean;
+  comingSoon?: boolean;
+  hidden?: boolean;
+}
+
 // First, let's remove the static data object and make it a function
 // that returns filtered items based on role
-const getNavItems = (role?: string) => {
-  const allItems = [
+const getNavItems = (role?: string): SidebarItem[] => {
+  const allItems: SidebarItem[] = [
     {
       title: "Users",
       url: "users",
       icon: Users,
-      allowedRoles: ["owner", "admin"],
+      allowedRoles: ["owner", "organizer"],
     },
     {
       title: "Groups",
@@ -185,28 +173,25 @@ const getNavItems = (role?: string) => {
       allowedRoles: ["owner"],
       disabled: true,
       comingSoon: true,
-      items: [],
+      hidden: true,
     },
     {
       title: "Contests",
       url: "contests",
       icon: Trophy,
-      allowedRoles: ["owner", "admin", "member"],
-      items: [],
+      allowedRoles: ["owner", "organizer", "member"],
     },
     {
       title: "Problems",
       url: "problems",
       icon: FileCode,
-      allowedRoles: ["owner", "admin"],
-      items: [],
+      allowedRoles: ["owner", "organizer"],
     },
     {
       title: "Submissions",
       url: "submissions",
       icon: FileCheck,
-      allowedRoles: ["owner", "admin"],
-      items: [],
+      allowedRoles: ["owner", "organizer"],
     },
   ];
 
@@ -218,7 +203,7 @@ const getNavItems = (role?: string) => {
 function RoleBadge({ role }: { role: string }) {
   const colors = {
     owner: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
-    admin:
+    organizer:
       "bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground",
     member:
       "bg-muted text-muted-foreground dark:bg-muted/50 dark:text-muted-foreground",
@@ -371,7 +356,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuLabel className="text-xs text-muted-foreground">
                       Organizations
                     </DropdownMenuLabel>
-                    {teams.map((team, index) => (
+                    {teams.map((team) => (
                       <DropdownMenuItem
                         key={team.name}
                         onClick={() => handleTeamChange(team)}
@@ -389,7 +374,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer gap-2 p-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                      onClick={() => router.push("/onboarding")}
+                      onClick={() => router.push("/new-org")}
                     >
                       <div className="flex size-6 items-center justify-center rounded-sm border bg-sidebar-primary text-sidebar-primary-foreground">
                         <Plus className="size-4 shrink-0" />
@@ -406,39 +391,47 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             <SidebarGroup>
               <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
               <SidebarMenu>
-                {navItems.map((item) => {
-                  const isActive = pathname.includes(`${basePath}/${item.url}`);
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild={!item.disabled}
-                        tooltip={item.title}
-                        className={`
-                          ${item.disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-accent hover:text-accent-foreground"}
-                          ${isActive ? "bg-accent text-accent-foreground" : ""}
-                        `}
-                      >
-                        {item.disabled ? (
-                          <div className="flex items-center w-full">
-                            {item.icon && <item.icon className="size-4 mr-2" />}
-                            <div className="flex items-center justify-between w-full">
-                              <span>{item.title}</span>
-                              {item.comingSoon && <ComingSoonBadge />}
+                {navItems
+                  .filter((item) => !item.hidden)
+                  .map((item) => {
+                    const isActive = pathname.includes(
+                      `${basePath}/${item.url}`,
+                    );
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild={!item.disabled}
+                          tooltip={item.title}
+                          className={`
+                            ${item.disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-accent hover:text-accent-foreground"}
+                            ${isActive ? "bg-accent text-accent-foreground" : ""}
+                          `}
+                        >
+                          {item.disabled ? (
+                            <div className="flex items-center w-full">
+                              {item.icon && (
+                                <item.icon className="size-4 mr-2" />
+                              )}
+                              <div className="flex items-center justify-between w-full">
+                                <span>{item.title}</span>
+                                {item.comingSoon && <ComingSoonBadge />}
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <Link
-                            href={`${basePath}/${item.url}`}
-                            className="flex items-center w-full"
-                          >
-                            {item.icon && <item.icon className="size-4 mr-2" />}
-                            <span>{item.title}</span>
-                          </Link>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+                          ) : (
+                            <Link
+                              href={`${basePath}/${item.url}`}
+                              className="flex items-center w-full"
+                            >
+                              {item.icon && (
+                                <item.icon className="size-4 mr-2" />
+                              )}
+                              <span>{item.title}</span>
+                            </Link>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
               </SidebarMenu>
             </SidebarGroup>
           </SidebarContent>

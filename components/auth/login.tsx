@@ -35,7 +35,13 @@ export function LoginComponent() {
   async function onSubmit(values: LoginInput) {
     try {
       const userData = await login(values.email, values.password);
-      if (userData.orgs && userData.orgs.length > 0) {
+
+      // Check if user is superuser first
+      if (userData.isSuperuser) {
+        router.push("/admin");
+      }
+      // Otherwise check for orgs
+      else if (userData.orgs && userData.orgs.length > 0) {
         router.push(`/${userData.orgs[0].nameId}`);
       } else {
         router.push("/onboarding");

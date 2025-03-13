@@ -145,6 +145,59 @@ export default function UsersPage({
     }
   };
 
+  const handleCsvUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`/api/orgs/${orgId}/users/csv`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
+      }
+
+      const result = await response.json();
+      await fetchUsers();
+
+      const failedCount = result.results?.filter(
+        (r: any) => r.status === "error",
+      ).length;
+
+      if (failedCount > 0) {
+        console.error("Failed imports details:", {
+          failures: result.results.filter((r: any) => r.status === "error"),
+          stackTraces: result.results
+            .filter((r: any) => r.status === "error")
+            .map((r: any) => ({ email: r.email, error: r.error })),
+        });
+      }
+
+      toast({
+        variant: failedCount > 0 ? "destructive" : "default",
+        title: failedCount > 0 ? "Warning" : "Success",
+        description:
+          failedCount > 0
+            ? `${result.message} (${failedCount} failed imports. Check console for details)`
+            : result.message,
+      });
+    } catch (error) {
+      console.error("Error uploading CSV:", {
+        error,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to upload CSV",
+      });
+    }
+  };
+
   return (
     <>
       <MockAlert show={showMockAlert} />
@@ -158,6 +211,8 @@ export default function UsersPage({
           setIsEditorOpen(true);
         }}
         onDelete={deleteUser}
+        allowCsvUpload={true}
+        onCsvUpload={handleCsvUpload}
       />
 
       <GenericEditor
