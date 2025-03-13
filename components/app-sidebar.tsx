@@ -82,7 +82,7 @@ const defaultTeams = {
       name: "Acme Corp.",
       logo: AudioWaveform,
       nameId: "corp",
-      role: "admin",
+      role: "organizer",
     },
     {
       name: "Evil Corp.",
@@ -176,7 +176,7 @@ const getNavItems = (role?: string) => {
       title: "Users",
       url: "users",
       icon: Users,
-      allowedRoles: ["owner", "admin"],
+      allowedRoles: ["owner", "organizer"],
     },
     {
       title: "Groups",
@@ -191,21 +191,21 @@ const getNavItems = (role?: string) => {
       title: "Contests",
       url: "contests",
       icon: Trophy,
-      allowedRoles: ["owner", "admin", "member"],
+      allowedRoles: ["owner", "organizer", "member"],
       items: [],
     },
     {
       title: "Problems",
       url: "problems",
       icon: FileCode,
-      allowedRoles: ["owner", "admin"],
+      allowedRoles: ["owner", "organizer"],
       items: [],
     },
     {
       title: "Submissions",
       url: "submissions",
       icon: FileCheck,
-      allowedRoles: ["owner", "admin"],
+      allowedRoles: ["owner", "organizer"],
       items: [],
     },
   ];
@@ -218,7 +218,7 @@ const getNavItems = (role?: string) => {
 function RoleBadge({ role }: { role: string }) {
   const colors = {
     owner: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
-    admin:
+    organizer:
       "bg-secondary/20 text-secondary-foreground dark:bg-secondary/30 dark:text-secondary-foreground",
     member:
       "bg-muted text-muted-foreground dark:bg-muted/50 dark:text-muted-foreground",
