@@ -148,10 +148,11 @@ export async function createSubmission(
       throw new Error("Contest not found");
     }
 
-    const { startTime, endTime } = contestTimeResult[0];
-    if (now < startTime || now > endTime) {
-      throw new Error("Contest is not active");
-    }
+    // Allow all submissions for now.
+    // const { startTime, endTime } = contestTimeResult[0];
+    // if (now < startTime || now > endTime) {
+    //   throw new Error("Contest is not active");
+    // }
 
     // Create the submission with pending status
     const [submission] = await tx

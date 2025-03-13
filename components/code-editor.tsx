@@ -287,8 +287,8 @@ export function CodeEditor({ problem }: CodeEditorProps) {
 
     try {
       // Check if we're in a contest context
-      if (!problem.contestNameId) {
-        setOutput("Error: Submissions are only allowed within a contest");
+      if (!problem.orgId) {
+        setOutput("Error: Submissions are only allowed within an organization");
         return;
       }
 
@@ -330,7 +330,19 @@ export function CodeEditor({ problem }: CodeEditorProps) {
       }
 
       const result = await response.json();
-      setOutput(`Submission successful! ID: ${result.id}`);
+      
+      // Format the submission result with verdict
+      const status = result.status || "pending";
+      const statusColor = status === "accepted" ? "text-green-500" : 
+                          status === "rejected" ? "text-red-500" : 
+                          "text-yellow-500";
+      
+      const executionInfo = result.executionTime ? 
+        `\nExecution Time: ${result.executionTime}ms | Memory: ${result.memoryUsage || 'N/A'} KB` : '';
+      
+      setOutput(
+        `<span class="${statusColor} font-bold text-lg">${status.toUpperCase()}</span>${executionInfo}`
+      );
     } catch (error) {
       setOutput(`Submission error: ${(error as Error).message}`);
     } finally {
@@ -525,10 +537,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                           {executionError ? (
                             <div className="text-red-500">{output}</div>
                           ) : (
-                            <div>
-                              {output ||
-                                "Run your code to see the test results..."}
-                            </div>
+                            <div dangerouslySetInnerHTML={{ __html: output || "Run your code to see the test results..." }}></div>
                           )}
                         </div>
                       </div>
