@@ -279,6 +279,77 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     }
   };
 
+  const handleSubmit = async () => {
+    if (isRunning || !problem) return;
+
+    setIsRunning(true);
+    setOutput("Processing submission...");
+
+    try {
+      // Check if we're in a contest context
+      if (!problem.orgId) {
+        setOutput("Error: Submissions are only allowed within an organization");
+        return;
+      }
+
+      // First, get the current user's ID
+      const userResponse = await fetch("/api/me");
+      if (!userResponse.ok) {
+        throw new Error("You must be logged in to submit solutions");
+      }
+
+      const userData = await userResponse.json();
+      console.log("userData", userData);
+
+      // Find the organization in the user's orgs array
+      const userNameId = userData.nameId;
+
+      // Use the submissions endpoint with the correct orgId
+      const submissionEndpoint = `/api/orgs/${problem.orgId}/submissions`;
+      console.log("submitting to", submissionEndpoint);
+
+      // Now submit with the user ID included
+      const response = await fetch(submissionEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userNameId,
+          problemId: problem.id,
+          content: code,
+          language: languageAliases[language],
+          contestNameId: problem.contestNameId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.log("error", error);
+        throw new Error(error.message || "Failed to submit solution");
+      }
+
+      const result = await response.json();
+      
+      // Format the submission result with verdict
+      const status = result.status || "pending";
+      const statusColor = status === "accepted" ? "text-green-500" : 
+                          status === "rejected" ? "text-red-500" : 
+                          "text-yellow-500";
+      
+      const executionInfo = result.executionTime ? 
+        `\nExecution Time: ${result.executionTime}ms | Memory: ${result.memoryUsage || 'N/A'} KB` : '';
+      
+      setOutput(
+        `<span class="${statusColor} font-bold text-lg">${status.toUpperCase()}</span>${executionInfo}`
+      );
+    } catch (error) {
+      setOutput(`Submission error: ${(error as Error).message}`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   return (
     <div className="h-screen bg-background">
       <ResizablePanelGroup direction="horizontal" className="min-h-screen">
@@ -342,6 +413,8 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                   <Button
                     variant="outline"
                     className="w-[100px] h-10 bg-background text-foreground hover:bg-muted-foreground/20 border-border"
+                    onClick={handleSubmit}
+                    disabled={isRunning}
                   >
                     Submit
                   </Button>
@@ -464,10 +537,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                           {executionError ? (
                             <div className="text-red-500">{output}</div>
                           ) : (
-                            <div>
-                              {output ||
-                                "Run your code to see the test results..."}
-                            </div>
+                            <div dangerouslySetInnerHTML={{ __html: output || "Run your code to see the test results..." }}></div>
                           )}
                         </div>
                       </div>
