@@ -75,38 +75,62 @@ export async function createSubmission(
   orgId: number,
   data: z.infer<typeof createSubmissionSchema>,
 ) {
+  console.log(data);
   return await db.transaction(async (tx) => {
-    // Verify contest problem belongs to org's contest
-    const contestProblemResult = await tx
-      .select({
-        contestProblem: contestProblems,
-        contest: contests,
-        problem: problems,
-      })
-      .from(contestProblems)
-      .innerJoin(
-        contests,
+    // First, get the numeric contestId from the contestNameId
+    const contestResult = await tx
+      .select({ id: contests.id })
+      .from(contests)
+      .where(
         and(
-          eq(contests.id, contestProblems.contestId),
+          eq(contests.nameId, data.contestNameId),
           eq(contests.organizerId, orgId),
-          eq(contests.organizerKind, "org"),
-        ),
+          eq(contests.organizerKind, "org")
+        )
       )
-      .innerJoin(
-        problems,
-        eq(problems.id, contestProblems.problemId)
+      .limit(1);
+
+    if (contestResult.length === 0) {
+      throw new Error("Contest not found");
+    }
+
+    const contestId = contestResult[0].id;
+
+    // Find the contest problem entry that links the problem to the contest
+    const contestProblemResult = await tx
+      .select({ id: contestProblems.id })
+      .from(contestProblems)
+      .where(
+        and(
+          eq(contestProblems.contestId, contestId),
+          eq(contestProblems.problemId, data.problemId)
+        )
       )
-      .where(eq(contestProblems.id, data.contestProblemId))
       .limit(1);
 
     if (contestProblemResult.length === 0) {
-      throw new Error("Contest problem not found in this organization");
+      throw new Error("Problem not found in this contest");
     }
+
+    const contestProblemId = contestProblemResult[0].id;
 
     // Verify contest is ongoing
     const now = new Date();
-    const contest = contestProblemResult[0].contest;
-    if (now < contest.startTime || now > contest.endTime) {
+    const contestTimeResult = await tx
+      .select({
+        startTime: contests.startTime,
+        endTime: contests.endTime,
+      })
+      .from(contests)
+      .where(eq(contests.id, contestId))
+      .limit(1);
+
+    if (contestTimeResult.length === 0) {
+      throw new Error("Contest not found");
+    }
+
+    const { startTime, endTime } = contestTimeResult[0];
+    if (now < startTime || now > endTime) {
       throw new Error("Contest is not active");
     }
 
@@ -114,7 +138,10 @@ export async function createSubmission(
     const [submission] = await tx
       .insert(problemSubmissions)
       .values({
-        ...data,
+        userId: data.userId,
+        contestProblemId: contestProblemId,
+        content: data.content,
+        language: data.language,
         status: "pending",
         submittedAt: now,
       })
@@ -124,7 +151,7 @@ export async function createSubmission(
     const testCasesResult = await tx
       .select()
       .from(testCases)
-      .where(eq(testCases.problemId, contestProblemResult[0].problem.id));
+      .where(eq(testCases.problemId, data.problemId));
 
     if (testCasesResult.length === 0) {
       // Update submission status to error if no test cases found

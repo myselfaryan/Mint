@@ -10,9 +10,10 @@ interface Org {
 }
 
 interface User {
-  _id: number;
+  id: number;
   email: string;
   name: string;
+  nameId: string;
   orgs: Org[];
   isSuperuser: boolean;
 }
@@ -23,6 +24,7 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
       userId: users.id,
       email: users.email,
       name: users.name,
+      nameId: users.nameId,
       isSuperuser: users.isSuperuser,
       orgId: orgs.id,
       orgName: orgs.name,
@@ -42,9 +44,10 @@ export async function getUserWithOrgs(userId: number): Promise<User | null> {
   const userData = result[0];
 
   return {
-    _id: userData.userId,
+    id: userData.userId,
     email: userData.email,
     name: userData.name,
+    nameId: userData.nameId,
     isSuperuser: userData.isSuperuser,
     orgs: result
       .filter((row) => row.orgId !== null) // Filter out null orgs from left join

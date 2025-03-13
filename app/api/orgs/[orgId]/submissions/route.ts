@@ -69,24 +69,17 @@ export async function POST(
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const orgId = IdSchema.parse(params.orgId);
+    const orgNameId = NameIdSchema.parse(params.orgId);
+    const orgId = await getOrgIdFromNameId(orgNameId);
+    
     const requestData = await request.json();
+    console.log("requestData", requestData);
     
-    // Get the current user from the session
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { message: "You must be logged in to submit solutions" },
-        { status: 401 }
-      );
-    }
-    
-    // Add the user ID to the submission data
-    const data = createSubmissionSchema.parse({
-      ...requestData,
-      userId: session.user.id,
-    });
+    // Parse the submission data including the userId and contestNameId
+    const data = createSubmissionSchema.parse(requestData);
+    console.log("data", data);
 
+    // Pass the data to the service which will handle the contestNameId
     const submission = await submissionService.createSubmission(orgId, data);
     return NextResponse.json(submission, { status: 201 });
   } catch (error) {

@@ -286,11 +286,9 @@ export function CodeEditor({ problem }: CodeEditorProps) {
     setOutput("Processing submission...");
     
     try {
-      // Get the current contest problem ID from the problem
-      const contestProblemId = problem.contestProblemId;
-      
-      if (!contestProblemId) {
-        setOutput("Error: Cannot submit - missing contest problem ID");
+      // Check if we're in a contest context
+      if (!problem.contestNameId) {
+        setOutput("Error: Submissions are only allowed within a contest");
         return;
       }
       
@@ -301,24 +299,33 @@ export function CodeEditor({ problem }: CodeEditorProps) {
       }
       
       const userData = await userResponse.json();
-      const userId = userData.id;
+      console.log("userData", userData);
+      
+      // Find the organization in the user's orgs array
+      const userId = userData.nameId;
+
+      // Use the submissions endpoint with the correct orgId
+      const submissionEndpoint = `/api/orgs/${problem.orgId}/submissions`;
+      console.log('submitting to', submissionEndpoint);
       
       // Now submit with the user ID included
-      const response = await fetch(`/api/orgs/${problem.orgId}/submissions`, {
+      const response = await fetch(submissionEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
-          contestProblemId,
+          problemId: problem.id,
           content: code,
           language: languageAliases[language],
+          contestNameId: problem.contestNameId,
         }),
       });
       
       if (!response.ok) {
         const error = await response.json();
+        console.log("error", error);
         throw new Error(error.message || "Failed to submit solution");
       }
       

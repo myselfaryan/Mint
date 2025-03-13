@@ -3,42 +3,91 @@ import { z } from "zod";
 import { NameIdSchema } from "@/lib/validations";
 import { getOrgIdFromNameId, getContestIdFromNameId } from "@/app/api/service";
 import * as problemService from "./service";
+import { db } from "@/db/drizzle";
+import { problems, contestProblems, contests, testCases } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
+import { IdSchema } from "@/app/api/types";
 
 export async function GET(
-  _req: NextRequest,
-  {
-    params,
-  }: { params: { orgId: string; contestId: string; problemId: string } },
+  request: NextRequest,
+  { params }: { params: { orgId: string; contestId: string; problemId: string } }
 ) {
   try {
-    const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
-    const contestId = await getContestIdFromNameId(
+    // Parse and validate parameters
+    const orgNameId = NameIdSchema.parse(params.orgId);
+    const contestNameId = NameIdSchema.parse(params.contestId);
+    const problemId = params.problemId;
+    
+    // Get numeric orgId
+    const orgId = await getOrgIdFromNameId(orgNameId);
+    
+    // Find the contest by nameId
+    const contestResult = await db
+      .select({ id: contests.id })
+      .from(contests)
+      .where(
+        and(
+          eq(contests.nameId, contestNameId),
+          eq(contests.organizerId, orgId),
+          eq(contests.organizerKind, "org")
+        )
+      )
+      .limit(1);
+      
+    if (contestResult.length === 0) {
+      return NextResponse.json({ message: "Contest not found" }, { status: 404 });
+    }
+    
+    const contestId = contestResult[0].id;
+    
+    // Find the problem and its associated contest problem
+    const problemResult = await db
+      .select({
+        problem: problems,
+        contestProblem: contestProblems,
+      })
+      .from(problems)
+      .innerJoin(
+        contestProblems,
+        and(
+          eq(contestProblems.problemId, problems.id),
+          eq(contestProblems.contestId, contestId)
+        )
+      )
+      .where(eq(problems.code, problemId))
+      .limit(1);
+      
+    if (problemResult.length === 0) {
+      return NextResponse.json({ message: "Problem not found in this contest" }, { status: 404 });
+    }
+    
+    // Get test cases for the problem
+    const testCasesResult = await db
+      .select()
+      .from(testCases)
+      .where(eq(testCases.problemId, problemResult[0].problem.id));
+      
+    // Combine the data
+    const problem = {
+      ...problemResult[0].problem,
+      contestProblemId: problemResult[0].contestProblem.id,
+      testCases: testCasesResult.map(tc => ({
+        input: tc.input,
+        output: tc.output,
+        kind: tc.kind,
+      })),
       orgId,
-      NameIdSchema.parse(params.contestId),
-    );
-    const problemCode = NameIdSchema.parse(params.problemId);
-
-    const problem = await problemService.getContestProblem(
       contestId,
-      problemCode,
-    );
+    };
+    
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
-    if (error instanceof Error) {
-      if (
-        error.message === "Organization not found" ||
-        error.message === "Contest not found" ||
-        error.message === "Problem not found"
-      ) {
-        return NextResponse.json({ error: error.message }, { status: 404 });
-      }
+      return NextResponse.json({ errors: error.errors }, { status: 400 });
     }
     return NextResponse.json(
-      { error: "Failed to fetch contest problem" },
-      { status: 500 },
+      { message: "Failed to fetch problem" },
+      { status: 500 }
     );
   }
 }

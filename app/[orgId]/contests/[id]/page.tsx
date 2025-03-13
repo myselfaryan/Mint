@@ -223,7 +223,7 @@ export default function ContestDetailsPage() {
                 {contestData.problems.map(
                   (problem: { id: string; title: string }) => (
                     <li key={problem.id}>
-                      <Link href={`/${orgId}/problems/${problem.id}`}>
+                      <Link href={`/${orgId}/contests/${contestId}/problems/${problem.id}`}>
                         <Button
                           variant="link"
                           className="p-0 h-auto text-primary hover:text-primary/80"
