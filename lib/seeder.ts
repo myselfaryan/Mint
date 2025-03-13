@@ -1,4 +1,5 @@
 import { db } from "@/db/drizzle";
+import { sql } from "drizzle-orm";
 import {
   users,
   orgs,
@@ -9,6 +10,7 @@ import {
   groups,
   groupMemberships,
   sessionTable,
+  SelectUser,
 } from "@/db/schema";
 import { hashPassword } from "./password";
 
@@ -45,6 +47,13 @@ const seedConfig = {
 
 export async function seedDatabase(config = seedConfig) {
   try {
+    // Check if database is already populated
+    const isEmpty = await isDatabaseEmpty();
+    if (!isEmpty) {
+      console.log("Database already contains data. Skipping seed operation.");
+      return false;
+    }
+    
     // Create users
     const users = await createUsers(config.users);
     const orgs = await createOrganizations(config.organizations, users);
@@ -59,9 +68,9 @@ export async function seedDatabase(config = seedConfig) {
 
 async function createUsers(userConfig: typeof seedConfig.users) {
   const createdUsers = {
-    admins: [] as any[],
-    organizers: [] as any[],
-    members: [] as any[],
+    admins: [] as SelectUser[],
+    organizers: [] as SelectUser[],
+    members: [] as SelectUser[],
   };
 
   const hashedPassword = await hashPassword(userConfig.password);
@@ -114,7 +123,11 @@ async function createUsers(userConfig: typeof seedConfig.users) {
 
 async function createOrganizations(
   orgConfig: typeof seedConfig.organizations,
-  users: ReturnType<typeof createUsers> extends Promise<infer T> ? T : never,
+  users: {
+    admins: SelectUser[];
+    organizers: SelectUser[];
+    members: SelectUser[];
+  }
 ) {
   const createdOrgs = [];
 
@@ -151,8 +164,15 @@ async function createOrganizations(
   return createdOrgs;
 }
 
-async function createOrgMemberships(orgId: number, users: any) {
-  const memberships = [
+async function createOrgMemberships(
+  orgId: number, 
+  users: {
+    admins: SelectUser[];
+    organizers: SelectUser[];
+    members: SelectUser[];
+  }
+) {
+  const membershipValues = [
     // Assign first admin as owner
     {
       userId: users.admins[0].id,
@@ -160,24 +180,24 @@ async function createOrgMemberships(orgId: number, users: any) {
       role: "owner" as const,
     },
     // Assign organizers
-    ...users.organizers.map((user) => ({
+    ...users.organizers.map((user: SelectUser) => ({
       userId: user.id,
       orgId,
       role: "organizer" as const,
     })),
     // Assign members
-    ...users.members.map((user) => ({
+    ...users.members.map((user: SelectUser) => ({
       userId: user.id,
       orgId,
       role: "member" as const,
     })),
   ];
 
-  await db.insert(memberships).values(memberships);
+  await db.insert(memberships).values(membershipValues);
 }
 
 async function createProblems(orgId: number, count: number) {
-  const createdProblems = [];
+  const createdProblems: Array<typeof problems.$inferSelect> = [];
 
   for (let i = 0; i < count; i++) {
     const [problem] = await db
@@ -198,7 +218,7 @@ async function createProblems(orgId: number, count: number) {
 
 async function createContests(
   orgId: number,
-  problems: any[],
+  problems: Array<typeof problems.$inferSelect>,
   contestConfig: typeof seedConfig.contests,
 ) {
   const now = new Date();
@@ -225,6 +245,8 @@ async function createContests(
         ),
         organizerId: orgId,
         organizerKind: "org",
+        allowList: [],     // Add missing required fields
+        disallowList: [],  // Add missing required fields
       })
       .returning();
 
@@ -243,7 +265,11 @@ async function createContests(
 
 async function createGroups(
   orgId: number,
-  users: any,
+  users: {
+    admins: SelectUser[];
+    organizers: SelectUser[];
+    members: SelectUser[];
+  },
   groupCount: number,
   membersPerGroup: number,
 ) {
@@ -259,7 +285,7 @@ async function createGroups(
       .returning();
 
     // Add random members to group
-    const memberUsers = users.members.slice(0, membersPerGroup).map((user) => ({
+    const memberUsers = users.members.slice(0, membersPerGroup).map((user: SelectUser) => ({
       groupId: group.id,
       userId: user.id,
     }));
@@ -291,6 +317,6 @@ export async function clearDatabase() {
 }
 
 export async function isDatabaseEmpty() {
-  const userCount = await db.select({ count: db.fn.count() }).from(users);
-  return userCount[0].count === 0;
+  const userCount = await db.select({ count: sql`count(*)` }).from(users);
+  return parseInt(userCount[0].count as string) === 0;
 }
