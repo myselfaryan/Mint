@@ -21,7 +21,7 @@ import { AuthCard } from "./auth-card";
 
 export function LoginComponent() {
   const { toast } = useToast();
-  const { login } = useContext(AuthContext);
+  const { login, refreshUser } = useContext(AuthContext);
   const router = useRouter();
 
   const form = useForm<LoginInput>({
@@ -35,6 +35,9 @@ export function LoginComponent() {
   async function onSubmit(values: LoginInput) {
     try {
       const userData = await login(values.email, values.password);
+
+      // Refresh user data before redirecting
+      await refreshUser();
 
       // Check if user is superuser first
       if (userData.isSuperuser) {
