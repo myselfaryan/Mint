@@ -505,8 +505,8 @@ async function createContests(
         endTime: contestEnd,
         organizerId: orgId,
         organizerKind: "org",
-        allowList: [],
-        disallowList: [],
+        allowList: [], // Add missing required fields
+        disallowList: [], // Add missing required fields
       })
       .returning();
 
