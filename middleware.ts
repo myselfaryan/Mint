@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { loggingMiddleware } from "./middleware/logging";
 import { metricsMiddleware } from "./middleware/metrics";
 import { errorMiddleware } from "./middleware/error";
+import { corsMiddleware } from "./middleware/cors";
 
 export const config = {
   matcher: [
@@ -22,6 +23,12 @@ export async function middleware(request: NextRequest) {
     // Skip middleware for metrics endpoint
     if (request.nextUrl.pathname === "/api/metrics") {
       return NextResponse.next();
+    }
+
+    // Apply CORS middleware for API routes
+    if (request.nextUrl.pathname.startsWith("/api/")) {
+      const corsResponse = corsMiddleware(request);
+      if (corsResponse) return corsResponse;
     }
 
     // Apply logging middleware
