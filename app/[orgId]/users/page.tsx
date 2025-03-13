@@ -145,6 +145,54 @@ export default function UsersPage({
     }
   };
 
+  const handleCsvUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`/api/orgs/${orgId}/users/csv`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(formatValidationErrors(errorData));
+      }
+
+      const result = await response.json();
+
+      // Refresh the users list
+      await fetchUsers();
+
+      toast({
+        title: "Success",
+        description: result.message,
+      });
+
+      // Show failures if any
+      const failedCount = result.results?.filter(
+        (r: any) => r.status === "error",
+      ).length;
+
+      if (failedCount > 0) {
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: `${failedCount} users failed to be imported. Check the console for details.`,
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading CSV:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to upload CSV",
+      });
+    }
+  };
+
   return (
     <>
       <MockAlert show={showMockAlert} />
@@ -158,6 +206,8 @@ export default function UsersPage({
           setIsEditorOpen(true);
         }}
         onDelete={deleteUser}
+        allowCsvUpload={true}
+        onCsvUpload={handleCsvUpload}
       />
 
       <GenericEditor
