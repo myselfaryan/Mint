@@ -226,3 +226,46 @@ Add JSDoc comments with Swagger annotations to your API routes:
  *         description: Success response
  */
 ```
+
+### Environment Variables
+
+Make sure your `.env` file includes:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/mint
+
+# Email Configuration
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@example.com
+SMTP_PASSWORD=your-smtp-password
+SMTP_FROM_NAME=Mint Platform
+SMTP_FROM_EMAIL=noreply@example.com
+```
+
+#### Email Configuration Details
+
+- `SMTP_HOST`: Your SMTP server hostname (e.g., smtp.gmail.com for Gmail)
+- `SMTP_PORT`: SMTP port (usually 587 for TLS or 465 for SSL)
+- `SMTP_SECURE`: Use `true` for port 465, `false` for other ports
+- `SMTP_USER`: Your SMTP username/email
+- `SMTP_PASSWORD`: Your SMTP password or app-specific password
+- `SMTP_FROM_NAME`: Display name for sent emails
+- `SMTP_FROM_EMAIL`: Email address used as sender
+
+#### Gmail Setup
+
+If using Gmail:
+1. Enable 2-factor authentication
+2. Generate an app password
+3. Use the app password as `SMTP_PASSWORD`
+
+Example Gmail configuration:
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-gmail@gmail.com
+SMTP_PASSWORD=your-app-specific-password
+```
