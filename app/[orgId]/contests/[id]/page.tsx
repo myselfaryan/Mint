@@ -35,6 +35,29 @@ export default function ContestDetailsPage() {
   const [contestData, setContestData] = useState(defaultContestData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch('/api/me');
+        if (!res.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await res.json();
+        
+        // Find the user's role in the current organization
+        const currentOrg = userData.orgs.find((org: any) => org.nameId === orgId);
+        if (currentOrg) {
+          setUserRole(currentOrg.role);
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+
+    fetchUserData();
+  }, [orgId]);
 
   useEffect(() => {
     const fetchContestData = async () => {
@@ -122,6 +145,18 @@ export default function ContestDetailsPage() {
   };
 
   const status = getContestStatus();
+  
+  // Determine if problems should be shown
+  const shouldShowProblems = () => {
+    const now = new Date();
+    const startTime = new Date(contestData.startTime);
+    
+    // If contest has started, show problems to everyone
+    if (now >= startTime) return true;
+    
+    // For upcoming contests, only show problems to non-members (admins, instructors)
+    return userRole !== 'member';
+  };
 
   if (isLoading) {
     return (
@@ -179,28 +214,33 @@ export default function ContestDetailsPage() {
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center">
-              {/* <ListIcon className="mr-2 h-5 w-5" /> */}
-              Problems
-            </h3>
-            <ul className="space-y-2 px-2">
-              {contestData.problems.map(
-                (problem: { id: string; title: string }) => (
-                  <li key={problem.id}>
-                    <Link href={`/${orgId}/problems/${problem.id}`}>
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto text-primary hover:text-primary/80"
-                      >
-                        {problem.title}
-                      </Button>
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
+          {shouldShowProblems() ? (
+            <div>
+              <h3 className="text-lg font-semibold mb-2 flex items-center">
+                Problems
+              </h3>
+              <ul className="space-y-2 px-2">
+                {contestData.problems.map(
+                  (problem: { id: string; title: string }) => (
+                    <li key={problem.id}>
+                      <Link href={`/${orgId}/problems/${problem.id}`}>
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto text-primary hover:text-primary/80"
+                        >
+                          {problem.title}
+                        </Button>
+                      </Link>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </div>
+          ) : (
+            <div className="text-muted-foreground italic">
+              Problems will be available when the contest starts.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
