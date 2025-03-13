@@ -16,6 +16,7 @@ interface User {
   email: string;
   name: string;
   orgs: Org[];
+  isSuperuser: boolean;
 }
 
 interface AuthContextType {
