@@ -1,0 +1,11 @@
+email,role
+john.doe@example.com,member
+jane.smith@example.com,organizer
+alice.manager@example.com,member
+bob.admin@example.com,organizer
+team.lead@example.com,member
+dev.user@example.com,member
+qa.tester@example.com,member
+project.manager@example.com,organizer
+support.staff@example.com,member
+tech.lead@example.com,organizer
