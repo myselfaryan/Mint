@@ -83,7 +83,20 @@ export async function createSubmission(
 ) {
   console.log(data);
   return await db.transaction(async (tx) => {
-    // First, get the numeric contestId from the contestNameId
+    // First, get the user ID from the userNameId
+    const userResult = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.nameId, data.userNameId))
+      .limit(1);
+
+    if (userResult.length === 0) {
+      throw new Error("User not found");
+    }
+
+    const userId = userResult[0].id;
+
+    // Get the numeric contestId from the contestNameId
     const contestResult = await tx
       .select({ id: contests.id })
       .from(contests)
@@ -144,7 +157,7 @@ export async function createSubmission(
     const [submission] = await tx
       .insert(problemSubmissions)
       .values({
-        userId: data.userId,
+        userId: userId,
         contestProblemId: contestProblemId,
         content: data.content,
         language: data.language,

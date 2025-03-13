@@ -8,7 +8,6 @@ import { z } from "zod";
 import * as submissionService from "./service";
 import { getOrgIdFromNameId } from "@/app/api/service";
 import { NameIdSchema } from "@/app/api/types";
-import { auth } from "@/auth";
 
 export async function GET(
   request: NextRequest,

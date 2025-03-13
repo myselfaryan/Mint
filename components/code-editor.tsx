@@ -302,7 +302,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
       console.log("userData", userData);
 
       // Find the organization in the user's orgs array
-      const userId = userData.nameId;
+      const userNameId = userData.nameId;
 
       // Use the submissions endpoint with the correct orgId
       const submissionEndpoint = `/api/orgs/${problem.orgId}/submissions`;
@@ -315,7 +315,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId,
+          userNameId,
           problemId: problem.id,
           content: code,
           language: languageAliases[language],

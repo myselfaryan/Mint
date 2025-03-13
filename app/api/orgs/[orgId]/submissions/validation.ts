@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createSubmissionSchema = z.object({
-  userId: z.number().int().positive(),
+  userNameId: z.string().min(1, "User name ID is required"),
   problemId: z.number().int().positive(),
   content: z.string().min(1, "Code content is required"),
   language: z.string().min(1, "Programming language is required"),
