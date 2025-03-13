@@ -91,6 +91,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "@types/codemirror": "^5.60.15",
     "@types/node": "^20",
+    "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.11.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",
