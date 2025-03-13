@@ -2,43 +2,36 @@ import { db } from "@/db/drizzle";
 import { users } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
 import { generateUsername } from "@/lib/username";
-import * as readline from "readline";
-
-function prompt(question: string): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer);
-    });
-  });
-}
+import { prompt } from "enquirer";
 
 async function main() {
   try {
     console.log("\n=== Create Superuser ===\n");
 
     // Get email
-    const email = await prompt("Enter email: ");
-    if (!email.includes("@")) {
-      throw new Error("Invalid email address");
-    }
+    const { email } = await prompt<{ email: string }>({
+      type: "input",
+      name: "email",
+      message: "Enter email:",
+      validate: (value) => value.includes("@") || "Invalid email address",
+    });
 
     // Get password
-    const password = await prompt("Enter password (min 8 characters): ");
-    if (password.length < 8) {
-      throw new Error("Password must be at least 8 characters long");
-    }
+    const { password } = await prompt<{ password: string }>({
+      type: "password",
+      name: "password",
+      message: "Enter password (min 8 characters):",
+      validate: (value) =>
+        value.length >= 8 || "Password must be at least 8 characters long",
+    });
 
     // Confirm password
-    const confirmPassword = await prompt("Confirm password: ");
-    if (password !== confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
+    const { confirmPassword } = await prompt<{ confirmPassword: string }>({
+      type: "password",
+      name: "confirmPassword",
+      message: "Confirm password:",
+      validate: (value) => value === password || "Passwords do not match",
+    });
 
     // Generate username from email
     const nameId = await generateUsername(email);
