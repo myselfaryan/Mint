@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircle, Users } from "lucide-react";
 import { GenericEditor, Field } from "@/mint/generic-editor";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -49,9 +49,32 @@ export default function OrgOnboarding() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const router = useRouter();
-  const { refreshUser } = useContext(AuthContext);
-  // setOrg(null);
-  // const { toast } = useToast();
+  const { refreshUser, isAuthenticated, isLoading, user } =
+    useContext(AuthContext);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.push("/login");
+      } else if (
+        user?.orgs &&
+        user.orgs.length > 0 &&
+        window.location.pathname === "/onboarding"
+      ) {
+        router.push(`/${user.orgs[0].nameId}`);
+      }
+    }
+  }, [isLoading, isAuthenticated, user, router]);
+
+  if (
+    isLoading ||
+    !isAuthenticated ||
+    (user?.orgs &&
+      user.orgs.length > 0 &&
+      window.location.pathname === "/onboarding")
+  ) {
+    return null;
+  }
 
   const saveOrg = async (data: Org) => {
     console.log("Saving org:", data);

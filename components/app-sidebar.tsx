@@ -389,7 +389,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer gap-2 p-2 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                      onClick={() => router.push("/onboarding")}
+                      onClick={() => router.push("/new-org")}
                     >
                       <div className="flex size-6 items-center justify-center rounded-sm border bg-sidebar-primary text-sidebar-primary-foreground">
                         <Plus className="size-4 shrink-0" />
