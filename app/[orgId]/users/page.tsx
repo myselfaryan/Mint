@@ -69,6 +69,11 @@ export default function UsersPage({
         throw new Error(formatValidationErrors(errorData));
       }
       const data: User[] = makeJoinedAtReadable(await response.json());
+      for (const user of data) {
+        if (!user.about) {
+          user.about = "No description";
+        }
+      }
       setUsers(data);
       setShowMockAlert(false);
     } catch (error) {
