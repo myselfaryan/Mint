@@ -27,14 +27,14 @@ export default function ThemeTogglerFrame({
     <div className="min-h-screen">
       <div className="container mx-auto p-4">
         <div className="flex justify-end mb-4 items-center gap-2">
-          {theme === "dark" && (
+          {/* theme === "dark" && */ (
             <Sun className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
           )}
           <Switch
             checked={theme === "dark"}
             onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
           />
-          {theme === "light" && (
+          {/* theme === "light" && */ (
             <Moon className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
           )}
         </div>
