@@ -30,7 +30,7 @@ interface AuthContextType {
   ) => Promise<User>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
-  setIsAuthenticated: (status: boolean) => void;
+  // setIsAuthenticated: (status: boolean) => void;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
 }
@@ -41,7 +41,7 @@ const defaultContext: AuthContextType = {
   register: async () => Promise.reject("Not implemented"),
   logout: async () => Promise.reject("Not implemented"),
   isAuthenticated: false,
-  setIsAuthenticated: () => {},
+  // setIsAuthenticated: () => {},
   isLoading: true,
   refreshUser: async () => Promise.reject("Not implemented"),
 };
@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         register,
         logout,
         isAuthenticated,
-        setIsAuthenticated,
+        // setIsAuthenticated,
         isLoading,
         refreshUser,
       }}
