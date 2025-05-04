@@ -12,13 +12,13 @@ type CacheMetric = {
 
 class CacheMetricsCollector {
   private metrics: CacheMetric[] = [];
-  private readonly FILE_PATH = "./data/cache-metrics.json";
+  private readonly FILE_PATH = "/tmp/cache-metrics.json";
   private flushInterval: NodeJS.Timeout;
 
   constructor() {
     // Create metrics file if doesn't exist
     try {
-      const dir = "./data";
+      const dir = "/tmp";
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
@@ -30,6 +30,7 @@ class CacheMetricsCollector {
       this.flushInterval = setInterval(() => this.flush(), 5 * 60 * 1000);
     } catch (error) {
       console.error("Failed to initialize metrics collector:", error);
+      throw error;
     }
   }
 
@@ -39,7 +40,6 @@ class CacheMetricsCollector {
       timestamp: Date.now(),
     });
 
-    // Flush if we have too many metrics in memory
     if (this.metrics.length > 1000) {
       this.flush();
     }
@@ -49,11 +49,14 @@ class CacheMetricsCollector {
     if (this.metrics.length === 0) return;
 
     try {
+      console.log("Flushing metrics to file:", this.FILE_PATH);
       const existingMetrics = JSON.parse(
         fs.readFileSync(this.FILE_PATH, "utf8"),
       );
+      console.log("Existing metrics count:", existingMetrics.length);
       const allMetrics = [...existingMetrics, ...this.metrics];
       fs.writeFileSync(this.FILE_PATH, JSON.stringify(allMetrics, null, 2));
+      console.log("Flushed metrics count:", this.metrics.length);
       this.metrics = [];
     } catch (error) {
       console.error("Failed to flush metrics:", error);
@@ -67,9 +70,10 @@ class CacheMetricsCollector {
     memoryUsage: { withCache: number; withoutCache: number };
   } {
     try {
-      const allMetrics: CacheMetric[] = JSON.parse(
-        fs.readFileSync(this.FILE_PATH, "utf8"),
-      );
+      const allMetrics: CacheMetric[] = [
+        ...JSON.parse(fs.readFileSync(this.FILE_PATH, "utf8")),
+        ...this.metrics,
+      ];
 
       const cached = allMetrics.filter((m) => m.useCache);
       const uncached = allMetrics.filter((m) => !m.useCache);
