@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# Build output
+.next/
+out/
+build/
+dist/
+
+# Any test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Library files (if applicable)
+lib/swagger/
+
+# Other files that might be causing issues
+# Add specific problematic files here if needed
