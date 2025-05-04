@@ -1,0 +1,43 @@
+# Node modules and build outputs
+node_modules
+.next
+out
+
+# Logs and temporary files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*.local
+.env.local
+
+# VCS and Docker files
+.git
+.gitignore
+.dockerignore
+Dockerfile
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor directories
+.vscode
+.idea
+*.code-workspace
+
+# Test and coverage directories
+coverage
+__tests__
+__mocks__
+
+# Miscellaneous
+*.tsbuildinfo
+# *.lock
