@@ -44,10 +44,12 @@ async function main() {
     console.log("\n=== Create Superuser ===\n");
 
     // First, clear the database
-    const shouldClear = await prompt(
-      "This will clear ALL data in the database. Continue? (y/n): ",
-    );
-    if (shouldClear.toLowerCase() !== "y") {
+    const shouldClear = await prompt<{ shouldClear: boolean }>({
+      type: "confirm",
+      name: "shouldClear",
+      message: "This will clear ALL data in the database. Continue? (y/n): ",
+    });
+    if (!shouldClear.shouldClear) {
       console.log("Operation cancelled.");
       process.exit(0);
     }

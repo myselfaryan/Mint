@@ -10,6 +10,7 @@ export async function getOrgUsers(orgId: number) {
       id: users.id,
       name: users.name,
       nameId: users.nameId,
+      email: users.email,
       avatar: users.avatar,
       about: users.about,
       role: memberships.role,

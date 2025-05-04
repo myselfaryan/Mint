@@ -208,11 +208,11 @@ export default function ContestDetailsPage() {
           <div className="flex flex-col space-y-2">
             <div className="flex items-center text-muted-foreground">
               <CalendarIcon className="mr-2 h-4 w-4" />
-              <span>Start: {formatDate(contestData.startTime)}</span>
+              <span>Starts {formatDate(contestData.startTime)}</span>
             </div>
             <div className="flex items-center text-muted-foreground">
               <ClockIcon className="mr-2 h-4 w-4" />
-              <span>End: {formatDate(contestData.endTime)}</span>
+              <span>Ends {formatDate(contestData.endTime)}</span>
             </div>
           </div>
 

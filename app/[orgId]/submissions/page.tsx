@@ -30,14 +30,27 @@ export default function SubmissionsPage({
   const fetchSubmissions = useCallback(async () => {
     try {
       const response = await fetch(`/api/orgs/${params.orgId}/submissions`);
-      console.log("submission", response);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(formatValidationErrors(errorData));
       }
       const data = await response.json();
-      setSubmissions(data);
+      console.log("submission", data);
+
+      const submissions = data.map((submission: any) => ({
+        id: submission.id,
+        userNameId: submission.user.nameId,
+        contestNameId: submission.contest.nameId,
+        contestProblemNameId: submission.problem.id,
+        language: submission.language,
+        status: submission.status,
+        submittedAt: timeAgo(submission.submittedAt),
+        executionTime: submission.executionTime,
+        memoryUsage: submission.memoryUsage,
+      }));
+
+      setSubmissions(submissions);
       setShowMockAlert(false);
     } catch (error) {
       console.error("Error fetching submissions:", error);
