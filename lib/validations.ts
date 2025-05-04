@@ -253,11 +253,9 @@ export const problemSchema = z
     description: z
       .string()
       .openapi({ description: "Problem's detailed description" }),
-    allowedLanguages: z
-      .array(z.string())
-      .openapi({
-        description: "List of programming languages allowed for submissions",
-      }),
+    allowedLanguages: z.array(z.string()).openapi({
+      description: "List of programming languages allowed for submissions",
+    }),
     createdAt: z
       .string()
       .datetime()
