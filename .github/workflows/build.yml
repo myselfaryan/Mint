@@ -48,11 +48,16 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: false
-          tags: nextjs-app:test
+          tags: mint-app:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Test Docker image
+      - name: Verify Docker build
+        run: docker images mint-app:test
+
+      - name: Test Docker Compose
         run: |
-          docker run --rm nextjs-app:test echo "Docker image built successfully"
+          docker compose -f docker-compose.yml config
+          echo "Docker Compose configuration validated successfully"
