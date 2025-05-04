@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies # (assuming your project has dependencies)
         run: bun install # You can use npm/yarn/pnpm instead if you prefer
       - name: Run tests
-        run: bun test
+        run: npx jest
