@@ -3,26 +3,34 @@ import { problems, contestProblems, testCases } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { updateProblemSchema } from "@/lib/validations";
+import { withDataCache } from "@/lib/cache/utils";
+import { CACHE_TTL } from "@/db/redis";
 
 export async function getProblem(orgId: number, code: string) {
-  const problem = await db.query.problems.findFirst({
-    where: and(eq(problems.orgId, orgId), eq(problems.code, code)),
-    with: {
-      testCases: {
-        where: eq(testCases.kind, "example"),
-        columns: {
-          input: true,
-          output: true,
+  return withDataCache(
+    `org:problem:${orgId}:${code}`,
+    async () => {
+      const problem = await db.query.problems.findFirst({
+        where: and(eq(problems.orgId, orgId), eq(problems.code, code)),
+        with: {
+          testCases: {
+            where: eq(testCases.kind, "example"),
+            columns: {
+              input: true,
+              output: true,
+            },
+          },
         },
-      },
+      });
+
+      if (!problem) {
+        throw new Error("Problem not found");
+      }
+
+      return problem;
     },
-  });
-
-  if (!problem) {
-    throw new Error("Problem not found");
-  }
-
-  return problem;
+    CACHE_TTL.LONG,
+  );
 }
 
 export async function updateProblem(

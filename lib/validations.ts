@@ -239,6 +239,10 @@ export const createProblemSchema = z
     description: "Schema for creating a new problem",
   });
 
+export const updateProblemSchema = createProblemSchema.partial().openapi({
+  description: "Schema for updating an existing problem",
+});
+
 export const problemSchema = z
   .object({
     id: z

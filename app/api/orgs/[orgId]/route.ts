@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/db/drizzle";
 import { orgs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getOrgIdFromNameId } from "../../service";
+import { getOrgByOrgId } from "./service";
 
 const updateOrgSchema = z.object({
   name: z.string().optional(),
@@ -24,9 +25,7 @@ export async function GET(
     );
   }
 
-  const org = await db.query.orgs.findFirst({
-    where: eq(orgs.id, orgId),
-  });
+  const org = getOrgByOrgId(orgId);
 
   return org
     ? NextResponse.json(org)

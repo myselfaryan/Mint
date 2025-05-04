@@ -4,6 +4,8 @@ import { contests, problems, contestProblems } from "@/db/schema";
 import { createContestSchema, updateContestSchema } from "@/lib/validations";
 import { and, count, eq, asc } from "drizzle-orm";
 import { getProblemIdFromCode } from "../problems/service";
+import { CACHE_TTL } from "@/db/redis";
+import { withDataCache } from "@/lib/cache/utils";
 
 export async function createContest(
   orgId: number,
@@ -136,41 +138,52 @@ export async function getOrgContests(
 }
 
 export async function getContestByNameId(orgId: number, nameId: string) {
-  const contest = await db.query.contests.findFirst({
-    where: and(eq(contests.organizerId, orgId), eq(contests.nameId, nameId)),
-  });
+  return withDataCache(
+    `contest:${orgId}:${nameId}`,
+    async () => {
+      const contest = await db.query.contests.findFirst({
+        where: and(
+          eq(contests.organizerId, orgId),
+          eq(contests.nameId, nameId),
+          eq(contests.organizerKind, "org"),
+        ),
+      });
 
-  if (!contest) {
-    throw new Error("Contest not found");
-  }
-
-  // Fetch problems for the contest
-  const problemsData = await db.query.contestProblems.findMany({
-    where: eq(contestProblems.contestId, contest.id),
-    orderBy: (contestProblems, { asc }) => [asc(contestProblems.order)],
-  });
-
-  // For each problem ID, get the problem code
-  const problemCodes = await Promise.all(
-    problemsData.map(async (p) => {
-      try {
-        const problem = await db.query.problems.findFirst({
-          where: eq(problems.id, p.problemId),
-          columns: { code: true },
-        });
-        return problem?.code || "";
-      } catch (error) {
-        return "";
+      if (!contest) {
+        throw new Error("Contest not found");
       }
-    }),
+
+      // Fetch problems for the contest
+      const problemsData = await db.query.contestProblems.findMany({
+        where: eq(contestProblems.contestId, contest.id),
+        orderBy: (contestProblems, { asc }) => [asc(contestProblems.order)],
+      });
+
+      // For each problem ID, get the problem code
+      const problemCodes = await Promise.all(
+        problemsData.map(async (p) => {
+          try {
+            const problem = await db.query.problems.findFirst({
+              where: eq(problems.id, p.problemId),
+              columns: { code: true },
+            });
+            return problem?.code || "";
+          } catch (error) {
+            return "";
+          }
+        }),
+      );
+
+      const problemsList = problemCodes.filter((code) => code).join(",");
+
+      return {
+        ...contest,
+        problems: problemsList,
+      };
+    },
+    CACHE_TTL.MEDIUM,
+    3 + 2,
   );
-
-  const problemsList = problemCodes.filter((code) => code).join(",");
-
-  return {
-    ...contest,
-    problems: problemsList,
-  };
 }
 
 export async function updateContest(
