@@ -15,7 +15,6 @@ jest.mock('next/server', () => ({
   },
 }));
 
-// Mock your database and other dependencies
 jest.mock('@/db/drizzle', () => ({
   db: {
     query: {
