@@ -377,3 +377,28 @@ export const testCaseSchema = z
     title: "TestCase",
     description: "Test case schema",
   });
+
+// Post Schemas
+export const createPostSchema = z
+  .object({
+    title: z.string().min(2).max(200).openapi({
+      example: "Getting Started with Competitive Programming",
+      description: "Post's title",
+    }),
+    content: z.string().min(1).openapi({
+      example: "Competitive programming is a mind sport...",
+      description: "Post's content in markdown format",
+    }),
+    tags: z.string().optional().openapi({
+      example: "competitive-programming,algorithms,beginner",
+      description: "Comma-separated list of tags",
+    }),
+  })
+  .openapi({
+    title: "CreatePost",
+    description: "Schema for creating a new post",
+  });
+
+export const updatePostSchema = createPostSchema
+  .partial()
+  .openapi({ description: "Schema for updating an existing post" });

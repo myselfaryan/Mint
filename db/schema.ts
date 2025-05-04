@@ -261,6 +261,53 @@ export const problemSubmissions = pgTable(
   },
 );
 
+export const posts = pgTable(
+  "posts",
+  {
+    id: serial("id").primaryKey(),
+    
+    title: text("title").notNull(),
+    content: text("content").notNull(), // Use Markdown for content
+    
+    orgId: integer("org_id")
+      .notNull()
+      .references(() => orgs.id, { onDelete: "cascade" }),
+    authorId: integer("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+      
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    
+    isPublished: boolean("is_published").default(true).notNull(),
+    slug: text("slug").notNull(),
+  },
+  (table) => {
+    return {
+      orgIdIdx: index("post_org_id_idx").on(table.orgId),
+      authorIdIdx: index("post_author_id_idx").on(table.authorId),
+      createdAtIdx: index("post_created_at_idx").on(table.createdAt),
+      slugIdx: uniqueIndex("post_slug_idx").on(table.orgId, table.slug),
+    };
+  },
+);
+
+export const postTags = pgTable(
+  "post_tags",
+  {
+    postId: integer("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    tag: text("tag").notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.postId, table.tag] }),
+      postIdIdx: index("post_tags_post_id_idx").on(table.postId),
+    };
+  },
+);
+
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),
   userId: integer("user_id")
@@ -299,5 +346,11 @@ export type InsertContestProblem = typeof contestProblems.$inferInsert;
 
 export type SelectProblemSubmission = typeof problemSubmissions.$inferSelect;
 export type InsertProblemSubmission = typeof problemSubmissions.$inferInsert;
+
+export type SelectPost = typeof posts.$inferSelect;
+export type InsertPost = typeof posts.$inferInsert;
+
+export type SelectPostTag = typeof postTags.$inferSelect;
+export type InsertPostTag = typeof postTags.$inferInsert;
 
 export type Session = typeof sessionTable.$inferSelect;
