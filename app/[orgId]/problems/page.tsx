@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 import { formatValidationErrors } from "@/utils/error";
 import { useRouter } from "next/navigation";
 import { MockAlert } from "@/components/mock-alert";
+import { timeAgo } from "@/lib/utils";
 
 const columns: ColumnDef<Problem>[] = [
   { header: "Problem Code", accessorKey: "code", sortable: true },
@@ -33,6 +34,9 @@ export default function ProblemsPage({
         throw new Error(formatValidationErrors(errorData));
       }
       const data = await response.json();
+      for (const problem of data) {
+        problem.createdAt = timeAgo(problem.createdAt);
+      }
       setProblems(data);
       setShowMockAlert(false);
     } catch (error) {
@@ -49,7 +53,7 @@ export default function ProblemsPage({
   const handleDelete = async (problem: Problem) => {
     try {
       const response = await fetch(
-        `/api/orgs/${params.orgId}/problems/${problem.nameId}`,
+        `/api/orgs/${params.orgId}/problems/${problem.code}`,
         {
           method: "DELETE",
         },
