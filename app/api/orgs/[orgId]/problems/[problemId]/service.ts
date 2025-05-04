@@ -29,7 +29,7 @@ export async function getProblem(orgId: number, code: string) {
 
       return problem;
     },
-    CACHE_TTL.MEDIUM,
+    CACHE_TTL.LONG,
   );
 }
 

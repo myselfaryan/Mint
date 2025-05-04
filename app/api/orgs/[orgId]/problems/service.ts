@@ -84,7 +84,7 @@ export async function getOrgProblems(orgId: number) {
 
       return Object.values(groupedProblems);
     },
-    CACHE_TTL.MEDIUM,
+    CACHE_TTL.LONG,
     3,
   );
 }
