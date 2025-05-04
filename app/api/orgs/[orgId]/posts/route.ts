@@ -1,24 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createPost, getOrgPosts, getPostBySlug, updatePost, deletePost } from "./service";
-import { createPostSchema, updatePostSchema, NameIdSchema } from "@/lib/validations";
+import {
+  createPost,
+  getOrgPosts,
+  getPostBySlug,
+  updatePost,
+  deletePost,
+} from "./service";
+import {
+  createPostSchema,
+  updatePostSchema,
+  NameIdSchema,
+} from "@/lib/validations";
 import { getOrgIdFromNameId } from "@/app/api/service";
-import { auth } from "@/lib/auth";
+import { getCurrentSession } from "@/lib/server/session";
+// import { auth } from "@/lib/auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { orgId: string } },
 ) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const { user } = await getCurrentSession();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     const data = createPostSchema.parse(await request.json());
 
-    const post = await createPost(orgId, session.user.id, data);
+    const post = await createPost(orgId, user.id, data);
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
