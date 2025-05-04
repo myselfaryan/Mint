@@ -1,5 +1,4 @@
-import { POST } from '@/app/api/code/route'; // adjust the path if needed
-
+import { POST } from "@/app/api/code/route"; // adjust the path if needed
 
 // Mock global fetch
 global.fetch = jest.fn();
