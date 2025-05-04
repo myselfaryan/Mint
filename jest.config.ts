@@ -15,6 +15,19 @@ const config: Config = {
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
   modulePaths: ['<rootDir>'],
   roots: ['<rootDir>'],
+  reporters: [
+    'default',
+    [ 'jest-junit', {
+      outputDirectory: './reports',
+      outputName: 'junit.xml'
+    }],
+    ['jest-html-reporter', {
+      pageTitle: 'Test Report',
+      outputPath: 'reports/test-report.html',
+      includeFailureMsg: true,
+      includeConsoleLog: true
+    }]
+  ],
 };
 
 export default config;
