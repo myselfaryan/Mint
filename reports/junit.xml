@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="48" failures="0" errors="0" time="6.423">
+  <testsuite name="POST /api/execute" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.665" tests="2">
+    <testcase classname="POST /api/execute should forward the request to Piston API and return the result" name="POST /api/execute should forward the request to Piston API and return the result" time="0.023">
+    </testcase>
+    <testcase classname="POST /api/execute should return 500 on unexpected error" name="POST /api/execute should return 500 on unexpected error" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /api/me" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.685" tests="4">
+    <testcase classname="GET /api/me should return user data if session is valid" name="GET /api/me should return user data if session is valid" time="0.016">
+    </testcase>
+    <testcase classname="GET /api/me should return 401 if session is invalid" name="GET /api/me should return 401 if session is invalid" time="0.001">
+    </testcase>
+    <testcase classname="GET /api/me should return 404 if user not found" name="GET /api/me should return 404 if user not found" time="0.001">
+    </testcase>
+    <testcase classname="GET /api/me should return 500 on internal error" name="GET /api/me should return 500 on internal error" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="DELETE /api/auth/logout" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.684" tests="4">
+    <testcase classname="DELETE /api/auth/logout should logout successfully with valid session" name="DELETE /api/auth/logout should logout successfully with valid session" time="0.015">
+    </testcase>
+    <testcase classname="DELETE /api/auth/logout should handle case when no session exists" name="DELETE /api/auth/logout should handle case when no session exists" time="0.002">
+    </testcase>
+    <testcase classname="DELETE /api/auth/logout should handle errors during logout process" name="DELETE /api/auth/logout should handle errors during logout process" time="0.004">
+    </testcase>
+    <testcase classname="DELETE /api/auth/logout should handle errors during session invalidation" name="DELETE /api/auth/logout should handle errors during session invalidation" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /problems/:problemId" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.71" tests="7">
+    <testcase classname="GET /problems/:problemId should return problem details" name="GET /problems/:problemId should return problem details" time="0.023">
+    </testcase>
+    <testcase classname="GET /problems/:problemId should return 404 if not found" name="GET /problems/:problemId should return 404 if not found" time="0.001">
+    </testcase>
+    <testcase classname="PATCH /problems/:problemId should update problem successfully" name="PATCH /problems/:problemId should update problem successfully" time="0.002">
+    </testcase>
+    <testcase classname="PATCH /problems/:problemId should return 404 if problem not found during update" name="PATCH /problems/:problemId should return 404 if problem not found during update" time="0.002">
+    </testcase>
+    <testcase classname="DELETE /problems/:problemId should delete problem successfully" name="DELETE /problems/:problemId should delete problem successfully" time="0.001">
+    </testcase>
+    <testcase classname="DELETE /problems/:problemId should return 404 if problem not found" name="DELETE /problems/:problemId should return 404 if problem not found" time="0.001">
+    </testcase>
+    <testcase classname="DELETE /problems/:problemId should return 409 if problem is used in contests" name="DELETE /problems/:problemId should return 409 if problem is used in contests" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="POST /participants" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.744" tests="7">
+    <testcase classname="POST /participants should register a participant successfully" name="POST /participants should register a participant successfully" time="0.023">
+    </testcase>
+    <testcase classname="POST /participants should return 400 on Zod validation error" name="POST /participants should return 400 on Zod validation error" time="0.004">
+    </testcase>
+    <testcase classname="POST /participants should return 403 for disallowed errors" name="POST /participants should return 403 for disallowed errors" time="0.002">
+    </testcase>
+    <testcase classname="GET /participants should return participants successfully" name="GET /participants should return participants successfully" time="0.002">
+    </testcase>
+    <testcase classname="GET /participants should return 404 for not found errors" name="GET /participants should return 404 for not found errors" time="0.001">
+    </testcase>
+    <testcase classname="DELETE /participants should remove participant successfully" name="DELETE /participants should remove participant successfully" time="0.001">
+    </testcase>
+    <testcase classname="DELETE /participants should return 404 if user not registered" name="DELETE /participants should return 404 if user not registered" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /users" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.747" tests="5">
+    <testcase classname="GET /users should return users successfully" name="GET /users should return users successfully" time="0.02">
+    </testcase>
+    <testcase classname="GET /users should return 500 if fetching fails" name="GET /users should return 500 if fetching fails" time="0.002">
+    </testcase>
+    <testcase classname="POST /users should invite user successfully" name="POST /users should invite user successfully" time="0.002">
+    </testcase>
+    <testcase classname="POST /users should return 400 for invalid request body" name="POST /users should return 400 for invalid request body" time="0.002">
+    </testcase>
+    <testcase classname="POST /users should return 400 for service errors" name="POST /users should return 400 for service errors" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /submissions" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.772" tests="5">
+    <testcase classname="GET /submissions should return submissions successfully" name="GET /submissions should return submissions successfully" time="0.039">
+    </testcase>
+    <testcase classname="GET /submissions should return 404 if org not found" name="GET /submissions should return 404 if org not found" time="0.002">
+    </testcase>
+    <testcase classname="POST /submissions should create a submission successfully" name="POST /submissions should create a submission successfully" time="0.004">
+    </testcase>
+    <testcase classname="POST /submissions should return 400 for known error thrown by service" name="POST /submissions should return 400 for known error thrown by service" time="0.002">
+    </testcase>
+    <testcase classname="POST /submissions should return 400 for invalid submission schema" name="POST /submissions should return 400 for invalid submission schema" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /submissions" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.785" tests="8">
+    <testcase classname="GET /submissions should return submissions successfully" name="GET /submissions should return submissions successfully" time="0.039">
+    </testcase>
+    <testcase classname="GET /submissions should return 404 if org not found" name="GET /submissions should return 404 if org not found" time="0.002">
+    </testcase>
+    <testcase classname="POST /submissions should create a submission successfully" name="POST /submissions should create a submission successfully" time="0.004">
+    </testcase>
+    <testcase classname="POST /submissions should return 400 for known error thrown by service" name="POST /submissions should return 400 for known error thrown by service" time="0.002">
+    </testcase>
+    <testcase classname="POST /submissions should return 400 for invalid submission schema" name="POST /submissions should return 400 for invalid submission schema" time="0.002">
+    </testcase>
+    <testcase classname="GET /submissions/[submissionId] should return a single submission successfully" name="GET /submissions/[submissionId] should return a single submission successfully" time="0.007">
+    </testcase>
+    <testcase classname="GET /submissions/[submissionId] should return 404 if submission not found" name="GET /submissions/[submissionId] should return 404 if submission not found" time="0.002">
+    </testcase>
+    <testcase classname="GET /submissions/[submissionId] should return 400 for invalid input" name="GET /submissions/[submissionId] should return 400 for invalid input" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="GET /api/health" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.865" tests="2">
+    <testcase classname="GET /api/health should return 200 if DB connection is healthy" name="GET /api/health should return 200 if DB connection is healthy" time="0.016">
+    </testcase>
+    <testcase classname="GET /api/health should return 503 if DB connection fails" name="GET /api/health should return 503 if DB connection fails" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="POST /api/login" errors="0" failures="0" skipped="0" timestamp="2025-05-04T15:40:51" time="2.958" tests="4">
+    <testcase classname="POST /api/login should return user data on valid credentials" name="POST /api/login should return user data on valid credentials" time="0.017">
+    </testcase>
+    <testcase classname="POST /api/login should return 401 if user not found" name="POST /api/login should return 401 if user not found" time="0.001">
+    </testcase>
+    <testcase classname="POST /api/login should return 401 on invalid password" name="POST /api/login should return 401 on invalid password" time="0.001">
+    </testcase>
+    <testcase classname="POST /api/login should return 400 on invalid request" name="POST /api/login should return 400 on invalid request" time="0.002">
+    </testcase>
+  </testsuite>
+</testsuites>
