@@ -38,5 +38,5 @@ RUN mkdir -p .next && chown -R bun:bun .
 # run the app
 USER bun
 EXPOSE 3000/tcp
-RUN bun db:migrate
+# RUN bun db:migrate
 ENTRYPOINT [ "bun", "run", "dev" ]
