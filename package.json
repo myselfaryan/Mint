@@ -23,6 +23,7 @@
     "email": "tsx scripts/email.ts"
   },
   "dependencies": {
+    "@anatine/zod-openapi": "^2.2.8",
     "@codemirror/lang-cpp": "^6.0.2",
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "6.2.2",
