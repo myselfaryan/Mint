@@ -4,7 +4,7 @@ services:
     ports:
       - "8108:8108"
     volumes:
-      - ./typesense-data:/data
+      - typesense_data:/data
     environment:
       - TYPESENSE_API_KEY=your_api_key_here
       - TYPESENSE_DATA_DIR=/data
@@ -40,3 +40,4 @@ services:
 
 volumes:
   postgres_data:
+  typesense_data:
