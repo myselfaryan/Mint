@@ -1,0 +1,62 @@
+/* Reset container */
+.swagger-ui-container {
+  all: revert;
+  background: white;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Reset all Swagger UI elements */
+.swagger-ui {
+  all: revert;
+}
+
+.swagger-ui * {
+  all: revert;
+}
+
+/* Re-apply necessary Swagger styles */
+.swagger-ui .wrapper {
+  padding: 20px;
+  max-width: 1460px;
+  margin: 0 auto;
+}
+
+.swagger-ui .opblock {
+  margin: 0 0 15px;
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(0,0,0,.19);
+}
+
+.swagger-ui .opblock .opblock-summary {
+  padding: 8px;
+}
+
+.swagger-ui .opblock .opblock-summary-method {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px;
+  border-radius: 3px;
+  text-shadow: 0 1px 0 rgba(0,0,0,.1);
+}
+
+.swagger-ui table tbody tr td {
+  padding: 10px;
+  vertical-align: top;
+}
+
+.swagger-ui .parameters-col_description {
+  width: 75%;
+}
+
+.swagger-ui .parameters-col_name {
+  width: 25%;
+}
+
+.swagger-ui .response-col_status {
+  width: 15%;
+}
+
+.swagger-ui .response-col_description {
+  width: 85%;
+} 
