@@ -110,6 +110,7 @@
     "@types/slate": "^0.47.16",
     "@types/slate-react": "^0.50.1",
     "@udecode/plate": "^40.2.9",
+    "cross-fetch": "^4.1.0",
     "drizzle-kit": "^0.30.5",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
