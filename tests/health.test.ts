@@ -14,7 +14,7 @@ jest.mock('next/server', () => ({
 }));
 
 import { db } from '@/db/drizzle';
-import { NextResponse } from 'next/server';
+// import { NextResponse } from 'next/server';
 
 describe('GET /api/health', () => {
   beforeEach(() => {
