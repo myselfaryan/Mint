@@ -190,16 +190,6 @@
 //   });
 // });
 
-
-
-
-
-
-
-
-
-
-
 import { NextRequest, NextResponse } from "next/server";
 import { POST } from "@/app/api/auth/register/route"; // Assuming this file is in the same directory as the route
 import { registerSchema } from "@/lib/validations";
@@ -297,7 +287,11 @@ describe("User Registration API Route", () => {
 
     registerSchema.parse.mockReturnValue(mockRequestBody);
     db.query.users.findFirst.mockResolvedValue(null); // No existing user by default
-    eq.mockReturnValue({ operator: "=", field: "email", value: mockRequestBody.email });
+    eq.mockReturnValue({
+      operator: "=",
+      field: "email",
+      value: mockRequestBody.email,
+    });
     hashPassword.mockResolvedValue("hashed-password");
     generateUsername.mockResolvedValue(mockUser.nameId);
     db.returning.mockResolvedValue([mockUser]);
@@ -318,7 +312,7 @@ describe("User Registration API Route", () => {
     expect(eq).toHaveBeenCalledWith(users.email, mockRequestBody.email);
     expect(hashPassword).toHaveBeenCalledWith(mockRequestBody.password);
     expect(generateUsername).toHaveBeenCalledWith(mockRequestBody.email);
-    
+
     expect(db.insert).toHaveBeenCalledTimes(1);
     expect(db.values).toHaveBeenCalledWith({
       email: mockRequestBody.email,
@@ -327,18 +321,21 @@ describe("User Registration API Route", () => {
       nameId: mockUser.nameId,
     });
     expect(db.returning).toHaveBeenCalledTimes(1);
-    
+
     expect(generateSessionToken).toHaveBeenCalledTimes(1);
     expect(createSession).toHaveBeenCalledWith(mockToken, mockUser.id);
-    expect(setSessionTokenCookie).toHaveBeenCalledWith(mockToken, mockSession.expiresAt);
-    
+    expect(setSessionTokenCookie).toHaveBeenCalledWith(
+      mockToken,
+      mockSession.expiresAt,
+    );
+
     expect(NextResponse.json).toHaveBeenCalledWith({
       _id: mockUser.id,
       email: mockUser.email,
       name: mockUser.name,
       nameId: mockUser.nameId,
     });
-    
+
     expect(result).toEqual({
       data: {
         _id: mockUser.id,
@@ -366,12 +363,12 @@ describe("User Registration API Route", () => {
     expect(generateSessionToken).not.toHaveBeenCalled();
     expect(createSession).not.toHaveBeenCalled();
     expect(setSessionTokenCookie).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Email already exists" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Email already exists" },
       options: { status: 400 },
@@ -392,12 +389,12 @@ describe("User Registration API Route", () => {
     expect(registerSchema.parse).toHaveBeenCalled();
     expect(db.query.users.findFirst).not.toHaveBeenCalled();
     expect(db.insert).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },
@@ -415,12 +412,12 @@ describe("User Registration API Route", () => {
     // Assertions
     expect(hashPassword).toHaveBeenCalled();
     expect(db.insert).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },
@@ -438,12 +435,12 @@ describe("User Registration API Route", () => {
     // Assertions
     expect(generateUsername).toHaveBeenCalled();
     expect(db.insert).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },
@@ -461,12 +458,12 @@ describe("User Registration API Route", () => {
     // Assertions
     expect(db.returning).toHaveBeenCalled();
     expect(generateSessionToken).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },
@@ -484,12 +481,12 @@ describe("User Registration API Route", () => {
     // Assertions
     expect(createSession).toHaveBeenCalled();
     expect(setSessionTokenCookie).not.toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },
@@ -506,12 +503,12 @@ describe("User Registration API Route", () => {
 
     // Assertions
     expect(setSessionTokenCookie).toHaveBeenCalled();
-    
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: "Invalid request" },
-      { status: 400 }
+      { status: 400 },
     );
-    
+
     expect(result).toEqual({
       data: { error: "Invalid request" },
       options: { status: 400 },

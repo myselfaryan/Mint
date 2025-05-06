@@ -110,16 +110,17 @@
 //   });
 // });
 
-
-
-
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import * as problemService from "@/app/api/orgs/[orgId]/contests/[contestId]/problems/service";
 import { getOrgIdFromNameId, getContestIdFromNameId } from "@/app/api/service";
 import { addProblemSchema, NameIdSchema } from "@/lib/validations";
 import { getProblemIdFromCode } from "@/app/api/orgs/[orgId]/problems/service";
-import { POST, GET, DELETE } from "@/app/api/orgs/[orgId]/contests/[contestId]/problems/route";
+import {
+  POST,
+  GET,
+  DELETE,
+} from "@/app/api/orgs/[orgId]/contests/[contestId]/problems/route";
 
 // Mock the imported modules
 jest.mock("next/server", () => ({
@@ -144,11 +145,14 @@ jest.mock("zod", () => {
   };
 });
 
-jest.mock("@/app/api/orgs/[orgId]/contests/[contestId]/problems/service", () => ({
-  addProblemToContest: jest.fn(),
-  getContestProblems: jest.fn(),
-  removeProblemFromContest: jest.fn(),
-}));
+jest.mock(
+  "@/app/api/orgs/[orgId]/contests/[contestId]/problems/service",
+  () => ({
+    addProblemToContest: jest.fn(),
+    getContestProblems: jest.fn(),
+    removeProblemFromContest: jest.fn(),
+  }),
+);
 
 jest.mock("@/app/api/service", () => ({
   getOrgIdFromNameId: jest.fn(),
@@ -216,15 +220,23 @@ describe("Contest Problems API Routes", () => {
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.orgId);
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.contestId);
       expect(getOrgIdFromNameId).toHaveBeenCalledWith(mockParams.orgId);
-      expect(getContestIdFromNameId).toHaveBeenCalledWith(mockOrgId, mockParams.contestId);
+      expect(getContestIdFromNameId).toHaveBeenCalledWith(
+        mockOrgId,
+        mockParams.contestId,
+      );
       expect(addProblemSchema.parse).toHaveBeenCalledWith(mockRequestBody);
-      expect(getProblemIdFromCode).toHaveBeenCalledWith(mockOrgId, mockRequestBody.problemCode);
+      expect(getProblemIdFromCode).toHaveBeenCalledWith(
+        mockOrgId,
+        mockRequestBody.problemCode,
+      );
       expect(problemService.addProblemToContest).toHaveBeenCalledWith(
         mockContestId,
         mockProblemId,
-        mockRequestBody.order
+        mockRequestBody.order,
       );
-      expect(NextResponse.json).toHaveBeenCalledWith(mockAddedProblem, { status: 201 });
+      expect(NextResponse.json).toHaveBeenCalledWith(mockAddedProblem, {
+        status: 201,
+      });
       expect(result).toEqual({
         data: mockAddedProblem,
         options: { status: 201 },
@@ -244,7 +256,7 @@ describe("Contest Problems API Routes", () => {
       expect(problemService.addProblemToContest).toHaveBeenCalledWith(
         mockContestId,
         mockProblemId,
-        0 // Default order value
+        0, // Default order value
       );
     });
 
@@ -262,7 +274,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: validationErrors },
-        { status: 400 }
+        { status: 400 },
       );
       expect(result).toEqual({
         data: { error: validationErrors },
@@ -281,7 +293,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Organization not found" },
@@ -300,7 +312,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Contest not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Contest not found" },
@@ -319,7 +331,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Problem not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Problem not found" },
@@ -338,7 +350,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Problem already added to contest" },
-        { status: 409 }
+        { status: 409 },
       );
       expect(result).toEqual({
         data: { error: "Problem already added to contest" },
@@ -357,7 +369,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Failed to add problem to contest" },
-        { status: 500 }
+        { status: 500 },
       );
       expect(result).toEqual({
         data: { error: "Failed to add problem to contest" },
@@ -405,8 +417,13 @@ describe("Contest Problems API Routes", () => {
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.orgId);
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.contestId);
       expect(getOrgIdFromNameId).toHaveBeenCalledWith(mockParams.orgId);
-      expect(getContestIdFromNameId).toHaveBeenCalledWith(mockOrgId, mockParams.contestId);
-      expect(problemService.getContestProblems).toHaveBeenCalledWith(mockContestId);
+      expect(getContestIdFromNameId).toHaveBeenCalledWith(
+        mockOrgId,
+        mockParams.contestId,
+      );
+      expect(problemService.getContestProblems).toHaveBeenCalledWith(
+        mockContestId,
+      );
       expect(NextResponse.json).toHaveBeenCalledWith(mockProblems);
       expect(result).toEqual({
         data: mockProblems,
@@ -428,7 +445,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: validationErrors },
-        { status: 400 }
+        { status: 400 },
       );
       expect(result).toEqual({
         data: { error: validationErrors },
@@ -447,7 +464,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Organization not found" },
@@ -466,7 +483,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Contest not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Contest not found" },
@@ -485,7 +502,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Failed to fetch contest problems" },
-        { status: 500 }
+        { status: 500 },
       );
       expect(result).toEqual({
         data: { error: "Failed to fetch contest problems" },
@@ -526,11 +543,14 @@ describe("Contest Problems API Routes", () => {
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.contestId);
       expect(NameIdSchema.parse).toHaveBeenCalledWith(mockParams.problemId);
       expect(getOrgIdFromNameId).toHaveBeenCalledWith(mockParams.orgId);
-      expect(getContestIdFromNameId).toHaveBeenCalledWith(mockOrgId, mockParams.contestId);
+      expect(getContestIdFromNameId).toHaveBeenCalledWith(
+        mockOrgId,
+        mockParams.contestId,
+      );
       expect(problemService.removeProblemFromContest).toHaveBeenCalledWith(
         mockOrgId,
         mockContestId,
-        mockParams.problemId
+        mockParams.problemId,
       );
       expect(Response).toHaveBeenCalledWith(null, { status: 204 });
       expect(result).toEqual({
@@ -542,15 +562,20 @@ describe("Contest Problems API Routes", () => {
 
     it("should return 400 for validation errors", async () => {
       // Setup validation error
-      const validationErrors = [{ path: ["problemId"], message: "Invalid format" }];
+      const validationErrors = [
+        { path: ["problemId"], message: "Invalid format" },
+      ];
       const zodError = new z.ZodError(validationErrors);
-      NameIdSchema.parse.mockImplementationOnce(() => {
-        return mockParams.orgId;
-      }).mockImplementationOnce(() => {
-        return mockParams.contestId;
-      }).mockImplementationOnce(() => {
-        throw zodError;
-      });
+      NameIdSchema.parse
+        .mockImplementationOnce(() => {
+          return mockParams.orgId;
+        })
+        .mockImplementationOnce(() => {
+          return mockParams.contestId;
+        })
+        .mockImplementationOnce(() => {
+          throw zodError;
+        });
 
       // Call the function
       const result = await DELETE(new NextRequest(), { params: mockParams });
@@ -558,7 +583,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: validationErrors },
-        { status: 400 }
+        { status: 400 },
       );
       expect(result).toEqual({
         data: { error: validationErrors },
@@ -577,7 +602,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Organization not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Organization not found" },
@@ -596,7 +621,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Contest not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Contest not found" },
@@ -615,7 +640,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Problem not found" },
-        { status: 404 }
+        { status: 404 },
       );
       expect(result).toEqual({
         data: { error: "Problem not found" },
@@ -626,7 +651,9 @@ describe("Contest Problems API Routes", () => {
     it("should return 500 for unexpected errors", async () => {
       // Setup
       const unexpectedError = new Error("Unexpected database error");
-      problemService.removeProblemFromContest.mockRejectedValue(unexpectedError);
+      problemService.removeProblemFromContest.mockRejectedValue(
+        unexpectedError,
+      );
 
       // Call the function
       const result = await DELETE(new NextRequest(), { params: mockParams });
@@ -634,7 +661,7 @@ describe("Contest Problems API Routes", () => {
       // Assertions
       expect(NextResponse.json).toHaveBeenCalledWith(
         { error: "Failed to remove problem from contest" },
-        { status: 500 }
+        { status: 500 },
       );
       expect(result).toEqual({
         data: { error: "Failed to remove problem from contest" },
