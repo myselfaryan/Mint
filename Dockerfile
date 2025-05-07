@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 
 # Install global packages
 ENV BUN_INSTALL_GLOBAL=/usr/local/bin
-RUN bun install -g tsx typescript
+RUN bun install -g tsx typescript && \
+    chmod -R 755 /usr/local/bin
 
 # Install dependencies
 COPY package.json bun.lock ./
