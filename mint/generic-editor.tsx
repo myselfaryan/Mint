@@ -119,7 +119,7 @@ export function GenericEditor<T>({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className={`p-8 ${fields.some((f) => f.type === "datetime") ? "w-[1000px]" : "w-[700px]"} rounded-lg`}
+        className={`p-8 ${fields.some((f) => f.type === "datetime") ? "w-[1000px]" : "w-[700px]"} rounded-lg min-w-[900px]`}
       >
         <DialogHeader>
           <DialogTitle>
