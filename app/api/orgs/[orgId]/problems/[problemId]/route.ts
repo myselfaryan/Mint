@@ -3,6 +3,7 @@ import { z } from "zod";
 import { NameIdSchema, updateProblemSchema } from "@/lib/validations";
 import { getOrgIdFromNameId } from "@/app/api/service";
 import * as problemService from "./service";
+import { invalidateCacheKey } from "@/lib/cache/utils";
 
 export async function GET(
   _req: NextRequest,
@@ -47,6 +48,7 @@ export async function PATCH(
       problemCode,
       data,
     );
+    await invalidateCacheKey(`org:problem:${orgId}:${params.problemId}`);
     return NextResponse.json(problem);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -76,6 +78,7 @@ export async function DELETE(
     const problemCode = NameIdSchema.parse(params.problemId);
 
     await problemService.deleteProblem(orgId, problemCode);
+    await invalidateCacheKey(`org:problem:${orgId}:${params.problemId}`);
     return new Response(null, { status: 204 });
   } catch (error) {
     if (error instanceof z.ZodError) {

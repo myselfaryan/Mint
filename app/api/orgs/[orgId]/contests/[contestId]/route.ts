@@ -3,6 +3,7 @@ import { z } from "zod";
 import { NameIdSchema, updateContestSchema } from "@/lib/validations";
 import { getOrgIdFromNameId } from "@/app/api/service";
 import { deleteContest, getContestByNameId, updateContest } from "../service";
+import { invalidateCacheKey } from "@/lib/cache/utils";
 
 export async function GET(
   _request: NextRequest,
@@ -47,6 +48,7 @@ export async function PATCH(
       NameIdSchema.parse(params.contestId),
       data,
     );
+    await invalidateCacheKey(`contest:${orgId}:${params.contestId}`);
     return NextResponse.json(contest);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -77,6 +79,7 @@ export async function DELETE(
       orgId,
       NameIdSchema.parse(params.contestId),
     );
+    await invalidateCacheKey(`contest:${orgId}:${params.contestId}`);
     return NextResponse.json(contest);
   } catch (error) {
     if (error instanceof z.ZodError) {

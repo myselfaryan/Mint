@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { NameIdSchema } from "@/app/api/types";
 import { problemSchema } from "@/lib/validations";
 import { z } from "zod";
+import { invalidateCacheKey } from "@/lib/cache/utils";
 
 export async function GET(
   _req: NextRequest,
@@ -51,6 +52,8 @@ export async function POST(
       validatedProblem,
       validatedTestCases,
     );
+
+    await invalidateCacheKey(`org:problems:${orgId}`);
 
     return NextResponse.json(problem, { status: 201 });
   } catch (error) {

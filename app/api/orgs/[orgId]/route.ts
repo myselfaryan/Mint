@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getOrgIdFromNameId } from "../../service";
 import { getOrgByOrgId } from "./service";
+import { invalidateCacheKey } from "@/lib/cache/utils";
 
 const updateOrgSchema = z.object({
   name: z.string().optional(),
@@ -53,6 +54,8 @@ export async function PATCH(
     .set(validatedData)
     .where(eq(orgs.id, orgId))
     .returning();
+
+  await invalidateCacheKey(`org:${orgId}`);
 
   return updatedOrg
     ? NextResponse.json(updatedOrg)
