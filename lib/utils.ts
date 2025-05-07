@@ -16,6 +16,34 @@ export function timeAgo(isoDate: string): string {
   const diffInMonths = Math.floor(diffInDays / 30);
   const diffInYears = Math.floor(diffInDays / 365);
 
+  // Handle future dates
+  if (diffInMs < 0) {
+    const absDiffInYears = Math.abs(diffInYears);
+    const absDiffInMonths = Math.abs(diffInMonths);
+    const absDiffInDays = Math.abs(diffInDays);
+    const absDiffInHours = Math.abs(diffInHours);
+    const absDiffInMins = Math.abs(diffInMins);
+
+    if (absDiffInYears > 0) {
+      return absDiffInYears === 1 ? "in 1 year" : `in ${absDiffInYears} years`;
+    } else if (absDiffInMonths > 0) {
+      return absDiffInMonths === 1
+        ? "in 1 month"
+        : `in ${absDiffInMonths} months`;
+    } else if (absDiffInDays > 0) {
+      return absDiffInDays === 1 ? "tomorrow" : `in ${absDiffInDays} days`;
+    } else if (absDiffInHours > 0) {
+      return absDiffInHours === 1 ? "in 1 hour" : `in ${absDiffInHours} hours`;
+    } else if (absDiffInMins > 0) {
+      return absDiffInMins === 1
+        ? "in 1 minute"
+        : `in ${absDiffInMins} minutes`;
+    } else {
+      return "just now";
+    }
+  }
+
+  // Handle past dates (existing logic)
   if (diffInYears > 0) {
     return diffInYears === 1 ? "1 year ago" : `${diffInYears} years ago`;
   } else if (diffInMonths > 0) {
