@@ -7,9 +7,6 @@ WORKDIR /usr/src/app
 COPY package.json bun.lock ./
 RUN bun install
 
-# Install global packages
-RUN bun install -g tsx typescript
-
 # Copy the rest of the application
 COPY . .
 
