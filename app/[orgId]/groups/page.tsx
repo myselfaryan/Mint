@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatValidationErrors } from "@/utils/error";
 import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
+import { timeAgo } from "@/lib/utils";
 
 const columns: ColumnDef<Group>[] = [
   { header: "Name", accessorKey: "name" as const },
@@ -83,6 +84,9 @@ export default function GroupsPage() {
         const data = await response.json();
         const updatedData = injectUsersCount(data);
         console.log("updatedData", updatedData);
+        for (const group of updatedData) {
+          group.createdAt = timeAgo(group.createdAt);
+        }
         setGroups(updatedData);
         setShowMockAlert(false);
       } catch (error) {

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatValidationErrors } from "@/utils/error";
 import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
+import { timeAgo } from "@/lib/utils";
 
 interface Post {
   id: number;
@@ -22,6 +23,7 @@ interface Post {
     name: string;
     nameId: string;
   };
+  authorName?: string;
 }
 
 // Form data type for creating/updating posts
@@ -33,7 +35,7 @@ interface PostFormData {
 
 const columns: ColumnDef<Post>[] = [
   { header: "Title", accessorKey: "title" },
-  { header: "Author", accessorKey: "author" },
+  { header: "Author", accessorKey: "authorName" },
   { header: "Tags", accessorKey: "tags" },
   { header: "Created At", accessorKey: "createdAt" },
   { header: "Updated At", accessorKey: "updatedAt" },
@@ -61,6 +63,13 @@ const postSchema = z.object({
     nameId: z.string(),
   }),
 });
+
+async function injectAuthor(posts: Post[]) {
+  return posts.map((post) => ({
+    ...post,
+    authorName: post.author.name,
+  }));
+}
 
 const fields: Field[] = [
   { name: "title", label: "Title", type: "text" },
@@ -92,7 +101,12 @@ export default function PostsPage() {
           throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
-        setPosts(data.data);
+        for (const post of data.data) {
+          post.createdAt = timeAgo(post.createdAt);
+          post.updatedAt = timeAgo(post.updatedAt);
+        }
+        setPosts(await injectAuthor(data.data));
+
         setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching posts:", error);

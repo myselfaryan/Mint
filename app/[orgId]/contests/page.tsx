@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatValidationErrors } from "@/utils/error";
 import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
+import { timeAgo } from "@/lib/utils";
 
 const columns: ColumnDef<Contest>[] = [
   { header: "Contest ID", accessorKey: "nameId", sortable: true },
@@ -88,6 +89,10 @@ export default function ContestsPage() {
           throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
+        for (const contest of data.data) {
+          contest.startTime = timeAgo(contest.startTime);
+          contest.endTime = timeAgo(contest.endTime);
+        }
         setContests(injectProblemsCount(data.data || []));
         setShowMockAlert(false);
       } catch (error) {
