@@ -265,20 +265,20 @@ export const posts = pgTable(
   "posts",
   {
     id: serial("id").primaryKey(),
-    
+
     title: text("title").notNull(),
     content: text("content").notNull(), // Use Markdown for content
-    
+
     orgId: integer("org_id")
       .notNull()
       .references(() => orgs.id, { onDelete: "cascade" }),
     authorId: integer("author_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-      
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    
+
     isPublished: boolean("is_published").default(true).notNull(),
     slug: text("slug").notNull(),
   },

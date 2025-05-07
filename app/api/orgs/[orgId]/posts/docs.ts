@@ -1,5 +1,9 @@
 import { documentRoute } from "@/lib/swagger/route-docs";
-import { NameIdSchema, createPostSchema, updatePostSchema } from "@/lib/validations";
+import {
+  NameIdSchema,
+  createPostSchema,
+  updatePostSchema,
+} from "@/lib/validations";
 import { z } from "zod";
 
 // Document GET /orgs/{orgId}/posts
