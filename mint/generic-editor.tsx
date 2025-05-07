@@ -128,7 +128,7 @@ export function GenericEditor<T>({
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           {fields.some((f) => f.type === "datetime") ? (
-            <div className="flex gap-0">
+            <div className="flex gap-0 items-start">
               {/* Left panel: non-datetime fields */}
               <div className="flex-1 grid gap-4 py-4 pr-6">
                 {fields
@@ -209,14 +209,12 @@ export function GenericEditor<T>({
                     </div>
                   ))}
               </div>
-              {/* Divider */}
-              <div className="w-px bg-border mx-2" />
               {/* Right panel: datetime fields */}
-              <div className="w-72 grid gap-1 py-4 pl-6">
+              <div className="w-72 grid gap-4 py-4 pl-6">
                 {fields
                   .filter((field) => field.type === "datetime")
                   .map((field) => (
-                    <div key={field.name} className="space-y-0.5">
+                    <div key={field.name} className="space-y-2">
                       <Label htmlFor={field.name}>{field.label}</Label>
                       <Input
                         id={field.name}
