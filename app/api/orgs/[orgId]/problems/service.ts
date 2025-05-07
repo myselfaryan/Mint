@@ -34,6 +34,8 @@ export async function createProblem(
       );
     }
 
+    console.log("CREATE problem", problem);
+
     return problem;
   });
 }

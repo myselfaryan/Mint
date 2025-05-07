@@ -30,6 +30,7 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { mockProblems, Problem } from "@/app/[orgId]/problems/mockProblems";
+import Markdown from "react-markdown";
 
 const themes = {
   "VS Code Dark": vscodeDark,
@@ -54,7 +55,7 @@ const defaultCode = {
 using namespace std;
 
 int main() {
-  
+
 }`,
 };
 
@@ -370,7 +371,7 @@ export function CodeEditor({ problem }: CodeEditorProps) {
                   {problem?.title}
                 </h1>
                 <p className="text-sm text-foreground">
-                  {problem?.description}
+                  <Markdown>{problem?.description}</Markdown>
                 </p>
               </div>
             </div>
