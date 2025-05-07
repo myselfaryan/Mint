@@ -172,9 +172,9 @@ const getNavItems = (role?: string): SidebarItem[] => {
       url: "groups",
       icon: Contact,
       allowedRoles: ["owner"],
-      disabled: false,
-      comingSoon: false,
-      hidden: false,
+      disabled: true,
+      comingSoon: true,
+      hidden: true,
     },
     {
       title: "Posts",
