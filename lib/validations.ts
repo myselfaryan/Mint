@@ -178,6 +178,9 @@ export const createGroupSchema = z
       .array(z.string().email())
       .optional()
       .openapi({ description: "List of member emails" }),
+    about: z.string().optional().openapi({
+      description: "Group's description",
+    }),
   })
   .openapi({ description: "Schema for creating a new group" });
 
