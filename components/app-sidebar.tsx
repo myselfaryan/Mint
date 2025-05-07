@@ -180,7 +180,7 @@ const getNavItems = (role?: string): SidebarItem[] => {
       title: "Posts",
       url: "posts",
       icon: SignpostBig,
-      allowedRoles: ["owner"],
+      allowedRoles: ["owner", "organizer", "member"],
       disabled: false,
       comingSoon: false,
       hidden: false,
