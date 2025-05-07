@@ -118,97 +118,203 @@ export function GenericEditor<T>({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent
+        className={`p-8 ${fields.some((f) => f.type === "datetime") ? "w-[1000px]" : "w-[700px]"} rounded-lg`}
+      >
         <DialogHeader>
           <DialogTitle>
             {data ? `Edit ${title}` : `Add New ${title}`}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
-            {fields.map((field) => (
-              <div key={field.name} className="space-y-2">
-                <Label htmlFor={field.name}>{field.label}</Label>
-                {field.type === "select" && field.options ? (
-                  <Select
-                    onValueChange={(value) => {
-                      const event = {
-                        target: { name: field.name, value },
-                      };
-                      register(field.name as any).onChange(event);
-                    }}
-                    defaultValue={
-                      data?.[field.name as keyof typeof data] as string
-                    }
-                  >
-                    <SelectTrigger
+          {fields.some((f) => f.type === "datetime") ? (
+            <div className="flex gap-0">
+              {/* Left panel: non-datetime fields */}
+              <div className="flex-1 grid gap-4 py-4 pr-6">
+                {fields
+                  .filter((field) => field.type !== "datetime")
+                  .map((field) => (
+                    <div key={field.name} className="space-y-2">
+                      <Label htmlFor={field.name}>{field.label}</Label>
+                      {field.type === "select" && field.options ? (
+                        <Select
+                          onValueChange={(value) => {
+                            const event = {
+                              target: { name: field.name, value },
+                            };
+                            register(field.name as any).onChange(event);
+                          }}
+                          defaultValue={
+                            data?.[field.name as keyof typeof data] as string
+                          }
+                        >
+                          <SelectTrigger
+                            className={
+                              errors[field.name as keyof typeof errors]
+                                ? "border-red-500"
+                                : ""
+                            }
+                          >
+                            <SelectValue
+                              placeholder={
+                                field.placeholder || "Select an option"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {field.options.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : field.type === "textarea" ? (
+                        <Textarea
+                          id={field.name}
+                          placeholder={field.placeholder || ""}
+                          {...register(field.name as any)}
+                          className={
+                            errors[field.name as keyof typeof errors]
+                              ? "border-red-500"
+                              : ""
+                          }
+                        />
+                      ) : (
+                        <Input
+                          id={field.name}
+                          type={field.type}
+                          placeholder={field.placeholder || ""}
+                          {...register(field.name as any, {
+                            valueAsNumber: field.type === "number",
+                          })}
+                          className={
+                            errors[field.name as keyof typeof errors]
+                              ? "border-red-500"
+                              : ""
+                          }
+                        />
+                      )}
+                      {errors[field.name as keyof typeof errors] && (
+                        <p className="text-red-500 text-sm">
+                          {
+                            errors[field.name as keyof typeof errors]
+                              ?.message as string
+                          }
+                        </p>
+                      )}
+                    </div>
+                  ))}
+              </div>
+              {/* Divider */}
+              <div className="w-px bg-border mx-2" />
+              {/* Right panel: datetime fields */}
+              <div className="w-72 grid gap-1 py-4 pl-6">
+                {fields
+                  .filter((field) => field.type === "datetime")
+                  .map((field) => (
+                    <div key={field.name} className="space-y-0.5">
+                      <Label htmlFor={field.name}>{field.label}</Label>
+                      <Input
+                        id={field.name}
+                        type="datetime-local"
+                        placeholder={field.placeholder || ""}
+                        {...register(field.name as any)}
+                        className={
+                          errors[field.name as keyof typeof errors]
+                            ? "border-red-500"
+                            : ""
+                        }
+                      />
+                      {errors[field.name as keyof typeof errors] && (
+                        <p className="text-red-500 text-sm">
+                          {
+                            errors[field.name as keyof typeof errors]
+                              ?.message as string
+                          }
+                        </p>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-4 py-4">
+              {fields.map((field) => (
+                <div key={field.name} className="space-y-2">
+                  <Label htmlFor={field.name}>{field.label}</Label>
+                  {field.type === "select" && field.options ? (
+                    <Select
+                      onValueChange={(value) => {
+                        const event = {
+                          target: { name: field.name, value },
+                        };
+                        register(field.name as any).onChange(event);
+                      }}
+                      defaultValue={
+                        data?.[field.name as keyof typeof data] as string
+                      }
+                    >
+                      <SelectTrigger
+                        className={
+                          errors[field.name as keyof typeof errors]
+                            ? "border-red-500"
+                            : ""
+                        }
+                      >
+                        <SelectValue
+                          placeholder={field.placeholder || "Select an option"}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : field.type === "textarea" ? (
+                    <Textarea
+                      id={field.name}
+                      placeholder={field.placeholder || ""}
+                      {...register(field.name as any)}
                       className={
                         errors[field.name as keyof typeof errors]
                           ? "border-red-500"
                           : ""
                       }
-                    >
-                      <SelectValue
-                        placeholder={field.placeholder || "Select an option"}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {field.options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : field.type === "textarea" ? (
-                  <Textarea
-                    id={field.name}
-                    placeholder={field.placeholder || ""}
-                    {...register(field.name as any)}
-                    className={
-                      errors[field.name as keyof typeof errors]
-                        ? "border-red-500"
-                        : ""
-                    }
-                  />
-                ) : field.type === "datetime" ? (
-                  <Input
-                    id={field.name}
-                    type="datetime-local"
-                    placeholder={field.placeholder || ""}
-                    {...register(field.name as any)}
-                    className={
-                      errors[field.name as keyof typeof errors]
-                        ? "border-red-500"
-                        : ""
-                    }
-                  />
-                ) : (
-                  <Input
-                    id={field.name}
-                    type={field.type}
-                    placeholder={field.placeholder || ""}
-                    {...register(field.name as any, {
-                      valueAsNumber: field.type === "number",
-                    })}
-                    className={
-                      errors[field.name as keyof typeof errors]
-                        ? "border-red-500"
-                        : ""
-                    }
-                  />
-                )}
-                {errors[field.name as keyof typeof errors] && (
-                  <p className="text-red-500 text-sm">
-                    {
-                      errors[field.name as keyof typeof errors]
-                        ?.message as string
-                    }
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
+                    />
+                  ) : (
+                    <Input
+                      id={field.name}
+                      type={field.type}
+                      placeholder={field.placeholder || ""}
+                      {...register(field.name as any, {
+                        valueAsNumber: field.type === "number",
+                      })}
+                      className={
+                        errors[field.name as keyof typeof errors]
+                          ? "border-red-500"
+                          : ""
+                      }
+                    />
+                  )}
+                  {errors[field.name as keyof typeof errors] && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        errors[field.name as keyof typeof errors]
+                          ?.message as string
+                      }
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           <DialogFooter>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? (
