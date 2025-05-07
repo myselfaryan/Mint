@@ -39,12 +39,6 @@ const fields: Field[] = [
     placeholder: "Comma-separated problem IDs",
   },
   { name: "rules", label: "Rules", type: "textarea" },
-  {
-    name: "registrationStartTime",
-    label: "Registration Start",
-    type: "datetime",
-  },
-  { name: "registrationEndTime", label: "Registration End", type: "datetime" },
 ];
 
 const contestSchema = z.object({
@@ -56,8 +50,6 @@ const contestSchema = z.object({
   endTime: z.string(),
   problems: z.string(),
   rules: z.string().default(""),
-  registrationStartTime: z.string().default(new Date().toISOString()),
-  registrationEndTime: z.string().default(new Date().toISOString()),
 }) as z.ZodType<Contest, z.ZodTypeDef, Contest>;
 
 const injectProblemsCount = (contests: Contest[]) => {

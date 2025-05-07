@@ -129,24 +129,8 @@ export const createContestSchema = z
         "1. Individual participation only\n2. 3-hour duration\n3. Standard library allowed",
       description: "Contest rules and guidelines",
     }),
-    registrationStartTime: TimestampSchema,
-    registrationEndTime: TimestampSchema,
     startTime: TimestampSchema,
     endTime: TimestampSchema,
-    allowList: z
-      .array(z.string().email())
-      .default([])
-      .openapi({
-        example: ["student1@iiits.in", "student2@iiits.in"],
-        description: "List of emails allowed to participate",
-      }),
-    disallowList: z
-      .array(z.string().email())
-      .default([])
-      .openapi({
-        example: ["blocked@iiits.in"],
-        description: "List of emails not allowed to participate",
-      }),
     problems: z.string().optional().openapi({
       example: "A,B,C,D",
       description: "Contest problems configuration",

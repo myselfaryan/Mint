@@ -27,8 +27,9 @@ export async function POST(
         return NextResponse.json({ error: error.message }, { status: 409 });
       }
     }
+    console.error(error);
     return NextResponse.json(
-      { error: "Failed to create contest" },
+      { error: `Failed to create contest: ${error}` },
       { status: 500 },
     );
   }

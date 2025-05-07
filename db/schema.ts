@@ -117,16 +117,8 @@ export const contests = pgTable(
     description: text("description").notNull(), // Use Markdown for description
     rules: text("rules").notNull(),
 
-    // remove
-    registrationStartTime: timestamp("registration_start_time").notNull(),
-    registrationEndTime: timestamp("registration_end_time").notNull(),
-
     startTime: timestamp("start_time").notNull(),
     endTime: timestamp("end_time").notNull(),
-
-    // remove
-    allowList: text("allow_list").array().notNull(),
-    disallowList: text("disallow_list").array().notNull(),
   },
   (table) => {
     return {
