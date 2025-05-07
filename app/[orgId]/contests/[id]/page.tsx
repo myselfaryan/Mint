@@ -245,6 +245,25 @@ export default function ContestDetailsPage() {
               Problems will be available when the contest starts.
             </div>
           )}
+
+          {shouldShowProblems() ? (
+            <div>
+              <h3 className="text-lg font-semibold mb-2 flex items-center">
+                <Link href={`/${orgId}/contests/${contestId}/submissions`}>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto text-primary hover:text-primary/80"
+                  >
+                    View Submissions
+                  </Button>
+                </Link>
+              </h3>
+            </div>
+          ) : (
+            <div className="text-muted-foreground italic">
+              Submissions will be available when the contest starts.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

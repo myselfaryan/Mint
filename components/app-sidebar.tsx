@@ -18,6 +18,7 @@ import {
   Monitor,
   Contact,
   LucideIcon,
+  SignpostBig,
 } from "lucide-react";
 import { Check } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -171,9 +172,18 @@ const getNavItems = (role?: string): SidebarItem[] => {
       url: "groups",
       icon: Contact,
       allowedRoles: ["owner"],
-      disabled: true,
-      comingSoon: true,
-      hidden: true,
+      disabled: false,
+      comingSoon: false,
+      hidden: false,
+    },
+    {
+      title: "Posts",
+      url: "posts",
+      icon: SignpostBig,
+      allowedRoles: ["owner"],
+      disabled: false,
+      comingSoon: false,
+      hidden: false,
     },
     {
       title: "Contests",

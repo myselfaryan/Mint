@@ -43,9 +43,10 @@ const groupSchema = z.object({
 });
 
 const injectUsersCount = (groups: Group[]) => {
+  console.log("injecting users count", groups);
   return groups.map((group) => ({
     ...group,
-    usersCount: group.users?.split(/\r?\n/).length ?? 0,
+    usersCount: group.userEmails.length ?? 0,
   }));
 };
 
@@ -80,7 +81,9 @@ export default function GroupsPage() {
           throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
-        setGroups(injectUsersCount(data));
+        const updatedData = injectUsersCount(data);
+        console.log("updatedData", updatedData);
+        setGroups(updatedData);
         setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching groups:", error);
@@ -137,10 +140,12 @@ export default function GroupsPage() {
 
       // Convert users from string to array of strings (splitting at newlines)
       if (typeof groupToSave.users === "string") {
-        groupToSave.users = groupToSave.users
+        groupToSave.emails = groupToSave.users
           .split("\n")
           .map((user) => user.trim())
           .filter((user) => user.length > 0); // Remove empty lines
+        // groupToSave.users = null;
+        console.log("groupToSave.users", groupToSave.users);
       }
 
       console.log("groups", groupToSave);

@@ -6,6 +6,7 @@ export interface Group {
   about?: string;
   avatar?: string;
   users: string; // user emails seperated by newline
+  userEmails: string[];
   usersCount?: number;
 }
 
@@ -19,6 +20,11 @@ export const mockGroups: Group[] = [
     avatar: "https://api.dicebear.com/7.x/initials/svg?seed=ET",
     users:
       "john.doe@example.com\nalice.smith@example.com\nbob.wilson@example.com",
+    userEmails: [
+      "john.doe@example.com",
+      "alice.smith@example.com",
+      "bob.wilson@example.com",
+    ],
   },
   {
     id: 2,
@@ -28,6 +34,7 @@ export const mockGroups: Group[] = [
     about: "Product design and UX team",
     avatar: "https://api.dicebear.com/7.x/initials/svg?seed=DT",
     users: "sarah.designer@example.com\nmike.ux@example.com",
+    userEmails: ["sarah.designer@example.com", "mike.ux@example.com"],
   },
   {
     id: 3,
@@ -38,6 +45,11 @@ export const mockGroups: Group[] = [
     avatar: "https://api.dicebear.com/7.x/initials/svg?seed=MT",
     users:
       "emma.marketing@example.com\njames.growth@example.com\nlisa.social@example.com",
+    userEmails: [
+      "emma.marketing@example.com",
+      "james.growth@example.com",
+      "lisa.social@example.com",
+    ],
   },
   {
     id: 4,
@@ -47,5 +59,6 @@ export const mockGroups: Group[] = [
     about: "Product management and strategy",
     avatar: "https://api.dicebear.com/7.x/initials/svg?seed=PT",
     users: "david.pm@example.com\nanna.product@example.com",
+    userEmails: ["david.pm@example.com", "anna.product@example.com"],
   },
 ];

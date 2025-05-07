@@ -32,23 +32,25 @@ export async function POST(
     console.log("request data", requestData);
 
     // Rename 'users' to 'emails' in the request data
-    const { users, ...restRequestData } = requestData;
-    const processedData = {
-      ...restRequestData,
-      emails: users, // Rename 'users' to 'emails'
-    };
-    console.log("emails", processedData.emails);
-    console.log("emails", restRequestData);
+    // const { users, ...restRequestData } = requestData;
+    // console.log("*****users", users);
+    // const processedData = {
+    //   ...restRequestData,
+    //   emails: users, // Rename 'users' to 'emails'
+    // };
+    // console.log("emails", processedData.emails);
+    // console.log("restRequestData", restRequestData);
 
     // Now validate with your schema
-    const { emails, ...rest } = createGroupSchema.parse(processedData);
+    const { emails, ...rest } = createGroupSchema.parse(requestData);
 
-    console.log("emails", emails);
-    console.log("rest", rest);
+    console.log("emails after validation parsed", emails);
+    console.log("rest after validation parsed", rest);
 
     const group = await groupsService.createGroup(orgId, rest);
 
     if (emails) {
+      console.log("BAK BAK emails", emails);
       const groupWithUserEmails = await groupService.updateGroupMembers(
         orgId,
         group.id,
