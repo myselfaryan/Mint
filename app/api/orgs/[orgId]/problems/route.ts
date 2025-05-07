@@ -36,9 +36,11 @@ export async function POST(
   try {
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
     const body = await request.json();
+    console.log("body", request.body);
 
     const { testCases, ...problemData } = body;
-    const validatedProblem = createProblemSchema.parse(problemData);
+    console.log("testCases", testCases);
+    const validatedProblem = createProblemSchema.parse(body);
     const validatedTestCases = z
       .array(createTestCaseSchema)
       .min(1)
@@ -53,6 +55,7 @@ export async function POST(
     return NextResponse.json(problem, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.log(error.errors);
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
     return NextResponse.json(

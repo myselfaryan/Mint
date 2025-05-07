@@ -181,6 +181,9 @@ export function ProblemEditor() {
         ? `/api/orgs/${orgId}/problems/${problemId}`
         : `/api/orgs/${orgId}/problems`;
 
+      console.log("data.testCases", data.testCases);
+      console.log("isEdit", isEdit);
+
       // Transform the data to match the API's expected format
       const apiData = {
         code: data.code,
