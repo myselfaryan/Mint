@@ -3,14 +3,12 @@
 FROM oven/bun:1
 WORKDIR /usr/src/app
 
-# Install global packages
-ENV BUN_INSTALL_GLOBAL=/usr/local/bin
-RUN bun install -g tsx typescript && \
-    chmod -R 755 /usr/local/bin
-
 # Install dependencies
 COPY package.json bun.lock ./
 RUN bun install
+
+# Install global packages
+RUN bun install -g tsx typescript
 
 # Copy the rest of the application
 COPY . .
@@ -18,11 +16,9 @@ COPY . .
 # Build the application
 RUN bun run build
 
-# Create and set ownership of the .next directory
-RUN mkdir -p .next && chown -R bun:bun .
+# Create .next directory
+RUN mkdir -p .next
 
-# run the app from built files
-USER bun
 EXPOSE 3000/tcp
 # RUN bun db:migrate
 ENTRYPOINT [ "bun", "run", "start" ]
