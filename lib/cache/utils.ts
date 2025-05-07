@@ -43,3 +43,8 @@ export async function withDataCache<T>(
     throw error;
   }
 }
+
+export async function invalidateCacheKey(key: string): Promise<number> {
+  const redis = getRedis();
+  return redis.del(key);
+}
