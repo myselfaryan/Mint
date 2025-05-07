@@ -21,10 +21,14 @@ export const EmailSchema = z.string().email().openapi({
   description: "Valid email address",
 });
 
-export const TimestampSchema = z.string().datetime().openapi({
-  example: "2024-03-20T10:00:00Z",
-  description: "ISO 8601 datetime string",
-});
+export const TimestampSchema = z
+  .string()
+  .datetime()
+  .transform((str) => new Date(str))
+  .openapi({
+    example: "2024-03-20T10:00:00Z",
+    description: "ISO 8601 datetime string",
+  });
 
 // User Schemas
 export const createUserSchema = z
