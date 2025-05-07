@@ -20,5 +20,4 @@ RUN bun run build
 RUN mkdir -p .next
 
 EXPOSE 3000/tcp
-# RUN bun db:migrate
-ENTRYPOINT [ "bun", "run", "start" ]
+CMD ["bun", "run", "start"]
