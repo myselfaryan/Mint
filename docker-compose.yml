@@ -48,6 +48,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/mint
       - REDIS_URL=redis://redis:6379
+    command: sh -c "bun db:migrate && bun run start"
     depends_on:
       postgres:
         condition: service_healthy
