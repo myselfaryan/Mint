@@ -1,45 +1,27 @@
 # use the official Bun image
 # see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1 AS base
+FROM oven/bun:1
 WORKDIR /usr/src/app
 
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lock /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
-
-# install with --production (exclude devDependencies)
-RUN mkdir -p /temp/prod
-COPY package.json bun.lock /temp/prod/
-# Install global packages in a location that's in the PATH
+# Install global packages
 ENV BUN_INSTALL_GLOBAL=/usr/local/bin
 RUN bun install -g tsx typescript
-RUN cd /temp/prod && bun install --frozen-lockfile
 
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
+# Install dependencies
+COPY package.json bun.lock ./
+RUN bun install
+
+# Copy the rest of the application
 COPY . .
 
-# [optional] tests & build
-ENV NODE_ENV=development
-# RUN bun test
-# RUN bun run build
-
-# copy production dependencies and source code into final image
-FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=install /usr/local/bin /usr/local/bin
-COPY --from=prerelease /usr/src/app/ .
+# Build the application
+RUN bun run build
 
 # Create and set ownership of the .next directory
 RUN mkdir -p .next && chown -R bun:bun .
 
-# run the app
+# run the app from built files
 USER bun
 EXPOSE 3000/tcp
 # RUN bun db:migrate
-ENTRYPOINT [ "bun", "run", "dev" ]
+ENTRYPOINT [ "bun", "run", "start" ]
