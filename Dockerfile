@@ -13,6 +13,8 @@ RUN cd /temp/dev && bun install --frozen-lockfile
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
 COPY package.json bun.lock /temp/prod/
+# Install global packages in a location that's in the PATH
+ENV BUN_INSTALL_GLOBAL=/usr/local/bin
 RUN bun install -g tsx typescript
 RUN cd /temp/prod && bun install --frozen-lockfile
 
@@ -30,6 +32,7 @@ ENV NODE_ENV=development
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=install /usr/local/bin /usr/local/bin
 COPY --from=prerelease /usr/src/app/ .
 
 # Create and set ownership of the .next directory
