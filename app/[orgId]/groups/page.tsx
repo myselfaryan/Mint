@@ -140,10 +140,12 @@ export default function GroupsPage() {
 
       // Convert users from string to array of strings (splitting at newlines)
       if (typeof groupToSave.users === "string") {
-        groupToSave.users = groupToSave.users
+        groupToSave.emails = groupToSave.users
           .split("\n")
           .map((user) => user.trim())
           .filter((user) => user.length > 0); // Remove empty lines
+        // groupToSave.users = null;
+        console.log("groupToSave.users", groupToSave.users);
       }
 
       console.log("groups", groupToSave);
