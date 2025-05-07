@@ -43,9 +43,10 @@ const groupSchema = z.object({
 });
 
 const injectUsersCount = (groups: Group[]) => {
+  console.log("injecting users count", groups);
   return groups.map((group) => ({
     ...group,
-    usersCount: group.users?.split(/\r?\n/).length ?? 0,
+    usersCount: group.userEmails.length ?? 0,
   }));
 };
 
@@ -80,7 +81,9 @@ export default function GroupsPage() {
           throw new Error(formatValidationErrors(errorData));
         }
         const data = await response.json();
-        setGroups(injectUsersCount(data));
+        const updatedData = injectUsersCount(data);
+        console.log("updatedData", updatedData);
+        setGroups(updatedData);
         setShowMockAlert(false);
       } catch (error) {
         console.error("Error fetching groups:", error);
