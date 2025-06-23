@@ -1,156 +1,121 @@
 # Mint
 
-A modern platform for conducting programming contests and managing coding problems.
+![Mint Logo](https://raw.githubusercontent.com/myselfaryan/Mint/main/public/image/logo.png)
 
-## Development Setup
+<p align="center">
+  <b>Mint</b> is a modern, full-featured platform for conducting programming contests, managing coding problems, and building developer communities.
+</p>
+
+<p align="center">
+  <a href="https://github.com/myselfaryan/Mint/actions"><img src="https://img.shields.io/github/actions/workflow/status/myselfaryan/Mint/ci.yml?branch=main&style=flat-square" alt="Build Status"></a>
+  <a href="https://github.com/myselfaryan/Mint/blob/main/LICENSE"><img src="https://img.shields.io/github/license/myselfaryan/Mint?style=flat-square" alt="License"></a>
+</p>
+
+---
+
+## ✨ Features
+
+- 🏆 Host and manage programming contests
+- 📚 Organize and share coding problems
+- 👥 Multi-organization support
+- 📊 Real-time monitoring and analytics (Prometheus)
+- 🔒 Secure authentication and user management
+- 📝 Interactive API documentation (Swagger)
+- ⚡ Fast, modern stack (Next.js, Bun, Drizzle, Tailwind CSS)
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- Node.js 22.2.0+ and npm
+- Node.js 22.2.0+
 - Docker
-- [Bun](https://bun.sh) (recommended package manager)
+- [Bun](https://bun.sh) (recommended)
 
-### Quick Start
-
-1. Clone the repository
-
-2. Install dependencies
+### Setup
 
 ```bash
+# 1. Clone the repository
 bun install
-```
 
-3. Set up environment variables
-
-```bash
+# 2. Copy environment variables
 cp .env.example .env
-```
 
-4. Start the database
-
-```bash
+# 3. Start the database
 bun pg
-```
 
-5. Run migrations and seed data
-
-```bash
+# 4. Run migrations and seed data
 bun db:migrate
 bun db:superuser  # Create an admin user
-bun db:seed      # Add test data (optional)
-```
+bun db:seed       # (Optional) Add test data
 
-6. Start the development server
-
-```bash
+# 5. Start the development server
 bun dev
 ```
 
-Visit `http://localhost:3000` to see the application.
+Visit [http://localhost:3000](http://localhost:3000) to see the app.
 
-## Available Commands
+---
 
-### Development
+## 🛠️ Project Structure
 
-```bash
-bun dev          # Start development server
-bun build        # Build for production
-bun start        # Start production server
-bun lint         # Run ESLint
-bun format       # Format code with Prettier
-bun format:check # Check code formatting
-```
-
-### Database Management
-
-#### PostgreSQL Control
-
-```bash
-bun pg           # Start PostgreSQL container
-bun pg:stop      # Stop and remove PostgreSQL container
-```
-
-Connection Details:
-
-- Host: `localhost` (from host) or `mint-postgres` (from containers)
-- Port: `5432`
-- Database: `mint`
-- Username: `postgres`
-- Password: `postgres`
-- URL: `postgres://postgres:postgres@localhost:5432/mint`
-
-#### pgAdmin (Database UI)
-
-```bash
-bun pg-admin     # Start pgAdmin web interface
-bun pg-admin:stop # Stop and remove pgAdmin container
-```
-
-Access Details:
-
-- URL: http://localhost:5050
-- Email: `admin@admin.com`
-- Password: `admin`
-
-#### Database Operations
-
-```bash
-bun db:migrate   # Generate and apply database migrations
-bun db:seed     # Add test data to database
-bun db:clear    # Clear all data from database
-bun db:superuser # Create an admin user interactively
-```
-
-### Test Data
-
-The seeding process creates:
-
-- Admin users (2)
-- Organizer users (3)
-- Regular users (5)
-- Organizations (3)
-- Problems per organization (2)
-- Contests per organization (2)
-- Groups per organization (2)
-
-All test users are created with password: `password123`
-
-## Project Structure
-
-```bash
+```text
 mint/
 ├── app/            # Next.js app router pages
 │   ├── api-doc/    # Swagger API documentation
-│   └── api/       # API routes
+│   └── api/        # API routes
 ├── components/     # React components
-├── db/            # Database schema and migrations
-├── lib/           # Utility functions and shared logic
-├── middleware/    # Request middleware (logging, metrics, error handling)
-├── public/        # Static assets
-└── scripts/       # CLI scripts for development
+├── db/             # Database schema and migrations
+├── lib/            # Utility functions and shared logic
+├── middleware/     # Request middleware (logging, metrics, error handling)
+├── public/         # Static assets
+└── scripts/        # CLI scripts for development
 ```
 
-## Monitoring
+---
 
-The application includes built-in monitoring with Prometheus metrics:
+## ⚡ Available Commands
 
-- HTTP request counts and durations
-- Active user counts
-- Database query durations
+```bash
+bun dev           # Start development server
+bun build         # Build for production
+bun start         # Start production server
+bun lint          # Run ESLint
+bun format        # Format code with Prettier
+bun format:check  # Check code formatting
 
-Metrics are available at: `http://localhost:3000/api/metrics`
+# Database
+bun pg            # Start PostgreSQL container
+bun pg:stop       # Stop and remove PostgreSQL container
+bun pg-admin      # Start pgAdmin web interface
+bun pg-admin:stop # Stop and remove pgAdmin container
+bun db:migrate    # Generate and apply database migrations
+bun db:seed       # Add test data to database
+bun db:clear      # Clear all data from database
+bun db:superuser  # Create an admin user interactively
+```
 
-### Available Metrics
+---
 
-- `http_requests_total`: Counter of HTTP requests
-- `http_request_duration_ms`: Histogram of HTTP request durations
-- `active_users`: Gauge of currently active users
-- `db_query_duration_ms`: Histogram of database query durations
+## 🧪 Test Data
 
-### Prometheus Configuration
+Seeding creates:
+- 2 Admin users
+- 3 Organizer users
+- 5 Regular users
+- 3 Organizations
+- 2 Problems, 2 Contests, 2 Groups per organization
 
-Add to your `prometheus.yml`:
+All test users: `password123`
 
+---
+
+## 📊 Monitoring & Metrics
+
+- Built-in Prometheus metrics: HTTP requests, user counts, DB query durations
+- Metrics endpoint: [http://localhost:3000/api/metrics](http://localhost:3000/api/metrics)
+
+**Prometheus config:**
 ```yaml
 scrape_configs:
   - job_name: 'mint'
@@ -159,38 +124,30 @@ scrape_configs:
     metrics_path: '/api/metrics'
 ```
 
-## Troubleshooting
+---
 
-### Database Issues
+## 🩺 Troubleshooting
 
-1. If containers are already running:
+- **Reset containers:**
+  ```bash
+  docker stop mint-postgres mint-pgadmin
+  docker rm mint-postgres mint-pgadmin
+  ```
+- **Check ports:**
+  ```bash
+  sudo lsof -i :5432  # PostgreSQL
+  sudo lsof -i :5050  # pgAdmin
+  ```
+- **Full reset:**
+  ```bash
+  bun pg:stop && bun pg-admin:stop && bun pg && bun pg-admin && bun db:clear && bun db:migrate && bun db:seed
+  ```
 
-```bash
-docker stop mint-postgres mint-pgadmin
-docker rm mint-postgres mint-pgadmin
-```
+> **Note:** You can use `npm run` instead of `bun` if preferred.
 
-1. If ports are in use:
+---
 
-- Check if PostgreSQL is running locally: `sudo lsof -i :5432`
-- Check if something is using pgAdmin port: `sudo lsof -i :5050`
-
-2. To completely reset:
-
-```bash
-bun pg:stop
-bun pg-admin:stop
-bun pg
-bun pg-admin
-bun db:clear
-bun db:migrate
-bun db:seed
-```
-
-> [!NOTE]
-> While Bun is recommended, you can still use npm by replacing `bun` with `npm run` in all commands.
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -198,23 +155,21 @@ bun db:seed
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+---
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📄 License
 
-## API Documentation
+MIT License. See [LICENSE](LICENSE).
 
-The API documentation is available at `/api-doc` when running the development server.
-It provides:
+---
 
-- Interactive API documentation
+## 📚 API Documentation
+
+- Interactive docs at `/api-doc` (dev server)
 - Request/response examples
 - API endpoint testing interface
 
-### Adding Documentation
-
-Add JSDoc comments with Swagger annotations to your API routes:
-
+**Add docs to API routes:**
 ```typescript
 /**
  * @swagger
@@ -227,9 +182,11 @@ Add JSDoc comments with Swagger annotations to your API routes:
  */
 ```
 
-### Environment Variables
+---
 
-Make sure your `.env` file includes:
+## 🔑 Environment Variables
+
+Copy `.env.example` to `.env` and fill in:
 
 ```env
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/mint
@@ -244,24 +201,11 @@ SMTP_FROM_NAME=Mint Platform
 SMTP_FROM_EMAIL=noreply@example.com
 ```
 
-#### Email Configuration Details
+**Gmail setup:**
+- Enable 2FA
+- Generate an app password
+- Use as `SMTP_PASSWORD`
 
-- `SMTP_HOST`: Your SMTP server hostname (e.g., smtp.gmail.com for Gmail)
-- `SMTP_PORT`: SMTP port (usually 587 for TLS or 465 for SSL)
-- `SMTP_SECURE`: Use `true` for port 465, `false` for other ports
-- `SMTP_USER`: Your SMTP username/email
-- `SMTP_PASSWORD`: Your SMTP password or app-specific password
-- `SMTP_FROM_NAME`: Display name for sent emails
-- `SMTP_FROM_EMAIL`: Email address used as sender
-
-#### Gmail Setup
-
-If using Gmail:
-1. Enable 2-factor authentication
-2. Generate an app password
-3. Use the app password as `SMTP_PASSWORD`
-
-Example Gmail configuration:
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -269,5 +213,13 @@ SMTP_SECURE=false
 SMTP_USER=your-gmail@gmail.com
 SMTP_PASSWORD=your-app-specific-password
 ```
+
+---
+
+## 🙋 Contact
+
+For questions, suggestions, or support, open an [issue](https://github.com/myselfaryan/Mint/issues) or contact [@myselfaryan](https://github.com/myselfaryan).
+
+---
 
 <!-- test ci deploy -->
