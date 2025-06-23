@@ -216,10 +216,4 @@ SMTP_PASSWORD=your-app-specific-password
 
 ---
 
-## 🙋 Contact
-
-For questions, suggestions, or support, open an [issue](https://github.com/myselfaryan/Mint/issues) or contact [@myselfaryan](https://github.com/myselfaryan).
-
----
-
 <!-- test ci deploy -->
