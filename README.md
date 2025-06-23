@@ -1,6 +1,8 @@
 # Mint
 
-![Mint Logo](https://raw.githubusercontent.com/myselfaryan/Mint/main/public/image/logo.png)
+<p align="center">
+  <img src="/public/image/interactive-learning.jpg" alt="Mint Logo" width="180" />
+</p>
 
 <p align="center">
   <b>Mint</b> is a modern, full-featured platform for conducting programming contests, managing coding problems, and building developer communities.
