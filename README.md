@@ -1,16 +1,11 @@
 # Mint
 
 <p align="center">
-  <img src="/public/image/interactive-learning.jpg" alt="Mint Logo" width="180" />
+  <img src="https://raw.githubusercontent.com/myselfaryan/Mint/main/public/image/mint-logo.png" alt="Mint Logo" width="180" />
 </p>
 
 <p align="center">
   <b>Mint</b> is a modern, full-featured platform for conducting programming contests, managing coding problems, and building developer communities.
-</p>
-
-<p align="center">
-  <a href="https://github.com/myselfaryan/Mint/actions"><img src="https://img.shields.io/github/actions/workflow/status/myselfaryan/Mint/ci.yml?branch=main&style=flat-square" alt="Build Status"></a>
-  <a href="https://github.com/myselfaryan/Mint/blob/main/LICENSE"><img src="https://img.shields.io/github/license/myselfaryan/Mint?style=flat-square" alt="License"></a>
 </p>
 
 ---
