@@ -1,15 +1,10 @@
 # Mint
 
-![Mint Logo](https://raw.githubusercontent.com/myselfaryan/Mint/main/public/image/logo.png)
 
 <p align="center">
   <b>Mint</b> is a modern, full-featured platform for conducting programming contests, managing coding problems, and building developer communities.
 </p>
 
-<p align="center">
-  <a href="https://github.com/myselfaryan/Mint/actions"><img src="https://img.shields.io/github/actions/workflow/status/myselfaryan/Mint/ci.yml?branch=main&style=flat-square" alt="Build Status"></a>
-  <a href="https://github.com/myselfaryan/Mint/blob/main/LICENSE"><img src="https://img.shields.io/github/license/myselfaryan/Mint?style=flat-square" alt="License"></a>
-</p>
 
 ---
 
@@ -158,8 +153,6 @@ scrape_configs:
 ---
 
 ## 📄 License
-
-MIT License. See [LICENSE](LICENSE).
 
 ---
 
