@@ -4,13 +4,14 @@ import { getOrgIdFromNameId } from "@/app/api/service";
 import { parseCSV } from "@/lib/csv";
 import * as userService from "../service";
 import { sendEmail } from "@/lib/email";
+import { getCurrentSession } from "@/lib/server/session";
 
 /**
  * @swagger
  * /api/orgs/{orgId}/users/csv:
  *   post:
- *     summary: Bulk invite users from CSV
- *     description: Upload a CSV file containing user emails and roles to invite multiple users at once
+ *     summary: Bulk import users from CSV
+ *     description: Upload a CSV file containing user emails and roles. Creates new accounts for users who don't exist and adds all users to the organization.
  *     tags:
  *       - Organizations
  *     parameters:
@@ -30,7 +31,7 @@ import { sendEmail } from "@/lib/email";
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: CSV file with columns - email,role
+ *                 description: CSV file with columns - email,role (optional - name)
  *     responses:
  *       200:
  *         description: Users processed successfully
@@ -41,6 +42,19 @@ import { sendEmail } from "@/lib/email";
  *               properties:
  *                 message:
  *                   type: string
+ *                 summary:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: number
+ *                     successful:
+ *                       type: number
+ *                     newAccounts:
+ *                       type: number
+ *                     existingUsers:
+ *                       type: number
+ *                     failed:
+ *                       type: number
  *                 results:
  *                   type: array
  *                   items:
@@ -51,12 +65,16 @@ import { sendEmail } from "@/lib/email";
  *                       status:
  *                         type: string
  *                         enum: [success, error]
- *                       membership:
- *                         type: object
+ *                       isNewUser:
+ *                         type: boolean
  *                       error:
  *                         type: string
  *       400:
  *         description: Invalid request or CSV format
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires owner or organizer role
  *       500:
  *         description: Server error
  */
@@ -66,6 +84,12 @@ export async function POST(
   { params }: { params: { orgId: string } },
 ) {
   try {
+    // Check authentication
+    const { session } = await getCurrentSession();
+    if (!session?.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const orgId = await getOrgIdFromNameId(NameIdSchema.parse(params.orgId));
 
     const formData = await request.formData();
@@ -90,30 +114,52 @@ export async function POST(
     const content = await file.text();
     const users = parseCSV(content);
 
-    // Process users
+    if (users.length === 0) {
+      return NextResponse.json(
+        { message: "CSV file is empty or contains no valid rows" },
+        { status: 400 },
+      );
+    }
+
+    // Process users - create accounts if needed and add to org
     const results = await Promise.allSettled(
       users.map(async (user) => {
         try {
-          const membership = await userService.inviteUser(orgId, {
+          const result = await userService.inviteOrCreateUser(orgId, {
             email: user.email,
             role: user.role,
           });
 
-          // Send invitation email
-          await sendEmail({
-            to: user.email,
-            subject: "Organization Invitation",
-            html: `
-              <h1>You've been invited!</h1>
-              <p>You've been invited to join an organization with the role: ${user.role}</p>
-              <p>Click here to accept the invitation and set up your account.</p>
-            `,
-          });
+          // Send appropriate email based on whether user is new or existing
+          if (result.isNewUser) {
+            // Send welcome email for new users
+            await sendEmail({
+              to: user.email,
+              subject: "Your Account Has Been Created",
+              html: `
+                <h1>Welcome!</h1>
+                <p>An account has been created for you and you've been added to an organization as a ${user.role}.</p>
+                <p><strong>Important:</strong> Please reset your password to access your account.</p>
+                <p>Visit the platform and use the "Forgot Password" option to set your password.</p>
+              `,
+            });
+          } else {
+            // Send invitation email for existing users
+            await sendEmail({
+              to: user.email,
+              subject: "Organization Invitation",
+              html: `
+                <h1>You've been added!</h1>
+                <p>You've been added to an organization with the role: ${user.role}</p>
+                <p>Log in to access the organization.</p>
+              `,
+            });
+          }
 
           return {
             email: user.email,
-            status: "success",
-            membership,
+            status: "success" as const,
+            isNewUser: result.isNewUser,
           };
         } catch (error) {
           console.error("Error processing user:", {
@@ -122,46 +168,41 @@ export async function POST(
             stack: error instanceof Error ? error.stack : undefined,
           });
 
-          // Handle specific error types
-          let errorMessage = "Unknown error";
-          if (error instanceof Error) {
-            if (error.message === "User not found") {
-              errorMessage = `User ${user.email} needs to register first before being invited`;
-            } else {
-              errorMessage = error.message;
-            }
-          }
-
           return {
             email: user.email,
-            status: "error",
-            error: errorMessage,
+            status: "error" as const,
+            error: error instanceof Error ? error.message : "Unknown error",
           };
         }
       }),
     );
 
-    // Prepare response with more details
-    const successful = results.filter(
-      (r) => r.status === "fulfilled" && r.value.status === "success",
+    // Calculate summary statistics
+    const processedResults = results.map((r) =>
+      r.status === "fulfilled"
+        ? r.value
+        : { status: "error" as const, error: r.reason, email: "" },
+    );
+
+    const successful = processedResults.filter(
+      (r) => r.status === "success",
     ).length;
-    const failed = results.filter(
-      (r) => r.status === "rejected" || r.value.status === "error",
+    const newAccounts = processedResults.filter(
+      (r) => r.status === "success" && "isNewUser" in r && r.isNewUser,
     ).length;
-    const notFound = results.filter(
-      (r) =>
-        r.status === "fulfilled" &&
-        r.value.status === "error" &&
-        r.value.error.includes("needs to register first"),
-    ).length;
+    const existingUsers = successful - newAccounts;
+    const failed = processedResults.filter((r) => r.status === "error").length;
 
     return NextResponse.json({
-      message: `Processed ${users.length} users (${successful} successful, ${failed} failed, ${notFound} need to register)`,
-      results: results.map((r) =>
-        r.status === "fulfilled"
-          ? r.value
-          : { status: "error", error: r.reason },
-      ),
+      message: `Processed ${users.length} users`,
+      summary: {
+        total: users.length,
+        successful,
+        newAccounts,
+        existingUsers,
+        failed,
+      },
+      results: processedResults,
     });
   } catch (error) {
     console.error("Error processing CSV:", {

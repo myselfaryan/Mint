@@ -9,10 +9,44 @@ import { formatValidationErrors } from "@/utils/error";
 import { MockAlert } from "@/components/mock-alert";
 import { User, mockUsers } from "./mockUsers";
 import { timeAgo } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Download,
+  FileSpreadsheet,
+  CheckCircle,
+  XCircle,
+  UserPlus,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface InviteUserData {
   email: string;
   role: "owner" | "organizer" | "member";
+}
+
+interface CSVImportResult {
+  email: string;
+  status: "success" | "error";
+  isNewUser?: boolean;
+  error?: string;
+}
+
+interface CSVImportResponse {
+  message: string;
+  summary: {
+    total: number;
+    successful: number;
+    newAccounts: number;
+    existingUsers: number;
+    failed: number;
+  };
+  results: CSVImportResult[];
 }
 
 const columns: ColumnDef<User>[] = [
@@ -50,6 +84,12 @@ function makeJoinedAtReadable(users: User[]) {
   });
 }
 
+// CSV Template content
+const CSV_TEMPLATE = `email,role,name
+john@example.com,member,John Doe
+jane@example.com,organizer,Jane Smith
+admin@example.com,owner,Admin User`;
+
 export default function UsersPage({
   params: { orgId },
 }: {
@@ -60,6 +100,10 @@ export default function UsersPage({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showMockAlert, setShowMockAlert] = useState(false);
+  const [importResults, setImportResults] = useState<CSVImportResponse | null>(
+    null,
+  );
+  const [showResultsDialog, setShowResultsDialog] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -150,6 +194,11 @@ export default function UsersPage({
     }
   };
 
+  const downloadTemplate = () => {
+    // Use API route which sets proper Content-Disposition header
+    window.location.href = `/api/orgs/${orgId}/users/csv/template`;
+  };
+
   const handleCsvUpload = async (file: File) => {
     try {
       const formData = new FormData();
@@ -165,35 +214,21 @@ export default function UsersPage({
         throw new Error(formatValidationErrors(errorData));
       }
 
-      const result = await response.json();
+      const result: CSVImportResponse = await response.json();
+      setImportResults(result);
+      setShowResultsDialog(true);
+
       await fetchUsers();
 
-      const failedCount = result.results?.filter(
-        (r: any) => r.status === "error",
-      ).length;
-
-      if (failedCount > 0) {
-        console.error("Failed imports details:", {
-          failures: result.results.filter((r: any) => r.status === "error"),
-          stackTraces: result.results
-            .filter((r: any) => r.status === "error")
-            .map((r: any) => ({ email: r.email, error: r.error })),
-        });
-      }
-
+      // Show toast based on results
+      const hasErrors = result.summary.failed > 0;
       toast({
-        variant: failedCount > 0 ? "destructive" : "default",
-        title: failedCount > 0 ? "Warning" : "Success",
-        description:
-          failedCount > 0
-            ? `${result.message} (${failedCount} failed imports. Check console for details)`
-            : result.message,
+        variant: hasErrors ? "destructive" : "default",
+        title: hasErrors ? "Import Completed with Errors" : "Import Successful",
+        description: `${result.summary.successful} users added (${result.summary.newAccounts} new accounts created)`,
       });
     } catch (error) {
-      console.error("Error uploading CSV:", {
-        error,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
+      console.error("Error uploading CSV:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -206,6 +241,15 @@ export default function UsersPage({
   return (
     <>
       <MockAlert show={showMockAlert} />
+
+      {/* Template Download Button */}
+      <div className="px-6 pt-4">
+        <Button variant="outline" size="sm" onClick={downloadTemplate}>
+          <FileSpreadsheet className="h-4 w-4 mr-2" />
+          Download CSV Template
+        </Button>
+      </div>
+
       <GenericListing
         data={users}
         columns={columns}
@@ -218,6 +262,7 @@ export default function UsersPage({
         onDelete={deleteUser}
         allowCsvUpload={true}
         onCsvUpload={handleCsvUpload}
+        exportUrl={`/api/orgs/${orgId}/users/csv/export`}
       />
 
       <GenericEditor
@@ -229,6 +274,95 @@ export default function UsersPage({
         fields={fields}
         title="Invite User"
       />
+
+      {/* Import Results Dialog */}
+      <Dialog open={showResultsDialog} onOpenChange={setShowResultsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              CSV Import Results
+            </DialogTitle>
+            <DialogDescription>
+              Summary of the bulk user import operation
+            </DialogDescription>
+          </DialogHeader>
+
+          {importResults && (
+            <div className="space-y-4">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 bg-muted rounded-lg text-center">
+                  <div className="text-2xl font-bold">
+                    {importResults.summary.total}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Total Processed
+                  </div>
+                </div>
+                <div className="p-3 bg-emerald-500/10 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-emerald-500">
+                    {importResults.summary.successful}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Successful
+                  </div>
+                </div>
+                <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-blue-500">
+                    {importResults.summary.newAccounts}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    New Accounts
+                  </div>
+                </div>
+                <div className="p-3 bg-red-500/10 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-red-500">
+                    {importResults.summary.failed}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Failed</div>
+                </div>
+              </div>
+
+              {/* Detailed Results */}
+              <div className="border rounded-lg divide-y max-h-60 overflow-y-auto">
+                {importResults.results.map((result, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      {result.status === "success" ? (
+                        <CheckCircle className="h-4 w-4 text-emerald-500" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className="text-sm">{result.email}</span>
+                      {result.isNewUser && (
+                        <span className="text-xs bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded">
+                          New Account
+                        </span>
+                      )}
+                    </div>
+                    {result.error && (
+                      <span className="text-xs text-red-500 max-w-xs truncate">
+                        {result.error}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={() => setShowResultsDialog(false)}
+              >
+                Close
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

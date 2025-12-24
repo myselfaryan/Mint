@@ -1,10 +1,8 @@
 # Mint
 
-
 <p align="center">
   <b>Mint</b> is a modern, full-featured platform for conducting programming contests, managing coding problems, and building developer communities.
 </p>
-
 
 ---
 
@@ -23,6 +21,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 22.2.0+
 - Docker
 - [Bun](https://bun.sh) (recommended)
@@ -95,6 +94,7 @@ bun db:superuser  # Create an admin user interactively
 ## 🧪 Test Data
 
 Seeding creates:
+
 - 2 Admin users
 - 3 Organizer users
 - 5 Regular users
@@ -111,12 +111,13 @@ All test users: `password123`
 - Metrics endpoint: [http://localhost:3000/api/metrics](http://localhost:3000/api/metrics)
 
 **Prometheus config:**
+
 ```yaml
 scrape_configs:
-  - job_name: 'mint'
+  - job_name: "mint"
     static_configs:
-      - targets: ['localhost:3000']
-    metrics_path: '/api/metrics'
+      - targets: ["localhost:3000"]
+    metrics_path: "/api/metrics"
 ```
 
 ---
@@ -163,6 +164,7 @@ scrape_configs:
 - API endpoint testing interface
 
 **Add docs to API routes:**
+
 ```typescript
 /**
  * @swagger
@@ -195,6 +197,7 @@ SMTP_FROM_EMAIL=noreply@example.com
 ```
 
 **Gmail setup:**
+
 - Enable 2FA
 - Generate an app password
 - Use as `SMTP_PASSWORD`

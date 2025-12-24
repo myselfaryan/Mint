@@ -54,6 +54,7 @@ interface GenericListingProps<T> {
   editPathSuffix?: string;
   allowCsvUpload?: boolean;
   onCsvUpload?: (file: File) => Promise<void>;
+  exportUrl?: string; // API URL for server-side CSV export with proper filename
 }
 
 // For passing to listing, the id should not be null, its just a temporary hack to satisfy typescript
@@ -72,6 +73,7 @@ export function GenericListing<T extends { id: number | undefined }>({
   editPathSuffix,
   allowCsvUpload = false,
   onCsvUpload,
+  exportUrl,
 }: GenericListingProps<T>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,19 +108,37 @@ export function GenericListing<T extends { id: number | undefined }>({
   };
 
   const downloadCSV = () => {
+    // If exportUrl is provided, use server-side export with proper Content-Disposition
+    if (exportUrl) {
+      window.location.href = exportUrl;
+      return;
+    }
+
+    // Fall back to client-side CSV generation
     const headers = columns.map((col) => col.header);
     const csvContent = [
       headers.join(","),
       ...filteredAndSortedData.map((item) =>
-        columns.map((col) => item[col.accessorKey]).join(","),
+        columns
+          .map((col) => {
+            const value = String(item[col.accessorKey] ?? "");
+            // Escape values that contain commas or quotes
+            if (value.includes(",") || value.includes('"')) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
       ),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    // Use data URL for better cross-browser compatibility with filename
+    const encodedContent =
+      "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
     const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `data_export_${title}.csv`);
+    link.setAttribute("href", encodedContent);
+    link.setAttribute("download", `${title}_export.csv`);
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

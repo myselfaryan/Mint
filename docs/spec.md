@@ -61,7 +61,7 @@ by @virinci, with minor changes sprinkled here and there, aimed at simplificatio
 - In the db, a group just contains
   - Group Name
   - Group alias (a short unique slug,
-  lowercase username style: alphanumeric, underscore and hyphen allowed)
+    lowercase username style: alphanumeric, underscore and hyphen allowed)
   - List of user IDs associated with the group
 - Contests can be aimed at specific groups.
 
@@ -81,7 +81,7 @@ by @virinci, with minor changes sprinkled here and there, aimed at simplificatio
 - Attributes
   - org
   - target groups (array of group IDs, special case: allow all org members):
-  members who are allowed to participate in this contest
+    members who are allowed to participate in this contest
   - start and end time
   - details of organizers (editors of the contest)
   - array of problems this contest has (with ordering information)
@@ -109,18 +109,17 @@ by @virinci, with minor changes sprinkled here and there, aimed at simplificatio
 > [!NOTE]
 >
 > - Here (in the UI Pages section) Id
-> does not mean db ids, but usernames or slugs.
-> These are unique, and kept indexed on db.
->
+>   does not mean db ids, but usernames or slugs.
+>   These are unique, and kept indexed on db.
 > - Variables are denoted within angular brackets
->
 > - A page won't render if current user does not have access.
-> Throw unauthorized error and error.tsx in that directory should handle it.
-> Such pages would also be removed from the sidebar for a user.
+>   Throw unauthorized error and error.tsx in that directory should handle it.
+>   Such pages would also be removed from the sidebar for a user.
 
 All possible frontend URL paths are following:
 
 - `/<orgId>`
+
   - `/` Dashboard (based on current user's role in org)
   - Users `/users`
     - Specific User `/<userId>`
@@ -148,7 +147,6 @@ All possible frontend URL paths are following:
 > - All UI should be exclusively under `components` directory.
 > - Some components will be re-used with different filter props on different routes
 > - Like `<Problems/>` will be rendered on `/problems`, while `<Problems contest={contestId}/>` will be rendered on `/contests/<contestId>/problems` page
-
 
 ## Schema Design
 

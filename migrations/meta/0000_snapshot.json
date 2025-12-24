@@ -65,12 +65,8 @@
           "name": "contest_participants_contest_id_contests_id_fk",
           "tableFrom": "contest_participants",
           "tableTo": "contests",
-          "columnsFrom": [
-            "contest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["contest_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -78,12 +74,8 @@
           "name": "contest_participants_user_id_users_id_fk",
           "tableFrom": "contest_participants",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -91,10 +83,7 @@
       "compositePrimaryKeys": {
         "contest_participants_contest_id_user_id_pk": {
           "name": "contest_participants_contest_id_user_id_pk",
-          "columns": [
-            "contest_id",
-            "user_id"
-          ]
+          "columns": ["contest_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -195,12 +184,8 @@
           "name": "contest_problems_contest_id_contests_id_fk",
           "tableFrom": "contest_problems",
           "tableTo": "contests",
-          "columnsFrom": [
-            "contest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["contest_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -208,12 +193,8 @@
           "name": "contest_problems_problem_id_problems_id_fk",
           "tableFrom": "contest_problems",
           "tableTo": "problems",
-          "columnsFrom": [
-            "problem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["problem_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -423,12 +404,8 @@
           "name": "group_memberships_group_id_groups_id_fk",
           "tableFrom": "group_memberships",
           "tableTo": "groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -436,12 +413,8 @@
           "name": "group_memberships_user_id_users_id_fk",
           "tableFrom": "group_memberships",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -449,10 +422,7 @@
       "compositePrimaryKeys": {
         "group_memberships_group_id_user_id_pk": {
           "name": "group_memberships_group_id_user_id_pk",
-          "columns": [
-            "group_id",
-            "user_id"
-          ]
+          "columns": ["group_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -514,12 +484,8 @@
           "name": "groups_org_id_orgs_id_fk",
           "tableFrom": "groups",
           "tableTo": "orgs",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["org_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -529,9 +495,7 @@
         "groups_name_id_unique": {
           "name": "groups_name_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name_id"
-          ]
+          "columns": ["name_id"]
         }
       },
       "policies": {},
@@ -605,12 +569,8 @@
           "name": "memberships_org_id_orgs_id_fk",
           "tableFrom": "memberships",
           "tableTo": "orgs",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["org_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -618,12 +578,8 @@
           "name": "memberships_user_id_users_id_fk",
           "tableFrom": "memberships",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -631,10 +587,7 @@
       "compositePrimaryKeys": {
         "memberships_org_id_user_id_pk": {
           "name": "memberships_org_id_user_id_pk",
-          "columns": [
-            "org_id",
-            "user_id"
-          ]
+          "columns": ["org_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -691,9 +644,7 @@
         "orgs_name_id_unique": {
           "name": "orgs_name_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name_id"
-          ]
+          "columns": ["name_id"]
         }
       },
       "policies": {},
@@ -812,12 +763,8 @@
           "name": "problem_submissions_user_id_users_id_fk",
           "tableFrom": "problem_submissions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -825,12 +772,8 @@
           "name": "problem_submissions_contest_problem_id_contest_problems_id_fk",
           "tableFrom": "problem_submissions",
           "tableTo": "contest_problems",
-          "columnsFrom": [
-            "contest_problem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["contest_problem_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -889,12 +832,8 @@
           "name": "problems_org_id_orgs_id_fk",
           "tableFrom": "problems",
           "tableTo": "orgs",
-          "columnsFrom": [
-            "org_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["org_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -934,12 +873,8 @@
           "name": "session_user_id_users_id_fk",
           "tableFrom": "session",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1008,12 +943,8 @@
           "name": "test_cases_problem_id_problems_id_fk",
           "tableFrom": "test_cases",
           "tableTo": "problems",
-          "columnsFrom": [
-            "problem_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["problem_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1085,16 +1016,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_name_id_unique": {
           "name": "users_name_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name_id"
-          ]
+          "columns": ["name_id"]
         }
       },
       "policies": {},
