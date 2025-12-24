@@ -178,44 +178,59 @@ export async function getOrgRecentGroups(orgId: number, period: Period) {
 }
 
 export async function getOrgSubmissionsCount(orgId: number) {
-  const result = await db
-    .select({ value: sql<number>`count(problemSubmissions.*)` })
-    .from(problemSubmissions)
-    .innerJoin(
-      contestProblems,
-      eq(problemSubmissions.contestProblemId, contestProblems.id),
-    )
-    .innerJoin(
-      contests,
-      and(
+  try {
+    const result = await db
+      .select({ value: count() })
+      .from(problemSubmissions)
+      .innerJoin(
+        contestProblems,
+        eq(problemSubmissions.contestProblemId, contestProblems.id),
+      )
+      .innerJoin(
+        contests,
         eq(contestProblems.contestId, contests.id),
-        eq(contests.organizerId, orgId),
-        eq(contests.organizerKind, "org"),
-      ),
-    );
+      )
+      .where(
+        and(
+          eq(contests.organizerId, orgId),
+          eq(contests.organizerKind, "org"),
+        )
+      );
 
-  return result[0].value;
+    return result[0]?.value ?? 0;
+  } catch (error) {
+    console.error("Error getting submissions count:", error);
+    return 0;
+  }
 }
 
 export async function getOrgRecentSubmissions(orgId: number, period: Period) {
-  const start = getPeriodStart(period);
+  try {
+    const start = getPeriodStart(period);
 
-  const result = await db
-    .select({ value: sql<number>`count(${problemSubmissions.id})` })
-    .from(problemSubmissions)
-    .innerJoin(
-      contestProblems,
-      eq(problemSubmissions.contestProblemId, contestProblems.id),
-    )
-    .innerJoin(
-      contests,
-      and(
+    const result = await db
+      .select({ value: count() })
+      .from(problemSubmissions)
+      .innerJoin(
+        contestProblems,
+        eq(problemSubmissions.contestProblemId, contestProblems.id),
+      )
+      .innerJoin(
+        contests,
         eq(contestProblems.contestId, contests.id),
-        eq(contests.organizerId, orgId),
-        eq(contests.organizerKind, "org"),
-      ),
-    )
-    .where(gt(problemSubmissions.submittedAt, start));
+      )
+      .where(
+        and(
+          eq(contests.organizerId, orgId),
+          eq(contests.organizerKind, "org"),
+          gt(problemSubmissions.submittedAt, start),
+        )
+      );
 
-  return result[0].value;
+    return result[0]?.value ?? 0;
+  } catch (error) {
+    console.error("Error getting recent submissions:", error);
+    return 0;
+  }
 }
+

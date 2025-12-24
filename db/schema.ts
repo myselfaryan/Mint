@@ -300,16 +300,25 @@ export const postTags = pgTable(
   },
 );
 
-export const sessionTable = pgTable("session", {
-  id: text("id").primaryKey(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
-});
+export const sessionTable = pgTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      userIdIdx: index("session_user_id_idx").on(table.userId),
+      expiresAtIdx: index("session_expires_at_idx").on(table.expiresAt),
+    };
+  },
+);
 
 export type SelectUser = typeof users.$inferSelect;
 export type User = typeof users.$inferSelect;
