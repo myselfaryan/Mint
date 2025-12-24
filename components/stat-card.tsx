@@ -26,9 +26,12 @@ interface StatCardProps {
 
 const variantStyles = {
   default: "bg-card",
-  primary: "bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/20",
-  success: "bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20",
-  warning: "bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20",
+  primary:
+    "bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/20",
+  success:
+    "bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20",
+  warning:
+    "bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20",
   info: "bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20",
 };
 
@@ -50,7 +53,13 @@ export default function StatCard({
   variant = "default",
 }: StatCardProps) {
   return (
-    <Card className={cn("relative overflow-hidden", variantStyles[variant], className)}>
+    <Card
+      className={cn(
+        "relative overflow-hidden",
+        variantStyles[variant],
+        className,
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {heading}
@@ -75,10 +84,11 @@ export default function StatCard({
             <span
               className={cn(
                 "text-xs font-medium",
-                trend.isPositive ? "text-emerald-500" : "text-red-500"
+                trend.isPositive ? "text-emerald-500" : "text-red-500",
               )}
             >
-              {trend.isPositive ? "+" : ""}{trend.value}
+              {trend.isPositive ? "+" : ""}
+              {trend.value}
             </span>
             <span className="text-xs text-muted-foreground">{trend.label}</span>
           </div>

@@ -24,7 +24,13 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import StatCard from "@/components/stat-card";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   ChartContainer,
@@ -81,7 +87,11 @@ function StatsLoadingSkeleton() {
 }
 
 // Pie chart colors
-const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))"];
+const COLORS = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+];
 
 // =====================================================
 // MEMBER DASHBOARD COMPONENT
@@ -95,16 +105,20 @@ function MemberDashboard({ orgId }: { orgId: string }) {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        const response = await fetchApi<{ data: Contest[] }>(`/orgs/${orgId}/contests?limit=10`);
+        const response = await fetchApi<{ data: Contest[] }>(
+          `/orgs/${orgId}/contests?limit=10`,
+        );
         const now = new Date();
 
-        const upcoming = response.data.filter(
-          (c) => new Date(c.startTime) > now
-        ).slice(0, 5);
+        const upcoming = response.data
+          .filter((c) => new Date(c.startTime) > now)
+          .slice(0, 5);
 
-        const active = response.data.filter(
-          (c) => new Date(c.startTime) <= now && new Date(c.endTime) > now
-        ).slice(0, 5);
+        const active = response.data
+          .filter(
+            (c) => new Date(c.startTime) <= now && new Date(c.endTime) > now,
+          )
+          .slice(0, 5);
 
         setUpcomingContests(upcoming);
         setActiveContests(active);
@@ -152,7 +166,9 @@ function MemberDashboard({ orgId }: { orgId: string }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome Back! 👋</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome Back! 👋
+          </h1>
           <p className="text-muted-foreground">
             Your personal dashboard - explore contests and track your progress
           </p>
@@ -271,7 +287,9 @@ function MemberDashboard({ orgId }: { orgId: string }) {
                       <span className="text-sm font-medium text-blue-500">
                         {getTimeUntil(contest.startTime)}
                       </span>
-                      <p className="text-xs text-muted-foreground">until start</p>
+                      <p className="text-xs text-muted-foreground">
+                        until start
+                      </p>
                     </div>
                   </div>
                 </Link>
@@ -338,30 +356,81 @@ function MemberDashboard({ orgId }: { orgId: string }) {
 // =====================================================
 // ORGANIZER/OWNER DASHBOARD COMPONENT
 // =====================================================
-function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolean }) {
-  const { stats, loading, error } = useOrgStats(orgId, isOwner ? "owner" : "organizer");
+function OrganizerDashboard({
+  orgId,
+  isOwner,
+}: {
+  orgId: string;
+  isOwner: boolean;
+}) {
+  const { stats, loading, error } = useOrgStats(
+    orgId,
+    isOwner ? "owner" : "organizer",
+  );
 
   // Derived data for charts
-  const contestStatusData = useMemo(() => [
-    { name: "Upcoming", value: stats.upcomingContests, fill: "hsl(var(--chart-1))" },
-    { name: "Active", value: Math.max(0, stats.totalContests - stats.upcomingContests - stats.endedContests), fill: "hsl(var(--chart-2))" },
-    { name: "Ended", value: stats.endedContests, fill: "hsl(var(--chart-3))" },
-  ], [stats]);
+  const contestStatusData = useMemo(
+    () => [
+      {
+        name: "Upcoming",
+        value: stats.upcomingContests,
+        fill: "hsl(var(--chart-1))",
+      },
+      {
+        name: "Active",
+        value: Math.max(
+          0,
+          stats.totalContests - stats.upcomingContests - stats.endedContests,
+        ),
+        fill: "hsl(var(--chart-2))",
+      },
+      {
+        name: "Ended",
+        value: stats.endedContests,
+        fill: "hsl(var(--chart-3))",
+      },
+    ],
+    [stats],
+  );
 
-  const overviewData = useMemo(() => [
-    { name: "Contests", value: stats.totalContests, fill: "hsl(var(--chart-1))" },
-    { name: "Problems", value: stats.totalProblems, fill: "hsl(var(--chart-2))" },
-    { name: "Submissions", value: stats.totalSubmissions, fill: "hsl(var(--chart-3))" },
-    { name: "Groups", value: stats.totalGroups, fill: "hsl(var(--chart-4))" },
-  ], [stats]);
+  const overviewData = useMemo(
+    () => [
+      {
+        name: "Contests",
+        value: stats.totalContests,
+        fill: "hsl(var(--chart-1))",
+      },
+      {
+        name: "Problems",
+        value: stats.totalProblems,
+        fill: "hsl(var(--chart-2))",
+      },
+      {
+        name: "Submissions",
+        value: stats.totalSubmissions,
+        fill: "hsl(var(--chart-3))",
+      },
+      { name: "Groups", value: stats.totalGroups, fill: "hsl(var(--chart-4))" },
+    ],
+    [stats],
+  );
 
   // Activity data (simulated trend)
   const activityData = useMemo(() => {
     const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const baseSubmissions = Math.max(1, Math.floor(stats.recentSubmissions / 7));
+    const baseSubmissions = Math.max(
+      1,
+      Math.floor(stats.recentSubmissions / 7),
+    );
     return weekDays.map((day, i) => ({
       day,
-      submissions: Math.max(0, baseSubmissions + Math.floor(Math.random() * baseSubmissions * 0.5 - baseSubmissions * 0.25)),
+      submissions: Math.max(
+        0,
+        baseSubmissions +
+          Math.floor(
+            Math.random() * baseSubmissions * 0.5 - baseSubmissions * 0.25,
+          ),
+      ),
       problems: Math.floor(Math.random() * 3),
     }));
   }, [stats.recentSubmissions]);
@@ -422,7 +491,15 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
           unit="contests"
           icon={Trophy}
           variant="primary"
-          trend={stats.recentContests > 0 ? { value: stats.recentContests, label: "this month", isPositive: true } : undefined}
+          trend={
+            stats.recentContests > 0
+              ? {
+                  value: stats.recentContests,
+                  label: "this month",
+                  isPositive: true,
+                }
+              : undefined
+          }
         />
         <StatCard
           heading="Upcoming Contests"
@@ -444,7 +521,15 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
           unit="problems"
           icon={FileCode2}
           variant="warning"
-          trend={stats.recentProblems > 0 ? { value: stats.recentProblems, label: "this month", isPositive: true } : undefined}
+          trend={
+            stats.recentProblems > 0
+              ? {
+                  value: stats.recentProblems,
+                  label: "this month",
+                  isPositive: true,
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -479,7 +564,11 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
           unit="submissions"
           icon={TrendingUp}
           variant="default"
-          trend={{ value: stats.recentSubmissions, label: "this week", isPositive: stats.recentSubmissions > 0 }}
+          trend={{
+            value: stats.recentSubmissions,
+            label: "this week",
+            isPositive: stats.recentSubmissions > 0,
+          }}
         />
       </div>
 
@@ -506,11 +595,7 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
                   tickLine={false}
                   className="text-xs"
                 />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  className="text-xs"
-                />
+                <YAxis axisLine={false} tickLine={false} className="text-xs" />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Area
                   type="monotone"
@@ -537,7 +622,10 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={contestChartConfig} className="h-[250px] w-full">
+            <ChartContainer
+              config={contestChartConfig}
+              className="h-[250px] w-full"
+            >
               <PieChart>
                 <Pie
                   data={contestStatusData}
@@ -548,7 +636,9 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
                   paddingAngle={5}
                   dataKey="value"
                   nameKey="name"
-                  label={({ name, value }) => value > 0 ? `${name}: ${value}` : ""}
+                  label={({ name, value }) =>
+                    value > 0 ? `${name}: ${value}` : ""
+                  }
                   labelLine={false}
                 >
                   {contestStatusData.map((entry, index) => (
@@ -576,7 +666,11 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[200px] w-full">
             <BarChart data={overviewData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                className="stroke-muted"
+                horizontal={false}
+              />
               <XAxis type="number" axisLine={false} tickLine={false} />
               <YAxis
                 dataKey="name"
@@ -609,15 +703,21 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>New contests this month</span>
-                <span className="font-medium text-foreground">{stats.recentContests}</span>
+                <span className="font-medium text-foreground">
+                  {stats.recentContests}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Problems added this month</span>
-                <span className="font-medium text-foreground">{stats.recentProblems}</span>
+                <span className="font-medium text-foreground">
+                  {stats.recentProblems}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Submissions this week</span>
-                <span className="font-medium text-foreground">{stats.recentSubmissions}</span>
+                <span className="font-medium text-foreground">
+                  {stats.recentSubmissions}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -634,15 +734,21 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Total Contests</span>
-                <span className="font-medium text-foreground">{stats.totalContests}</span>
+                <span className="font-medium text-foreground">
+                  {stats.totalContests}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Upcoming</span>
-                <span className="font-medium text-blue-500">{stats.upcomingContests}</span>
+                <span className="font-medium text-blue-500">
+                  {stats.upcomingContests}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Completed</span>
-                <span className="font-medium text-emerald-500">{stats.endedContests}</span>
+                <span className="font-medium text-emerald-500">
+                  {stats.endedContests}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -659,15 +765,21 @@ function OrganizerDashboard({ orgId, isOwner }: { orgId: string; isOwner: boolea
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Total Problems</span>
-                <span className="font-medium text-foreground">{stats.totalProblems}</span>
+                <span className="font-medium text-foreground">
+                  {stats.totalProblems}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Added this month</span>
-                <span className="font-medium text-foreground">{stats.recentProblems}</span>
+                <span className="font-medium text-foreground">
+                  {stats.recentProblems}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Total Submissions</span>
-                <span className="font-medium text-foreground">{stats.totalSubmissions}</span>
+                <span className="font-medium text-foreground">
+                  {stats.totalSubmissions}
+                </span>
               </div>
             </div>
           </CardContent>

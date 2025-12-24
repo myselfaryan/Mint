@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { db } from "@/db/drizzle";
-import { contests, problems as problemsTable, contestProblems } from "@/db/schema";
+import {
+  contests,
+  problems as problemsTable,
+  contestProblems,
+} from "@/db/schema";
 import { createContestSchema, updateContestSchema } from "@/lib/validations";
 import { and, count, eq, asc, inArray } from "drizzle-orm";
 import { getProblemIdFromCode } from "../problems/service";
@@ -27,9 +31,9 @@ export async function createContest(
     // Extract problems from data if present
     const problemsList = data.problems
       ? data.problems
-        .split(",")
-        .map((p) => p.trim())
-        .filter((p) => p)
+          .split(",")
+          .map((p) => p.trim())
+          .filter((p) => p)
       : [];
 
     // Remove problems from data before inserting into contests table
@@ -124,15 +128,18 @@ export async function getOrgContests(
       });
 
       // Get all unique problem IDs
-      const problemIds = Array.from(new Set(allContestProblems.map((cp) => cp.problemId)));
+      const problemIds = Array.from(
+        new Set(allContestProblems.map((cp) => cp.problemId)),
+      );
 
       // Batch fetch all problems in a single query
-      const allProblems = problemIds.length > 0
-        ? await db.query.problems.findMany({
-          where: inArray(problemsTable.id, problemIds),
-          columns: { id: true, code: true },
-        })
-        : [];
+      const allProblems =
+        problemIds.length > 0
+          ? await db.query.problems.findMany({
+              where: inArray(problemsTable.id, problemIds),
+              columns: { id: true, code: true },
+            })
+          : [];
 
       // Create a map for quick problem code lookup
       const problemCodeMap = new Map(allProblems.map((p) => [p.id, p.code]));
@@ -244,9 +251,9 @@ export async function updateContest(
     // Extract problems from data if present
     const problemsList = data.problems
       ? data.problems
-        .split(",")
-        .map((p) => p.trim())
-        .filter((p) => p)
+          .split(",")
+          .map((p) => p.trim())
+          .filter((p) => p)
       : null;
 
     // Remove problems from data before updating contests table

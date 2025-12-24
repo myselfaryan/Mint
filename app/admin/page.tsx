@@ -7,7 +7,13 @@ import { useEffect, useState, useMemo } from "react";
 import { fetchApi } from "@/lib/client/fetch";
 import { notFound } from "next/navigation";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -91,14 +97,12 @@ export default function AdminPage() {
   // Chart data derived from organizations
   const orgChartData = useMemo(() => {
     if (!data) return [];
-    return data.organizations
-      .slice(0, 10)
-      .map((org) => ({
-        name: org.name.length > 15 ? org.name.slice(0, 15) + "..." : org.name,
-        contests: org.contestsCount ?? 0,
-        problems: org.problemsCount ?? 0,
-        submissions: org.submissionsCount ?? 0,
-      }));
+    return data.organizations.slice(0, 10).map((org) => ({
+      name: org.name.length > 15 ? org.name.slice(0, 15) + "..." : org.name,
+      contests: org.contestsCount ?? 0,
+      problems: org.problemsCount ?? 0,
+      submissions: org.submissionsCount ?? 0,
+    }));
   }, [data]);
 
   // User distribution by role across all orgs
@@ -110,11 +114,15 @@ export default function AdminPage() {
         organizers: acc.organizers + (org.organizerUsers ?? 0),
         members: acc.members + (org.memberUsers ?? 0),
       }),
-      { owners: 0, organizers: 0, members: 0 }
+      { owners: 0, organizers: 0, members: 0 },
     );
     return [
       { name: "Owners", value: totals.owners, fill: "hsl(var(--chart-1))" },
-      { name: "Organizers", value: totals.organizers, fill: "hsl(var(--chart-2))" },
+      {
+        name: "Organizers",
+        value: totals.organizers,
+        fill: "hsl(var(--chart-2))",
+      },
       { name: "Members", value: totals.members, fill: "hsl(var(--chart-3))" },
     ];
   }, [data]);
@@ -123,10 +131,26 @@ export default function AdminPage() {
   const platformDistributionData = useMemo(() => {
     if (!data) return [];
     return [
-      { name: "Organizations", value: data.platformStats.totalOrgs, fill: "hsl(var(--chart-1))" },
-      { name: "Contests", value: data.platformStats.totalContests, fill: "hsl(var(--chart-2))" },
-      { name: "Problems", value: data.platformStats.totalProblems, fill: "hsl(var(--chart-3))" },
-      { name: "Users", value: data.platformStats.totalUsers, fill: "hsl(var(--chart-4))" },
+      {
+        name: "Organizations",
+        value: data.platformStats.totalOrgs,
+        fill: "hsl(var(--chart-1))",
+      },
+      {
+        name: "Contests",
+        value: data.platformStats.totalContests,
+        fill: "hsl(var(--chart-2))",
+      },
+      {
+        name: "Problems",
+        value: data.platformStats.totalProblems,
+        fill: "hsl(var(--chart-3))",
+      },
+      {
+        name: "Users",
+        value: data.platformStats.totalUsers,
+        fill: "hsl(var(--chart-4))",
+      },
     ];
   }, [data]);
 
@@ -134,7 +158,10 @@ export default function AdminPage() {
   const activityTrendData = useMemo(() => {
     if (!data) return [];
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const baseSubmissions = Math.max(1, Math.floor(data.platformStats.totalSubmissions / 30));
+    const baseSubmissions = Math.max(
+      1,
+      Math.floor(data.platformStats.totalSubmissions / 30),
+    );
     return days.map((day) => ({
       day,
       submissions: Math.floor(baseSubmissions * (0.7 + Math.random() * 0.6)),
@@ -275,7 +302,9 @@ export default function AdminPage() {
                   paddingAngle={5}
                   dataKey="value"
                   nameKey="name"
-                  label={({ name, value }) => value > 0 ? `${name}: ${value}` : ""}
+                  label={({ name, value }) =>
+                    value > 0 ? `${name}: ${value}` : ""
+                  }
                   labelLine={false}
                 >
                   {userDistributionData.map((entry, index) => (
@@ -303,13 +332,36 @@ export default function AdminPage() {
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[300px] w-full">
             <BarChart data={orgChartData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} angle={-15} textAnchor="end" height={60} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                className="stroke-muted"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                angle={-15}
+                textAnchor="end"
+                height={60}
+              />
               <YAxis axisLine={false} tickLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="contests" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="problems" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="submissions" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="contests"
+                fill="hsl(var(--chart-1))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="problems"
+                fill="hsl(var(--chart-2))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="submissions"
+                fill="hsl(var(--chart-3))"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ChartContainer>
         </CardContent>
@@ -325,7 +377,9 @@ export default function AdminPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.platformStats.totalOrgs}</div>
+            <div className="text-2xl font-bold">
+              {data.platformStats.totalOrgs}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
               Active on the platform
             </p>
@@ -342,7 +396,10 @@ export default function AdminPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {data.platformStats.totalOrgs > 0
-                ? (data.platformStats.totalContests / data.platformStats.totalOrgs).toFixed(1)
+                ? (
+                    data.platformStats.totalContests /
+                    data.platformStats.totalOrgs
+                  ).toFixed(1)
                 : 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -361,7 +418,10 @@ export default function AdminPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {data.platformStats.totalOrgs > 0
-                ? (data.platformStats.totalProblems / data.platformStats.totalOrgs).toFixed(1)
+                ? (
+                    data.platformStats.totalProblems /
+                    data.platformStats.totalOrgs
+                  ).toFixed(1)
                 : 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -380,8 +440,14 @@ export default function AdminPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {data.platformStats.totalUsers > 0
-                ? ((data.platformStats.totalSubmissions / data.platformStats.totalUsers) * 100 / 10).toFixed(1)
-                : 0}%
+                ? (
+                    ((data.platformStats.totalSubmissions /
+                      data.platformStats.totalUsers) *
+                      100) /
+                    10
+                  ).toFixed(1)
+                : 0}
+              %
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Based on submissions/user

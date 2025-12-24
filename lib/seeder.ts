@@ -764,15 +764,12 @@ const contestTemplates = [
     name: "Team Programming Battle",
     description:
       "Collaborate with your team to solve challenging problems together.",
-    rules:
-      "Teams of 3 share one computer. Communication and teamwork are key.",
+    rules: "Teams of 3 share one computer. Communication and teamwork are key.",
   },
   {
     name: "Weekly Code Challenge",
-    description:
-      "Our regular weekly contest to keep your skills sharp.",
-    rules:
-      "New problems every week. Leaderboard tracks cumulative scores.",
+    description: "Our regular weekly contest to keep your skills sharp.",
+    rules: "New problems every week. Leaderboard tracks cumulative scores.",
   },
   {
     name: "Mock Interview Prep",
@@ -783,8 +780,7 @@ const contestTemplates = [
   },
   {
     name: "Code Optimization Contest",
-    description:
-      "Submit the fastest and most efficient solutions possible.",
+    description: "Submit the fastest and most efficient solutions possible.",
     rules:
       "Solutions ranked by execution time and memory usage. Correctness is required.",
   },
@@ -797,15 +793,13 @@ const contestTemplates = [
   },
   {
     name: "System Design Sprint",
-    description:
-      "Design and implement small systems under time pressure.",
+    description: "Design and implement small systems under time pressure.",
     rules:
       "Focus on clean architecture and best practices. Code review included.",
   },
   {
     name: "AI Coding Challenge",
-    description:
-      "Implement AI and machine learning algorithms from scratch.",
+    description: "Implement AI and machine learning algorithms from scratch.",
     rules:
       "No external ML libraries allowed. Implement algorithms using basic libraries only.",
   },
@@ -818,17 +812,14 @@ const contestTemplates = [
   },
   {
     name: "Frontend Challenge Cup",
-    description:
-      "Build user interfaces that match given specifications.",
+    description: "Build user interfaces that match given specifications.",
     rules:
       "HTML, CSS, and JavaScript allowed. Pixel-perfect matching required.",
   },
   {
     name: "API Design Tournament",
-    description:
-      "Design RESTful APIs that meet given requirements.",
-    rules:
-      "Focus on RESTful principles, error handling, and documentation.",
+    description: "Design RESTful APIs that meet given requirements.",
+    rules: "Focus on RESTful principles, error handling, and documentation.",
   },
 ];
 

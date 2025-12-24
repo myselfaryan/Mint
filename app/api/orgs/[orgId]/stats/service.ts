@@ -186,15 +186,9 @@ export async function getOrgSubmissionsCount(orgId: number) {
         contestProblems,
         eq(problemSubmissions.contestProblemId, contestProblems.id),
       )
-      .innerJoin(
-        contests,
-        eq(contestProblems.contestId, contests.id),
-      )
+      .innerJoin(contests, eq(contestProblems.contestId, contests.id))
       .where(
-        and(
-          eq(contests.organizerId, orgId),
-          eq(contests.organizerKind, "org"),
-        )
+        and(eq(contests.organizerId, orgId), eq(contests.organizerKind, "org")),
       );
 
     return result[0]?.value ?? 0;
@@ -215,16 +209,13 @@ export async function getOrgRecentSubmissions(orgId: number, period: Period) {
         contestProblems,
         eq(problemSubmissions.contestProblemId, contestProblems.id),
       )
-      .innerJoin(
-        contests,
-        eq(contestProblems.contestId, contests.id),
-      )
+      .innerJoin(contests, eq(contestProblems.contestId, contests.id))
       .where(
         and(
           eq(contests.organizerId, orgId),
           eq(contests.organizerKind, "org"),
           gt(problemSubmissions.submittedAt, start),
-        )
+        ),
       );
 
     return result[0]?.value ?? 0;
@@ -233,4 +224,3 @@ export async function getOrgRecentSubmissions(orgId: number, period: Period) {
     return 0;
   }
 }
-

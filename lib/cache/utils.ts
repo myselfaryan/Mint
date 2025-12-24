@@ -5,7 +5,10 @@ import { cacheMetrics } from "@/lib/metrics/cache";
 const CACHE_TIMEOUT_MS = 500;
 
 // Helper to add timeout to promises
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
+function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+): Promise<T | null> {
   return Promise.race([
     promise,
     new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),

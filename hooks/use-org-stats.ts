@@ -87,11 +87,11 @@ const statsConfig: StatConfig[] = [
 async function fetchStat(
   orgId: string,
   stat: string,
-  period?: Period
+  period?: Period,
 ): Promise<number> {
   try {
     const response = await fetchApi<StatsResponse>(
-      `/orgs/${orgId}/stats?stat=${stat}${period ? `&period=${period}` : ""}`
+      `/orgs/${orgId}/stats?stat=${stat}${period ? `&period=${period}` : ""}`,
     );
     return response.value ?? 0;
   } catch (error) {
@@ -110,7 +110,7 @@ export function useOrgStats(orgId: string, currentRole?: string) {
       try {
         // Filter stats based on user's role
         const allowedStats = statsConfig.filter((config) =>
-          config.roleRequired?.includes(currentRole || "")
+          config.roleRequired?.includes(currentRole || ""),
         );
 
         if (allowedStats.length === 0) {
@@ -121,8 +121,8 @@ export function useOrgStats(orgId: string, currentRole?: string) {
         // Fetch each stat individually with error handling
         const results = await Promise.all(
           allowedStats.map(({ stat, period }) =>
-            fetchStat(orgId, stat, period)
-          )
+            fetchStat(orgId, stat, period),
+          ),
         );
 
         // Combine responses into stats object
