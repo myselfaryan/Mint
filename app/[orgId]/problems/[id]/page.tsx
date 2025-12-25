@@ -1,15 +1,19 @@
-import { CodeEditor } from "@/components/code-editor";
+import { CodeEditorV2 } from "@/components/code-editor-v2";
 import { notFound } from "next/navigation";
-// import { getProblemIdFromCode } from "@/app/api/orgs/[orgId]/problems/service";
+import { headers } from "next/headers";
 
 async function getProblem(orgId: string, problemId: string) {
-  console.log(`ENV: ${process.env.NEXT_PUBLIC_APP_URL}`, orgId, problemId);
+  // Get the host from headers for server-side fetch
+  const headersList = headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
+  console.log(`Fetching problem from: ${baseUrl}/api/orgs/${orgId}/problems/${problemId}`);
 
   try {
-    // const problemIdNumber = await getProblemIdFromCode(orgId, problemId);
-
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/orgs/${orgId}/problems/${problemId}`,
+      `${baseUrl}/api/orgs/${orgId}/problems/${problemId}`,
       {
         cache: "no-store",
       },
@@ -19,12 +23,12 @@ async function getProblem(orgId: string, problemId: string) {
       throw new Error("Failed to fetch problem");
     }
 
-    // Return the problem without adding contestId
+    // Return the problem with orgNameId for submission context
     const problem = await response.json();
     return {
       ...problem,
-      orgId,
-      // No contestId here, as this is a standalone problem
+      orgId: problem.orgId,
+      orgNameId: orgId, // String version for API calls
     };
   } catch (error) {
     console.error("Error fetching problem:", error);
@@ -45,7 +49,7 @@ export default async function Page({
 
   return (
     <>
-      <CodeEditor problem={problem} />
+      <CodeEditorV2 problem={problem} />
     </>
   );
 }

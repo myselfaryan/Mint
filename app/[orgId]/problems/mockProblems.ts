@@ -11,7 +11,9 @@ export interface Problem {
   description?: string;
   allowedLanguages: string[];
   createdAt: string;
-  orgId: number;
+  orgId: number | string;
+  orgNameId?: string; // String version of orgId for API calls
+  contestNameId?: string; // For submission context
   testCases?: TestCase[];
 }
 

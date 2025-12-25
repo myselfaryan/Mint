@@ -20,7 +20,8 @@
     "pg:stop": "bun run scripts/pg-stop.ts",
     "pg-admin": "bun run scripts/pg-admin.ts",
     "pg-admin:stop": "bun run scripts/pg-admin-stop.ts",
-    "email": "bun run scripts/email.ts"
+    "email": "bun run scripts/email.ts",
+    "queue:worker": "bun run scripts/queue-worker.ts"
   },
   "dependencies": {
     "@anatine/zod-openapi": "^2.2.8",
