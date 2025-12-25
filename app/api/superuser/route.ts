@@ -14,6 +14,10 @@ import {
 import { getCurrentSession } from "@/lib/server/session";
 import { count, eq, sql } from "drizzle-orm";
 
+// This route uses cookies, so it must be dynamic
+export const dynamic = 'force-dynamic';
+
+
 export async function GET() {
   try {
     const { session } = await getCurrentSession();

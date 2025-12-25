@@ -10,7 +10,7 @@ async function getProblem(orgId: string, contestId: string, problemId: string) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
   console.log(
-    `Fetching problem from: ${baseUrl}/api/orgs/${orgId}/contests/${contestId}/problems/${problemId}`
+    `Fetching problem from: ${baseUrl}/api/orgs/${orgId}/contests/${contestId}/problems/${problemId}`,
   );
 
   try {

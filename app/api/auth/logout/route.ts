@@ -3,6 +3,9 @@ import { getCurrentSession } from "@/lib/server/session";
 import { deleteSessionTokenCookie } from "@/lib/server/cookies";
 import { invalidateSession } from "@/lib/server/session";
 
+// This route uses cookies, so it must be dynamic
+export const dynamic = 'force-dynamic';
+
 export async function DELETE() {
   try {
     const { session } = await getCurrentSession();

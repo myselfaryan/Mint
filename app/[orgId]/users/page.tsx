@@ -1,4 +1,4 @@
-                                                                                                                                                                            "use client";
+"use client";
 
 import { GenericListing, ColumnDef } from "@/mint/generic-listing";
 import { GenericEditor, Field } from "@/mint/generic-editor";
@@ -30,7 +30,7 @@ interface InviteUserData {
   role: "owner" | "organizer" | "member";
 }
 
-interface CSVImportResult {                   
+interface CSVImportResult {
   email: string;
   status: "success" | "error";
   isNewUser?: boolean;

@@ -2,9 +2,24 @@ import { Redis } from "ioredis";
 
 // Singleton Redis client with lazy initialization
 let redis: Redis | null = null;
-let redisEnabled = true;
+let redisEnabled: boolean | null = null; // null means not yet determined
+
+/**
+ * Check if we're in a build environment
+ */
+function isBuildTime(): boolean {
+  return process.env.NODE_ENV === 'production' &&
+    (process.env.NEXT_PHASE === 'phase-production-build' ||
+      process.env.VERCEL_ENV === undefined);
+}
 
 function createRedisClient(): Redis | null {
+  // Don't create Redis client during build time
+  if (isBuildTime()) {
+    console.log("Skipping Redis connection during build");
+    return null;
+  }
+
   // Check if Redis URL is configured
   const redisUrl = process.env.REDIS_URL;
 
@@ -15,11 +30,13 @@ function createRedisClient(): Redis | null {
   }
 
   try {
-    return new Redis(redisUrl, {
+    const client = new Redis(redisUrl, {
       password: process.env.REDIS_PASSWORD,
       retryStrategy(times) {
         if (times > 3) {
-          console.warn("Redis connection failed after 3 retries - disabling cache");
+          console.warn(
+            "Redis connection failed after 3 retries - disabling cache",
+          );
           redisEnabled = false;
           return null; // Stop retrying
         }
@@ -33,7 +50,12 @@ function createRedisClient(): Redis | null {
       connectTimeout: 5000,
       // Lazy connect - don't connect until first command
       lazyConnect: true,
+      // For Upstash and other TLS connections
+      tls: redisUrl.startsWith('rediss://') ? {} : undefined,
     });
+
+    redisEnabled = true;
+    return client;
   } catch (error) {
     console.warn("Failed to create Redis client:", error);
     redisEnabled = false;
@@ -59,13 +81,23 @@ export const CACHE_KEYS = {
 /**
  * Check if Redis is enabled and available
  */
-export const isRedisEnabled = (): boolean => redisEnabled;
+export const isRedisEnabled = (): boolean => {
+  if (isBuildTime()) return false;
+  if (redisEnabled === null) {
+    // Try to initialize
+    getRedis();
+  }
+  return redisEnabled === true;
+};
 
 /**
  * Get Redis client (may return null if Redis is not configured)
  */
 export const getRedis = (): Redis | null => {
-  if (!redisEnabled) return null;
+  // Never return Redis during build time
+  if (isBuildTime()) return null;
+
+  if (redisEnabled === false) return null;
 
   if (!redis) {
     redis = createRedisClient();
@@ -104,7 +136,7 @@ export const safeRedisGet = async (key: string): Promise<string | null> => {
 export const safeRedisSet = async (
   key: string,
   value: string,
-  ttl?: number
+  ttl?: number,
 ): Promise<boolean> => {
   const client = getRedis();
   if (!client) return false;

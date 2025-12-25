@@ -7,6 +7,9 @@ import * as orgsService from "./service";
 import { z } from "zod";
 import { getCurrentSession } from "@/lib/server/session";
 
+// This route uses cookies, so it must be dynamic
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const limit = Number(searchParams.get("limit") || 10);

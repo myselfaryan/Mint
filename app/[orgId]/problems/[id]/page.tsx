@@ -9,7 +9,9 @@ async function getProblem(orgId: string, problemId: string) {
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
-  console.log(`Fetching problem from: ${baseUrl}/api/orgs/${orgId}/problems/${problemId}`);
+  console.log(
+    `Fetching problem from: ${baseUrl}/api/orgs/${orgId}/problems/${problemId}`,
+  );
 
   try {
     const response = await fetch(

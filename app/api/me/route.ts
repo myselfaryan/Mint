@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/server/session";
 import { getUserWithOrgs } from "./service";
 
+// This route uses cookies, so it must be dynamic
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const { session } = await getCurrentSession();
