@@ -12,8 +12,12 @@ export async function fetchApi<T>(
   });
 
   if (!response.ok) {
+    const errorData = await response.json();
+    const errorMessage = errorData.details
+      ? `${errorData.error}: ${errorData.details}`
+      : errorData.error;
     throw new Error(
-      `API call failed: ${response.statusText}, ${(await response.json()).error}`,
+      `API call failed: ${response.statusText}, ${errorMessage}`,
     );
   }
 

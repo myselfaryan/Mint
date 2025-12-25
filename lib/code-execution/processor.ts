@@ -65,7 +65,7 @@ export async function processSubmission(job: ExecutionJob): Promise<void> {
 
       // Execute the code
       const result = await executeCode(job.code, job.language, testCase.input, {
-        timeLimit: 5,
+        timeLimit: 5000, // 5 seconds in milliseconds
         memoryLimit: 256000,
       });
 

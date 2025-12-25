@@ -1,4 +1,4 @@
-/**
+              /**
  * Real-Time Submission API
  * POST /api/submit - Submit code for evaluation with real-time updates
  * GET /api/submit/:id - Get submission status and results
@@ -16,7 +16,6 @@ import {
 } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import {
-  enqueueJob,
   checkRateLimit,
   createExecutionJob,
   SupportedLanguage,
@@ -152,7 +151,7 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    // Create and enqueue job
+    // Create execution job
     const job = await createExecutionJob(
       submission.id,
       data.code,
@@ -161,7 +160,13 @@ export async function POST(request: NextRequest) {
       userId,
     );
 
-    await enqueueJob(job);
+    // Process submission directly (don't wait for queue worker)
+    // This provides immediate feedback without requiring a separate process
+    const { processSubmission } = await import('@/lib/code-execution/processor');
+    // Process in background (don't await, so we can return immediately)
+    processSubmission(job).catch((error) => {
+      console.error(`Failed to process submission ${submission.id}:`, error);
+    });
 
     return NextResponse.json(
       {

@@ -32,11 +32,17 @@ interface SubmissionStatusDisplayProps {
 }
 
 const statusConfig: Record<
-  SubmissionStatus,
+  string,
   { label: string; color: string; icon: React.ReactNode; bgColor: string }
 > = {
   queued: {
     label: "Queued",
+    color: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+    icon: <Clock className="w-4 h-4" />,
+  },
+  pending: {
+    label: "Pending",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
     icon: <Clock className="w-4 h-4" />,
@@ -71,6 +77,12 @@ const statusConfig: Record<
     bgColor: "bg-red-500/10",
     icon: <XCircle className="w-4 h-4" />,
   },
+  rejected: {
+    label: "Rejected",
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+    icon: <XCircle className="w-4 h-4" />,
+  },
   time_limit_exceeded: {
     label: "Time Limit Exceeded",
     color: "text-orange-500",
@@ -101,6 +113,20 @@ const statusConfig: Record<
     bgColor: "bg-gray-500/10",
     icon: <AlertTriangle className="w-4 h-4" />,
   },
+  error: {
+    label: "Error",
+    color: "text-gray-500",
+    bgColor: "bg-gray-500/10",
+    icon: <AlertTriangle className="w-4 h-4" />,
+  },
+};
+
+// Default config for unknown statuses
+const defaultConfig = {
+  label: "Unknown",
+  color: "text-gray-500",
+  bgColor: "bg-gray-500/10",
+  icon: <Clock className="w-4 h-4" />,
 };
 
 export function SubmissionStatusDisplay({
@@ -114,15 +140,17 @@ export function SubmissionStatusDisplay({
   error,
   isConnected,
 }: SubmissionStatusDisplayProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || defaultConfig;
   const isComplete =
     status === "accepted" ||
     status === "wrong_answer" ||
+    status === "rejected" ||
     status === "time_limit_exceeded" ||
     status === "memory_limit_exceeded" ||
     status === "runtime_error" ||
     status === "compilation_error" ||
-    status === "internal_error";
+    status === "internal_error" ||
+    status === "error";
 
   return (
     <div className="space-y-4">
@@ -227,19 +255,19 @@ export function SubmissionStatusDisplay({
                       "w-8 h-8 rounded-md flex items-center justify-center text-xs font-medium transition-all",
                       isPending && "bg-muted text-muted-foreground",
                       isRunning &&
-                        "bg-blue-500/20 text-blue-500 ring-2 ring-blue-500",
+                      "bg-blue-500/20 text-blue-500 ring-2 ring-blue-500",
                       result?.status === "accepted" &&
-                        "bg-green-500/20 text-green-500",
+                      "bg-green-500/20 text-green-500",
                       result?.status === "wrong_answer" &&
-                        "bg-red-500/20 text-red-500",
+                      "bg-red-500/20 text-red-500",
                       result?.status === "time_limit_exceeded" &&
-                        "bg-orange-500/20 text-orange-500",
+                      "bg-orange-500/20 text-orange-500",
                       result?.status === "memory_limit_exceeded" &&
-                        "bg-orange-500/20 text-orange-500",
+                      "bg-orange-500/20 text-orange-500",
                       result?.status === "runtime_error" &&
-                        "bg-red-500/20 text-red-500",
+                      "bg-red-500/20 text-red-500",
                       result?.status === "compilation_error" &&
-                        "bg-red-500/20 text-red-500",
+                      "bg-red-500/20 text-red-500",
                     )}
                   >
                     {isRunning ? (

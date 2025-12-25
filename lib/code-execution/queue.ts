@@ -1,7 +1,10 @@
 /**
  * Submission Queue System using Redis (Optional)
- * Handles job queuing and real-time status updates via pub/sub
+ * Handles job queuing and status storage
  * Falls back gracefully when Redis is not available
+ * 
+ * Note: Real-time updates are now handled via database polling
+ * since Upstash REST API doesn't support pub/sub in serverless.
  */
 
 import { getRedis, CACHE_TTL, isRedisEnabled } from "@/db/redis";
@@ -15,7 +18,6 @@ import {
 // Queue and channel names
 const QUEUE_NAME = "code_execution_queue";
 const PROCESSING_SET = "code_execution_processing";
-const CHANNEL_PREFIX = "submission:";
 
 /**
  * Check if queue features are available
@@ -36,21 +38,10 @@ export async function enqueueJob(job: ExecutionJob): Promise<boolean> {
 
   try {
     // Store job data
-    await redis.set(`job:${job.id}`, JSON.stringify(job), "EX", CACHE_TTL.LONG);
+    await redis.set(`job:${job.id}`, JSON.stringify(job), { ex: CACHE_TTL.LONG });
 
-    // Add to queue
+    // Add to queue (Upstash supports rpush)
     await redis.rpush(QUEUE_NAME, job.id);
-
-    // Publish job created event
-    await publishUpdate(job.submissionId, {
-      type: "submission_created",
-      submissionId: job.submissionId,
-      data: {
-        status: "queued",
-        totalTestCases: job.testCases.length,
-        timestamp: Date.now(),
-      },
-    });
 
     return true;
   } catch (error) {
@@ -68,17 +59,17 @@ export async function dequeueJob(): Promise<ExecutionJob | null> {
 
   try {
     // Atomic pop from queue
-    const jobId = await redis.lpop(QUEUE_NAME);
+    const jobId = await redis.lpop<string>(QUEUE_NAME);
     if (!jobId) return null;
 
     // Get job data
-    const jobData = await redis.get(`job:${jobId}`);
+    const jobData = await redis.get<string>(`job:${jobId}`);
     if (!jobData) return null;
 
     // Mark as processing
     await redis.sadd(PROCESSING_SET, jobId);
 
-    return JSON.parse(jobData) as ExecutionJob;
+    return typeof jobData === 'string' ? JSON.parse(jobData) : jobData as unknown as ExecutionJob;
   } catch (error) {
     console.error("Failed to dequeue job:", error);
     return null;
@@ -102,60 +93,31 @@ export async function completeJob(jobId: string): Promise<void> {
 
 /**
  * Publish a real-time update for a submission
+ * Note: In serverless with Upstash REST, pub/sub doesn't work the same way.
+ * This function is kept for compatibility but updates are handled via DB polling.
  */
 export async function publishUpdate(
   submissionId: number,
   message: WSMessage,
 ): Promise<void> {
-  const redis = getRedis();
-  if (!redis) return;
-
-  try {
-    await redis.publish(
-      `${CHANNEL_PREFIX}${submissionId}`,
-      JSON.stringify(message),
-    );
-
-    // Also publish to a global channel for dashboard updates
-    await redis.publish("submissions:all", JSON.stringify(message));
-  } catch (error) {
-    console.error("Failed to publish update:", error);
-  }
+  // In Upstash REST, pub/sub isn't practical for serverless
+  // Updates are now delivered via database polling in the stream endpoint
+  // This function is a no-op but kept for API compatibility
+  console.log(`[Queue] Update for submission ${submissionId}:`, message.type);
 }
 
 /**
  * Subscribe to updates for a specific submission
+ * Note: Not available with Upstash REST API - use database polling instead
  */
 export async function subscribeToSubmission(
   submissionId: number,
   callback: (message: WSMessage) => void,
 ): Promise<(() => void) | null> {
-  const redis = getRedis();
-  if (!redis) return null;
-
-  try {
-    const subscriber = redis.duplicate();
-
-    await subscriber.subscribe(`${CHANNEL_PREFIX}${submissionId}`);
-
-    subscriber.on("message", (channel, message) => {
-      try {
-        const parsed = JSON.parse(message) as WSMessage;
-        callback(parsed);
-      } catch (error) {
-        console.error("Failed to parse subscription message:", error);
-      }
-    });
-
-    // Return unsubscribe function
-    return async () => {
-      await subscriber.unsubscribe(`${CHANNEL_PREFIX}${submissionId}`);
-      await subscriber.quit();
-    };
-  } catch (error) {
-    console.error("Failed to subscribe:", error);
-    return null;
-  }
+  // Pub/sub is not available in Upstash REST
+  // Real-time updates are handled via database polling in the stream endpoint
+  console.warn("subscribeToSubmission not available with Upstash REST - use polling");
+  return null;
 }
 
 /**
@@ -209,8 +171,7 @@ export async function cacheSubmissionResult(
     await redis.set(
       `submission_result:${submissionId}`,
       JSON.stringify(results),
-      "EX",
-      CACHE_TTL.MEDIUM,
+      { ex: CACHE_TTL.MEDIUM },
     );
   } catch (error) {
     console.error("Failed to cache submission result:", error);
@@ -232,10 +193,10 @@ export async function getCachedSubmissionResult(submissionId: number): Promise<{
   if (!redis) return null;
 
   try {
-    const cached = await redis.get(`submission_result:${submissionId}`);
+    const cached = await redis.get<string>(`submission_result:${submissionId}`);
     if (!cached) return null;
 
-    return JSON.parse(cached);
+    return typeof cached === 'string' ? JSON.parse(cached) : cached as any;
   } catch (error) {
     console.error("Failed to get cached submission result:", error);
     return null;
@@ -274,10 +235,10 @@ export async function checkRateLimit(
     const count = await redis.zcard(key);
 
     if (count >= limit) {
-      const oldestEntry = await redis.zrange(key, 0, 0, "WITHSCORES");
+      const oldestEntry = await redis.zrange(key, 0, 0, { withScores: true });
       const resetAt =
         oldestEntry.length > 1
-          ? parseInt(oldestEntry[1]) + windowSeconds * 1000
+          ? parseInt(String(oldestEntry[1])) + windowSeconds * 1000
           : now + windowSeconds * 1000;
 
       return {
@@ -288,7 +249,7 @@ export async function checkRateLimit(
     }
 
     // Add current request
-    await redis.zadd(key, now, `${now}:${Math.random()}`);
+    await redis.zadd(key, { score: now, member: `${now}:${Math.random()}` });
     await redis.expire(key, windowSeconds);
 
     return {

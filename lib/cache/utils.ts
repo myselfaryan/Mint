@@ -2,7 +2,7 @@ import { getRedis, CACHE_TTL } from "@/db/redis";
 import { cacheMetrics } from "@/lib/metrics/cache";
 
 // Cache timeout to prevent slow Redis from blocking requests
-const CACHE_TIMEOUT_MS = 500;
+const CACHE_TIMEOUT_MS = 2000; // Increased for REST API calls
 
 // Helper to add timeout to promises
 function withTimeout<T>(
@@ -27,8 +27,13 @@ export async function withDataCache<T>(
   try {
     const redis = getRedis();
 
+    // If Redis is not available, fall back to database directly
+    if (!redis) {
+      return fn();
+    }
+
     // Try to get from cache with timeout
-    const cached = await withTimeout(redis.get(key), CACHE_TIMEOUT_MS);
+    const cached = await withTimeout(redis.get<string>(key), CACHE_TIMEOUT_MS);
 
     if (cached) {
       cacheMetrics.record({
@@ -39,15 +44,17 @@ export async function withDataCache<T>(
         dbQueries: 0,
         memoryUsage: process.memoryUsage().heapUsed - initialMemory,
       });
-      return JSON.parse(cached);
+      // Upstash returns the value directly, may already be parsed
+      return typeof cached === 'string' ? JSON.parse(cached) : cached;
     }
 
     // Cache miss or timeout - fetch from database
     const result = await fn();
 
     // Try to set cache in background (don't await)
-    redis.setex(key, ttl, JSON.stringify(result)).catch((err) => {
-      console.error("Redis setex error:", err);
+    // Upstash uses set with ex option instead of setex
+    redis.set(key, JSON.stringify(result), { ex: ttl }).catch((err) => {
+      console.error("Redis set error:", err);
     });
 
     cacheMetrics.record({
@@ -70,6 +77,7 @@ export async function withDataCache<T>(
 export async function invalidateCacheKey(key: string): Promise<number> {
   try {
     const redis = getRedis();
+    if (!redis) return 0;
     return await redis.del(key);
   } catch (error) {
     console.error("Redis del error:", error);
@@ -82,6 +90,7 @@ export async function invalidateCacheKeys(keys: string[]): Promise<number> {
   if (keys.length === 0) return 0;
   try {
     const redis = getRedis();
+    if (!redis) return 0;
     return await redis.del(...keys);
   } catch (error) {
     console.error("Redis batch del error:", error);
@@ -93,6 +102,7 @@ export async function invalidateCacheKeys(keys: string[]): Promise<number> {
 export async function invalidateCachePattern(pattern: string): Promise<number> {
   try {
     const redis = getRedis();
+    if (!redis) return 0;
     const keys = await redis.keys(pattern);
     if (keys.length === 0) return 0;
     return await redis.del(...keys);

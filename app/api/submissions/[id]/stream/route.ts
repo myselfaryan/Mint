@@ -2,15 +2,18 @@
  * Server-Sent Events (SSE) endpoint for real-time submission updates
  * GET /api/submissions/[id]/stream - Stream submission status updates
  *
- * This uses SSE instead of WebSockets because Next.js API routes
- * don't natively support WebSocket upgrades in the app router.
+ * This version uses polling to check submission status from the database
+ * since Upstash Redis REST API doesn't support pub/sub.
  */
 
 import { NextRequest } from "next/server";
-import { getRedis } from "@/db/redis";
+import { db } from "@/db/drizzle";
+import { problemSubmissions } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { WSMessage } from "@/lib/code-execution/types";
 
-const CHANNEL_PREFIX = "submission:";
+const POLL_INTERVAL_MS = 1000; // Poll every 1 second
+const MAX_POLL_DURATION_MS = 5 * 60 * 1000; // 5 minutes max
 
 export async function GET(
   request: NextRequest,
@@ -23,15 +26,16 @@ export async function GET(
     return new Response("Invalid submission ID", { status: 400 });
   }
 
+  const submissionIdNum = parseInt(submissionId, 10);
+
   // Create a readable stream for SSE
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
-      const redis = getRedis();
-      const subscriber = redis.duplicate();
-
       let isConnected = true;
+      let lastStatus: string | null = null;
+      const startTime = Date.now();
 
       // Function to send SSE message
       const sendMessage = (data: WSMessage) => {
@@ -48,74 +52,123 @@ export async function GET(
       // Send initial connection message
       sendMessage({
         type: "submission_status_update",
-        submissionId: parseInt(submissionId, 10),
+        submissionId: submissionIdNum,
         data: {
           status: "queued",
           timestamp: Date.now(),
         },
       });
 
-      try {
-        // Subscribe to submission updates
-        await subscriber.subscribe(`${CHANNEL_PREFIX}${submissionId}`);
+      // Poll for updates
+      const poll = async () => {
+        if (!isConnected) return;
 
-        subscriber.on("message", (channel, message) => {
-          try {
-            const parsed = JSON.parse(message) as WSMessage;
-            sendMessage(parsed);
+        try {
+          // Check if timeout exceeded
+          if (Date.now() - startTime > MAX_POLL_DURATION_MS) {
+            sendMessage({
+              type: "error",
+              submissionId: submissionIdNum,
+              data: {
+                error: "Connection timeout",
+                timestamp: Date.now(),
+              },
+            });
+            isConnected = false;
+            controller.close();
+            return;
+          }
 
-            // Close connection on completion or error
-            if (
-              parsed.type === "submission_completed" ||
-              parsed.type === "error"
-            ) {
+          // Get submission from database
+          const submission = await db
+            .select({
+              id: problemSubmissions.id,
+              status: problemSubmissions.status,
+              executionTime: problemSubmissions.executionTime,
+              memoryUsage: problemSubmissions.memoryUsage,
+            })
+            .from(problemSubmissions)
+            .where(eq(problemSubmissions.id, submissionIdNum))
+            .limit(1);
+
+          if (submission.length === 0) {
+            sendMessage({
+              type: "error",
+              submissionId: submissionIdNum,
+              data: {
+                error: "Submission not found",
+                timestamp: Date.now(),
+              },
+            });
+            isConnected = false;
+            controller.close();
+            return;
+          }
+
+          const sub = submission[0];
+
+          // Only send update if status changed
+          if (sub.status !== lastStatus) {
+            lastStatus = sub.status;
+
+            // Check if submission is completed (accepted, rejected, error)
+            const isCompleted = sub.status &&
+              sub.status !== "pending" &&
+              sub.status !== "processing";
+
+            if (isCompleted) {
+              // Send final status
+              sendMessage({
+                type: "submission_completed",
+                submissionId: submissionIdNum,
+                data: {
+                  status: sub.status as any,
+                  executionTime: sub.executionTime ?? undefined,
+                  memoryUsed: sub.memoryUsage ?? undefined,
+                  timestamp: Date.now(),
+                },
+              });
+
+              // Close connection after sending final status
               setTimeout(() => {
                 if (isConnected) {
                   isConnected = false;
                   controller.close();
-                  subscriber.unsubscribe();
-                  subscriber.quit();
                 }
-              }, 1000);
-            }
-          } catch (error) {
-            console.error("Error parsing message:", error);
-          }
-        });
-
-        // Handle connection timeout (5 minutes max)
-        const timeout = setTimeout(
-          () => {
-            if (isConnected) {
-              isConnected = false;
+              }, 500);
+              return;
+            } else {
+              // Send status update
               sendMessage({
-                type: "error",
-                submissionId: parseInt(submissionId, 10),
+                type: "submission_status_update",
+                submissionId: submissionIdNum,
                 data: {
-                  error: "Connection timeout",
+                  status: (sub.status || "processing") as any,
                   timestamp: Date.now(),
                 },
               });
-              controller.close();
-              subscriber.unsubscribe();
-              subscriber.quit();
             }
-          },
-          5 * 60 * 1000,
-        );
+          }
 
-        // Cleanup on abort
-        request.signal.addEventListener("abort", () => {
-          isConnected = false;
-          clearTimeout(timeout);
-          subscriber.unsubscribe();
-          subscriber.quit();
-        });
-      } catch (error) {
-        console.error("SSE subscription error:", error);
+          // Continue polling
+          if (isConnected) {
+            setTimeout(poll, POLL_INTERVAL_MS);
+          }
+        } catch (error) {
+          console.error("Polling error:", error);
+          if (isConnected) {
+            setTimeout(poll, POLL_INTERVAL_MS * 2); // Retry with backoff on error
+          }
+        }
+      };
+
+      // Start polling
+      poll();
+
+      // Cleanup on abort
+      request.signal.addEventListener("abort", () => {
         isConnected = false;
-        controller.error(error);
-      }
+      });
     },
   });
 

@@ -18,7 +18,11 @@ import {
   CheckCircle,
   XCircle,
   Circle,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
+import Link from "next/link";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
@@ -71,7 +75,10 @@ const extensions = {
 };
 
 export interface CodeEditorProps {
-  problem?: Problem | null;
+  problem?: Problem & {
+    prevProblemCode?: string;
+    nextProblemCode?: string;
+  } | null;
 }
 
 interface TestCase {
@@ -247,11 +254,48 @@ export function CodeEditorV2({ problem }: CodeEditorProps) {
         {/* Problem Description Panel */}
         <ResizablePanel defaultSize={35} minSize={25}>
           <div className="h-full flex flex-col bg-background border-r border-border">
-            {/* Header */}
+            {/* Header with Navigation */}
             <div className="border-b border-border px-4 py-3 bg-card">
-              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <span className="text-primary">📝</span> Description
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <span className="text-primary">📝</span> Description
+                </h2>
+                <div className="flex items-center gap-1">
+                  {/* Back to Problems List */}
+                  {problem?.contestNameId && problem?.orgNameId && (
+                    <Link href={`/${problem.orgNameId}/contests/${problem.contestNameId}/problems`}>
+                      <Button variant="ghost" size="sm" className="h-8 px-2">
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        Problems
+                      </Button>
+                    </Link>
+                  )}
+                  {/* Previous Problem */}
+                  {problem?.prevProblemCode && problem?.contestNameId && problem?.orgNameId ? (
+                    <Link href={`/${problem.orgNameId}/contests/${problem.contestNameId}/problems/${problem.prevProblemCode}`}>
+                      <Button variant="outline" size="icon" className="h-8 w-8">
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button variant="outline" size="icon" className="h-8 w-8" disabled>
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                  )}
+                  {/* Next Problem */}
+                  {problem?.nextProblemCode && problem?.contestNameId && problem?.orgNameId ? (
+                    <Link href={`/${problem.orgNameId}/contests/${problem.contestNameId}/problems/${problem.nextProblemCode}`}>
+                      <Button variant="outline" size="icon" className="h-8 w-8">
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button variant="outline" size="icon" className="h-8 w-8" disabled>
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Problem Content */}

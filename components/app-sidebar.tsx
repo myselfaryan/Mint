@@ -201,7 +201,7 @@ const getNavItems = (role?: string): SidebarItem[] => {
       title: "Submissions",
       url: "submissions",
       icon: FileCheck,
-      allowedRoles: ["owner", "organizer"],
+      allowedRoles: ["owner", "organizer", "member"],
     },
   ];
 

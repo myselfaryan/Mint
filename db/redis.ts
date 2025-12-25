@@ -1,4 +1,4 @@
-import { Redis } from "ioredis";
+import { Redis } from "@upstash/redis";
 
 // Singleton Redis client with lazy initialization
 let redis: Redis | null = null;
@@ -20,47 +20,53 @@ function createRedisClient(): Redis | null {
     return null;
   }
 
-  // Check if Redis URL is configured
+  // Check if Upstash REST URL is configured (preferred for serverless)
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const restToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (restUrl && restToken) {
+    try {
+      const client = new Redis({
+        url: restUrl,
+        token: restToken,
+      });
+      redisEnabled = true;
+      console.log("Redis client created (Upstash REST)");
+      return client;
+    } catch (error) {
+      console.warn("Failed to create Upstash Redis client:", error);
+      redisEnabled = false;
+      return null;
+    }
+  }
+
+  // Fallback: Check for REDIS_URL (legacy format)
   const redisUrl = process.env.REDIS_URL;
+  if (redisUrl) {
+    // Parse the URL to extract components for Upstash REST format
+    try {
+      const url = new URL(redisUrl);
+      const host = url.hostname;
+      const password = url.password || decodeURIComponent(url.username.split(':')[1] || '');
 
-  if (!redisUrl) {
-    console.warn("REDIS_URL not configured - caching disabled");
-    redisEnabled = false;
-    return null;
+      // Try to use Upstash REST API format
+      const client = new Redis({
+        url: `https://${host}`,
+        token: password,
+      });
+      redisEnabled = true;
+      console.log("Redis client created (from REDIS_URL)");
+      return client;
+    } catch (error) {
+      console.warn("Failed to parse REDIS_URL for Upstash:", error);
+      redisEnabled = false;
+      return null;
+    }
   }
 
-  try {
-    const client = new Redis(redisUrl, {
-      password: process.env.REDIS_PASSWORD,
-      retryStrategy(times) {
-        if (times > 3) {
-          console.warn(
-            "Redis connection failed after 3 retries - disabling cache",
-          );
-          redisEnabled = false;
-          return null; // Stop retrying
-        }
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-      },
-      maxRetriesPerRequest: 3,
-      // Enable keep-alive for better connection reuse
-      keepAlive: 10000,
-      // Connection timeout for faster failure detection
-      connectTimeout: 5000,
-      // Lazy connect - don't connect until first command
-      lazyConnect: true,
-      // For Upstash and other TLS connections
-      tls: redisUrl.startsWith('rediss://') ? {} : undefined,
-    });
-
-    redisEnabled = true;
-    return client;
-  } catch (error) {
-    console.warn("Failed to create Redis client:", error);
-    redisEnabled = false;
-    return null;
-  }
+  console.warn("No Redis configuration found - caching disabled");
+  redisEnabled = false;
+  return null;
 }
 
 // Cache TTL constants (in seconds)
@@ -101,16 +107,6 @@ export const getRedis = (): Redis | null => {
 
   if (!redis) {
     redis = createRedisClient();
-
-    if (redis) {
-      redis.on("error", (error) => {
-        console.error("Redis connection error:", error);
-      });
-
-      redis.on("connect", () => {
-        console.log("Redis connected");
-      });
-    }
   }
   return redis;
 };
@@ -143,7 +139,7 @@ export const safeRedisSet = async (
 
   try {
     if (ttl) {
-      await client.set(key, value, "EX", ttl);
+      await client.set(key, value, { ex: ttl });
     } else {
       await client.set(key, value);
     }

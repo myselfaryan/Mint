@@ -70,12 +70,14 @@ export function GenericEditor<T>({
           field.type === "datetime" &&
           formattedData[field.name as keyof typeof formattedData]
         ) {
-          const date = new Date(
-            formattedData[field.name as keyof typeof formattedData] as string,
-          );
-          formattedData[field.name as keyof typeof formattedData] = date
-            .toISOString()
-            .slice(0, 16) as any;
+          const dateValue = formattedData[field.name as keyof typeof formattedData] as string;
+          const date = new Date(dateValue);
+          // Check if the date is valid before converting
+          if (!isNaN(date.getTime())) {
+            formattedData[field.name as keyof typeof formattedData] = date
+              .toISOString()
+              .slice(0, 16) as any;
+          }
         }
       });
       reset(formattedData);
@@ -97,8 +99,11 @@ export function GenericEditor<T>({
           const date = new Date(
             processedData[field.name as keyof typeof processedData] as string,
           );
-          processedData[field.name as keyof typeof processedData] =
-            date.toISOString() as any;
+          // Only convert if date is valid
+          if (!isNaN(date.getTime())) {
+            processedData[field.name as keyof typeof processedData] =
+              date.toISOString() as any;
+          }
         }
       });
 

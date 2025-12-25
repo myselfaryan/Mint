@@ -75,6 +75,23 @@ export async function GET(
       .from(testCases)
       .where(eq(testCases.problemId, problemResult[0].problem.id));
 
+    // Get all problems in this contest to determine prev/next
+    const allContestProblems = await db
+      .select({
+        problemCode: problems.code,
+        order: contestProblems.order,
+      })
+      .from(contestProblems)
+      .innerJoin(problems, eq(problems.id, contestProblems.problemId))
+      .where(eq(contestProblems.contestId, contestId))
+      .orderBy(contestProblems.order);
+
+    // Find current problem index and get prev/next
+    const currentOrder = problemResult[0].contestProblem.order;
+    const currentIndex = allContestProblems.findIndex((p) => p.order === currentOrder);
+    const prevProblemCode = currentIndex > 0 ? allContestProblems[currentIndex - 1].problemCode : null;
+    const nextProblemCode = currentIndex < allContestProblems.length - 1 ? allContestProblems[currentIndex + 1].problemCode : null;
+
     // Combine the data
     const problem = {
       ...problemResult[0].problem,
@@ -86,6 +103,8 @@ export async function GET(
       })),
       orgId,
       contestId,
+      prevProblemCode,
+      nextProblemCode,
     };
 
     return NextResponse.json(problem);

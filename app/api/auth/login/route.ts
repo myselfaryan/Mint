@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { generateSessionToken, createSession } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
 import { verifyPassword } from "@/lib/password";
+import { ZodError } from "zod";
 
 export async function POST(request: Request) {
   try {
@@ -46,6 +47,20 @@ export async function POST(request: Request) {
       //   role: user.role,
     });
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    // Handle Zod validation errors specifically
+    if (error instanceof ZodError) {
+      const fieldErrors = error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+      return NextResponse.json(
+        { error: "Validation failed", details: fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    // Log other errors for debugging
+    console.error("Login error:", error);
+    return NextResponse.json(
+      { error: "Invalid request", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 400 }
+    );
   }
 }
