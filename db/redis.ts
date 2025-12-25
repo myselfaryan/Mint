@@ -2,22 +2,43 @@ import { Redis } from "ioredis";
 
 // Singleton Redis client with lazy initialization
 let redis: Redis | null = null;
+let redisEnabled = true;
 
-function createRedisClient(): Redis {
-  return new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
-    password: process.env.REDIS_PASSWORD,
-    retryStrategy(times) {
-      const delay = Math.min(times * 50, 2000);
-      return delay;
-    },
-    maxRetriesPerRequest: 3,
-    // Enable keep-alive for better connection reuse
-    keepAlive: 10000,
-    // Connection timeout for faster failure detection
-    connectTimeout: 5000,
-    // Lazy connect - don't connect until first command
-    lazyConnect: true,
-  });
+function createRedisClient(): Redis | null {
+  // Check if Redis URL is configured
+  const redisUrl = process.env.REDIS_URL;
+
+  if (!redisUrl) {
+    console.warn("REDIS_URL not configured - caching disabled");
+    redisEnabled = false;
+    return null;
+  }
+
+  try {
+    return new Redis(redisUrl, {
+      password: process.env.REDIS_PASSWORD,
+      retryStrategy(times) {
+        if (times > 3) {
+          console.warn("Redis connection failed after 3 retries - disabling cache");
+          redisEnabled = false;
+          return null; // Stop retrying
+        }
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+      maxRetriesPerRequest: 3,
+      // Enable keep-alive for better connection reuse
+      keepAlive: 10000,
+      // Connection timeout for faster failure detection
+      connectTimeout: 5000,
+      // Lazy connect - don't connect until first command
+      lazyConnect: true,
+    });
+  } catch (error) {
+    console.warn("Failed to create Redis client:", error);
+    redisEnabled = false;
+    return null;
+  }
 }
 
 // Cache TTL constants (in seconds)
@@ -35,17 +56,68 @@ export const CACHE_KEYS = {
   LIST: "list:",
 } as const;
 
-export const getRedis = (): Redis => {
+/**
+ * Check if Redis is enabled and available
+ */
+export const isRedisEnabled = (): boolean => redisEnabled;
+
+/**
+ * Get Redis client (may return null if Redis is not configured)
+ */
+export const getRedis = (): Redis | null => {
+  if (!redisEnabled) return null;
+
   if (!redis) {
     redis = createRedisClient();
 
-    redis.on("error", (error) => {
-      console.error("Redis connection error:", error);
-    });
+    if (redis) {
+      redis.on("error", (error) => {
+        console.error("Redis connection error:", error);
+      });
 
-    redis.on("connect", () => {
-      console.log("Redis connected");
-    });
+      redis.on("connect", () => {
+        console.log("Redis connected");
+      });
+    }
   }
   return redis;
+};
+
+/**
+ * Safe Redis get - returns null if Redis is not available
+ */
+export const safeRedisGet = async (key: string): Promise<string | null> => {
+  const client = getRedis();
+  if (!client) return null;
+
+  try {
+    return await client.get(key);
+  } catch (error) {
+    console.warn("Redis get error:", error);
+    return null;
+  }
+};
+
+/**
+ * Safe Redis set - no-op if Redis is not available
+ */
+export const safeRedisSet = async (
+  key: string,
+  value: string,
+  ttl?: number
+): Promise<boolean> => {
+  const client = getRedis();
+  if (!client) return false;
+
+  try {
+    if (ttl) {
+      await client.set(key, value, "EX", ttl);
+    } else {
+      await client.set(key, value);
+    }
+    return true;
+  } catch (error) {
+    console.warn("Redis set error:", error);
+    return false;
+  }
 };
