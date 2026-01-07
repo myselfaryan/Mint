@@ -11,6 +11,8 @@ import { MockAlert } from "@/components/mock-alert";
 import { z } from "zod";
 import { timeAgo } from "@/lib/utils";
 
+type UserRole = "owner" | "organizer" | "member" | null;
+
 const columns: ColumnDef<Contest>[] = [
   { header: "Contest ID", accessorKey: "nameId", sortable: true },
   { header: "Title", accessorKey: "name", sortable: true },
@@ -71,6 +73,35 @@ export default function ContestsPage() {
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [showMockAlert, setShowMockAlert] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole>(null);
+
+  // Check if user can edit/delete (only owner and organizer)
+  const canEdit = userRole === "owner" || userRole === "organizer";
+
+  // Fetch user role for the current organization
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const res = await fetch("/api/me");
+        if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        const userData = await res.json();
+
+        // Find the user's role in the current organization
+        const currentOrg = userData.orgs?.find(
+          (org: { nameId: string; role: string }) => org.nameId === orgId,
+        );
+        if (currentOrg) {
+          setUserRole(currentOrg.role as UserRole);
+        }
+      } catch (err) {
+        console.error("Error fetching user role:", err);
+      }
+    };
+
+    fetchUserRole();
+  }, [orgId]);
 
   useEffect(() => {
     const fetchContests = async () => {
@@ -212,15 +243,23 @@ export default function ContestsPage() {
         columns={columns}
         title="Contests"
         searchableFields={["name", "description"]}
-        onAdd={() => {
-          setSelectedContest(null);
-          setIsEditorOpen(true);
-        }}
-        onEdit={(contest) => {
-          setSelectedContest(contest);
-          setIsEditorOpen(true);
-        }}
-        onDelete={deleteContest}
+        onAdd={
+          canEdit
+            ? () => {
+                setSelectedContest(null);
+                setIsEditorOpen(true);
+              }
+            : undefined
+        }
+        onEdit={
+          canEdit
+            ? (contest) => {
+                setSelectedContest(contest);
+                setIsEditorOpen(true);
+              }
+            : undefined
+        }
+        onDelete={canEdit ? deleteContest : undefined}
         rowClickAttr="nameId"
       />
 
